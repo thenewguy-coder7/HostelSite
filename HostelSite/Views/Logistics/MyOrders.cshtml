@@ -1,0 +1,532 @@
+@{
+    ViewData["Title"] = "My Orders";
+}
+
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Outfit:wght@400;500;600&display=swap');
+
+    :root {
+        --forest:      #1C3B2E;
+        --forest-mid:  #2E6B52;
+        --sage:        #4A9572;
+        --sage-light:  #EAF3EE;
+        --sage-muted:  #9CBDAD;
+        --amber:       #C9863A;
+        --amber-light: #FDF3E7;
+        --ink:         #111318;
+        --ink2:        #3D3F47;
+        --muted:       #7C808C;
+        --line:        #E3E5EA;
+        --sand:        #F8F7F4;
+        --white:       #FFFFFF;
+        --font-d:      'Playfair Display', Georgia, serif;
+        --font-b:      'Outfit', system-ui, sans-serif;
+        --r:           10px;
+    }
+
+    .orders-page * { box-sizing: border-box; }
+    .orders-page { font-family: var(--font-b); color: var(--ink); background: var(--sand); min-height: calc(100vh - 64px); }
+    .orders-page p, .orders-page h1, .orders-page h2,
+    .orders-page h3, .orders-page h4 { margin: 0; }
+
+    /* ── HEADER ── */
+    .orders-header {
+        background: var(--forest);
+        padding: 3rem 3rem 2.5rem;
+    }
+
+    .orders-header-inner {
+        max-width: 900px;
+        margin: 0 auto;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 1.5rem;
+    }
+
+    .orders-eyebrow {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        color: var(--sage);
+        margin-bottom: 8px;
+    }
+
+    .orders-header h1 {
+        font-family: var(--font-d);
+        font-size: 34px;
+        color: #fff;
+        font-weight: 600;
+        letter-spacing: -0.2px;
+    }
+
+    .orders-header h1 em { font-style: italic; color: #A8D8BF; }
+
+    .btn-new-order {
+        background: var(--amber);
+        color: #fff;
+        border: none;
+        padding: 11px 22px;
+        border-radius: var(--r);
+        font-size: 14px;
+        font-weight: 600;
+        font-family: var(--font-b);
+        text-decoration: none;
+        white-space: nowrap;
+        transition: background 0.15s;
+        display: inline-block;
+    }
+
+    .btn-new-order:hover { background: #B5722A; color: #fff; }
+
+    /* ── BODY ── */
+    .orders-body {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2.5rem 3rem 5rem;
+    }
+
+    /* ── STATUS FILTER TABS ── */
+    .status-tabs {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .status-tab {
+        padding: 7px 18px;
+        border-radius: 99px;
+        border: 1.5px solid var(--line);
+        background: var(--white);
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--muted);
+        cursor: pointer;
+        font-family: var(--font-b);
+        transition: all 0.15s;
+    }
+
+    .status-tab:hover { border-color: var(--sage); color: var(--forest); }
+    .status-tab.active { background: var(--forest); border-color: var(--forest); color: #fff; }
+
+    /* ── ORDER CARD ── */
+    .order-card {
+        background: var(--white);
+        border: 1.5px solid var(--line);
+        border-radius: 14px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+        transition: box-shadow 0.15s;
+    }
+
+    .order-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.07); }
+
+    .order-card-head {
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        border-bottom: 1px solid var(--line);
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .order-card-head:hover { background: var(--sand); }
+
+    .order-meta { display: flex; flex-direction: column; gap: 3px; }
+
+    .order-ref {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--ink);
+    }
+
+    .order-date {
+        font-size: 12px;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .order-date i { font-size: 13px; }
+
+    .order-head-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+    }
+
+    .order-total-label {
+        font-family: var(--font-d);
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--forest);
+    }
+
+    /* Status badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 11px;
+        border-radius: 99px;
+    }
+
+    .status-badge i { font-size: 12px; }
+
+    .badge-pending    { background: #FFF8E6; color: #946800; }
+    .badge-confirmed  { background: var(--sage-light); color: #1C5C40; }
+    .badge-collected  { background: #EEF4FF; color: #2B5CC8; }
+    .badge-stored     { background: #F0EBFF; color: #5B2BB5; }
+    .badge-returned   { background: var(--sage-light); color: #1C5C40; }
+    .badge-cancelled  { background: #FDECEA; color: #7A1E1E; }
+
+    .chevron {
+        font-size: 16px;
+        color: var(--muted);
+        transition: transform 0.2s;
+    }
+
+    .order-card.expanded .chevron { transform: rotate(180deg); }
+
+    /* Order body (expandable) */
+    .order-card-body {
+        display: none;
+        padding: 1.5rem;
+        background: var(--sand);
+        border-top: 1px solid var(--line);
+    }
+
+    .order-card.expanded .order-card-body { display: block; }
+
+    /* dates row */
+    .order-dates {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 1.25rem;
+    }
+
+    .order-date-box {
+        background: var(--white);
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        padding: 0.9rem 1rem;
+    }
+
+    .odb-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--muted);
+        margin-bottom: 4px;
+    }
+
+    .odb-value {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--ink);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .odb-value i { font-size: 15px; color: var(--sage); }
+
+    /* items mini list */
+    .order-items-title {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--muted);
+        margin-bottom: 10px;
+    }
+
+    .order-items-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.25rem; }
+
+    .oi-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 13px;
+        background: var(--white);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 9px 12px;
+    }
+
+    .oi-left { display: flex; align-items: center; gap: 8px; color: var(--ink2); }
+    .oi-left i { font-size: 16px; color: var(--sage); }
+    .oi-price { font-weight: 600; color: var(--ink); }
+
+    /* progress tracker */
+    .order-progress {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        padding: 0 4px;
+    }
+
+    .order-progress::before {
+        content: '';
+        position: absolute;
+        left: 18px; right: 18px;
+        top: 14px;
+        height: 2px;
+        background: var(--line);
+        z-index: 0;
+    }
+
+    .prog-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .prog-dot {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: 2px solid var(--line);
+        background: var(--white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+    }
+
+    .prog-step.done .prog-dot {
+        background: var(--sage);
+        border-color: var(--sage);
+        color: #fff;
+    }
+
+    .prog-step.active .prog-dot {
+        border-color: var(--amber);
+        color: var(--amber);
+        background: var(--white);
+    }
+
+    .prog-label {
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--muted);
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .prog-step.done   .prog-label  { color: var(--sage); }
+    .prog-step.active .prog-label  { color: var(--amber); font-weight: 600; }
+
+    /* ── EMPTY STATE ── */
+    .orders-empty {
+        text-align: center;
+        padding: 5rem 2rem;
+        color: var(--muted);
+    }
+
+    .orders-empty i { font-size: 52px; color: var(--line); display: block; margin-bottom: 14px; }
+    .orders-empty h3 { font-family: var(--font-d); font-size: 22px; color: var(--ink2); margin-bottom: 8px; }
+    .orders-empty p { font-size: 15px; line-height: 1.65; max-width: 380px; margin: 0 auto 1.75rem; }
+
+    .btn-start {
+        display: inline-block;
+        background: var(--amber);
+        color: #fff;
+        padding: 13px 28px;
+        border-radius: var(--r);
+        font-size: 15px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.15s;
+    }
+
+    .btn-start:hover { background: #B5722A; color: #fff; }
+
+    @@media (max-width: 768px) {
+        .orders-header { padding: 2.5rem 1.5rem 2rem; }
+        .orders-header-inner { flex-direction: column; align-items: flex-start; }
+        .orders-body { padding: 2rem 1.5rem 3rem; }
+        .order-dates { grid-template-columns: 1fr; }
+        .order-progress::before { display: none; }
+        .order-progress { flex-direction: column; align-items: flex-start; gap: 10px; }
+    }
+</style>
+
+<div class="orders-page">
+
+    <!-- HEADER -->
+    <div class="orders-header">
+        <div class="orders-header-inner">
+            <div>
+                <p class="orders-eyebrow">Logistics</p>
+                <h1>My storage <em>orders</em></h1>
+            </div>
+            <a asp-controller="Logistics" asp-action="Index" class="btn-new-order">
+                + New order
+            </a>
+        </div>
+    </div>
+
+    <div class="orders-body">
+
+        <!-- Status filter tabs -->
+        <div class="status-tabs">
+            <button class="status-tab active" onclick="filterStatus('all', this)">All orders</button>
+            <button class="status-tab" onclick="filterStatus('Confirmed', this)">Confirmed</button>
+            <button class="status-tab" onclick="filterStatus('Collected', this)">Collected</button>
+            <button class="status-tab" onclick="filterStatus('Stored', this)">In storage</button>
+            <button class="status-tab" onclick="filterStatus('Returned', this)">Returned</button>
+        </div>
+
+        @if (ViewBag.Orders != null && ((IEnumerable<dynamic>)ViewBag.Orders).Any())
+        {
+            foreach (var order in ViewBag.Orders)
+            {
+                var statusClass = order.Status switch {
+                    "Pending"   => "badge-pending",
+                    "Confirmed" => "badge-confirmed",
+                    "Collected" => "badge-collected",
+                    "Stored"    => "badge-stored",
+                    "Returned"  => "badge-returned",
+                    "Cancelled" => "badge-cancelled",
+                    _           => "badge-pending"
+                };
+
+                var statusIcon = order.Status switch {
+                    "Pending"   => "ti-clock",
+                    "Confirmed" => "ti-circle-check",
+                    "Collected" => "ti-truck",
+                    "Stored"    => "ti-building-warehouse",
+                    "Returned"  => "ti-home-check",
+                    "Cancelled" => "ti-x",
+                    _           => "ti-clock"
+                };
+
+                // Progress step index
+                var progIndex = order.Status switch {
+                    "Pending"   => 0,
+                    "Confirmed" => 1,
+                    "Collected" => 2,
+                    "Stored"    => 3,
+                    "Returned"  => 4,
+                    _           => 0
+                };
+
+                <div class="order-card" data-status="@order.Status" id="order-@order.Id">
+                    <div class="order-card-head" onclick="toggleOrder('@order.Id')">
+                        <div class="order-meta">
+                            <div class="order-ref">Order #@order.Id</div>
+                            <div class="order-date">
+                                <i class="ti ti-calendar"></i>
+                                Placed @order.CreatedAt.ToString("dd MMM yyyy")
+                            </div>
+                        </div>
+                        <div class="order-head-right">
+                            <span class="status-badge @statusClass">
+                                <i class="ti @statusIcon"></i>
+                                @order.Status
+                            </span>
+                            <span class="order-total-label">GH₵ @order.TotalAmount</span>
+                            <i class="ti ti-chevron-down chevron"></i>
+                        </div>
+                    </div>
+                    <div class="order-card-body">
+
+                        <!-- Dates -->
+                        <div class="order-dates">
+                            <div class="order-date-box">
+                                <div class="odb-label">Pickup date</div>
+                                <div class="odb-value"><i class="ti ti-truck"></i> @order.PickupDate?.ToString("dd MMM yyyy")</div>
+                            </div>
+                            <div class="order-date-box">
+                                <div class="odb-label">Return date</div>
+                                <div class="odb-value"><i class="ti ti-home"></i> @order.ReturnDate?.ToString("dd MMM yyyy")</div>
+                            </div>
+                        </div>
+
+                        <!-- Items -->
+                        <div class="order-items-title">Items stored</div>
+                        <div class="order-items-list">
+                            @foreach (var item in order.OrderItems)
+                            {
+                                <div class="oi-row">
+                                    <div class="oi-left">
+                                        <i class="ti ti-package"></i>
+                                        @item.LogisticsItem.Name × @item.Quantity
+                                    </div>
+                                    <div class="oi-price">GH₵ @(item.LogisticsItem.Price * item.Quantity)</div>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Progress -->
+                        <div class="order-items-title" style="margin-top:1.25rem">Order progress</div>
+                        <div class="order-progress">
+                            @{
+                                var steps = new[] { "Confirmed", "Collected", "In storage", "Returned" };
+                                for (int si = 0; si < steps.Length; si++)
+                                {
+                                    var cls = si < progIndex ? "done" : si == progIndex ? "active" : "";
+                                    <div class="prog-step @cls">
+                                        <div class="prog-dot">
+                                            @if (si < progIndex) { <i class="ti ti-check"></i> }
+                                            else { <span>@(si + 1)</span> }
+                                        </div>
+                                        <div class="prog-label">@steps[si]</div>
+                                    </div>
+                                }
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <!-- Empty state -->
+            <div class="orders-empty">
+                <i class="ti ti-package-off"></i>
+                <h3>No orders yet</h3>
+                <p>You haven't placed any storage orders. When you do, they'll all appear here.</p>
+                <a asp-controller="Logistics" asp-action="Index" class="btn-start">
+                    Browse items &amp; start an order
+                </a>
+            </div>
+        }
+
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function toggleOrder(id) {
+        const card = document.getElementById('order-' + id);
+        card.classList.toggle('expanded');
+    }
+
+    function filterStatus(status, btn) {
+        document.querySelectorAll('.status-tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+
+        document.querySelectorAll('.order-card').forEach(card => {
+            const match = status === 'all' || card.dataset.status === status;
+            card.style.display = match ? 'block' : 'none';
+        });
+    }
+</script>
+}

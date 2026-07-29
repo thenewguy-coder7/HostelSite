@@ -1,0 +1,682 @@
+
+
+// See https://aka.ms/new-console-template for more information
+//Console.WriteLine("Hello, World!");
+/*Console.WriteLine("Welcome to bootcamp 2025");
+Console.WriteLine("Welcome to bootcamp 2024");*/
+
+
+//string firstName = "John";
+//string lastName = "Doe";
+
+//Console.WriteLine(firstName + " " + lastName);
+//Console.WriteLine($"{firstName} {lastName}");
+
+//int age = 100;
+//double height = 5.5;
+
+//double IQ;
+
+//IQ = height;
+
+//height = age;
+//age = (int)height;
+
+
+//Console.WriteLine($"Hello {firstName} {lastName}. You are {age} years old. Your height is {height}");
+//Console.WriteLine("Hello John, you are 10 years old. And your height is 5.5");
+
+//Console.WriteLine(age);
+//Console.WriteLine(height);
+
+//int numberOfPens = (int)2.368;
+//Console.WriteLine(numberOfPens);
+
+//Console.WriteLine("What is your name?");
+//string name = Console.ReadLine();
+
+//Console.WriteLine("What is your age?");
+//string ageString = Console.ReadLine();
+
+////int age = int.Parse(ageString);
+//int age = Convert.ToInt32(ageString);
+
+
+//Console.WriteLine($"Hello {name}. You are {age} years old. How are you doing today?");
+
+//int num1 = 7;
+//int num2 = 3;
+
+//int sum = num1 +  num2;
+
+//Console.WriteLine($"The sum is : {sum}");
+
+//int difference = num1 - num2;
+//Console.WriteLine($"The difference is : {difference}");
+
+//int product = num1 * num2;
+//Console.WriteLine($"The product is : {++product}");
+
+////++product;
+
+////num1 = num1 + 4;
+//num1 += 4;
+
+//Console.WriteLine(num1);
+
+
+//int num1 = 7;
+//int num2 = 3;
+
+
+//bool result = num1 == num2;
+
+//Console.WriteLine(result);
+
+//result = num1 > num2;
+//Console.WriteLine(result);
+
+//result = num1 >= num2;
+//Console.WriteLine(result);
+
+//var logicalResult = true && true;
+//Console.WriteLine(logicalResult);
+
+//logicalResult = true && false;
+//Console.WriteLine(logicalResult);
+
+//logicalResult = true || false;
+//Console.WriteLine(logicalResult);
+
+
+//string firstName = "John";
+//string lastName = "Doe";
+
+//Console.WriteLine($"{firstName} {lastName}");
+//Console.WriteLine( firstName.Length );
+//Console.WriteLine(firstName.ToUpper() );
+
+//string randomString = "This is a random string containing randomly generated characters";
+////Console.WriteLine(randomString.ToUpper());
+
+////Console.WriteLine(randomString[14]);
+
+//int len = randomString.Length;
+
+//int lastCharacterIndex = len - 1;
+
+//Console.WriteLine(randomString[lastCharacterIndex]);
+
+//// let x = 7;
+//// y = x - 4;
+
+//string randomString = "This is a random string containing randomly generated characters";
+
+//int len = randomString.Length;
+//Console.WriteLine("The length of the string is : " + len);
+
+//Console.WriteLine(randomString[0]);
+//Console.WriteLine(randomString[1]);
+
+//var middleIndex = len / 2;
+//Console.WriteLine(randomString[middleIndex]);
+
+
+//int rIndex = randomString.IndexOf('r');
+//int rIndex = randomString.LastIndexOf('r');
+//int rIndex = randomString.IndexOf("characters");
+//int rIndex = randomString.IndexOf("z");
+//Console.WriteLine($"The index of 'r' is : {rIndex}");
+
+//int startingIndex = randomString.IndexOf("containing");
+//string subString = randomString.Substring(startingIndex);
+//Console.WriteLine(subString);
+
+//int startingIndex = randomString.IndexOf("random");
+//string subString = randomString.Substring(startingIndex, 33);
+
+//Console.WriteLine(subString);
+
+
+
+//int num1 = 7;
+//int num2 = 3;
+
+//bool result = num1 >= num2;
+
+//if(result)
+//{
+//    Console.WriteLine($"{num1} is greater than or equal to {num2}");
+//}
+
+
+//int age = 31;
+
+//if (age > 18)
+//{
+//    Console.WriteLine("You can vote.");
+//}
+//else
+//{
+//    Console.WriteLine("Arrest him.");
+//}
+
+//Console.WriteLine("The elections are over.");
+
+
+//int age = 22;
+
+//string nationality = "Nigerian";
+
+//bool isGhanaian = nationality == "Ghanaian";
+
+//if (isGhanaian && age > 18)
+//{
+//    Console.WriteLine("You can vote.");
+//}
+//else
+//{
+//    Console.WriteLine("Arrest him.");
+//}
+
+//Console.WriteLine("The elections are over.");
+
+//int num1 = 34;
+
+//if (num1 % 2 == 0)
+//{
+//    Console.WriteLine("Even number");
+//}
+//else
+//{
+//    Console.WriteLine("Odd number");
+//}
+
+//double CWA = 67.2;
+
+//if (CWA > 70)
+//{
+//    Console.WriteLine("First class");
+//}
+//else if(CWA >= 65 && CWA < 70)
+//{
+//    Console.WriteLine("Second class upper");
+//}
+//else
+//{
+//    Console.WriteLine("You have to repeat the year");
+//}
+
+//Console.WriteLine("School is over.");
+
+
+//Console.WriteLine("Fetch water");
+//Console.WriteLine("Pour water");
+
+//Console.WriteLine("Fetch water");
+//Console.WriteLine("Pour water");
+
+//Console.WriteLine("Fetch water");
+//Console.WriteLine("Pour water");
+
+
+//int i = 1;
+
+//while(i < 10)
+//{
+//    Console.WriteLine(i);
+//    i++;
+//}
+
+//Console.WriteLine("Outside the loop");
+
+//int i = 0;
+//int num = 2;
+//while(i < 10)
+//{
+
+//    Console.WriteLine(num);
+
+//    num += 2;
+//    i++;
+
+//}
+
+//int i = 0;
+//int num = 1;
+//while (i < 10)
+//{
+
+//    if(num % 2 == 0)
+//    {
+//        Console.WriteLine(num);
+//        i++;
+//    }
+
+//    num++;
+//}
+
+
+//int i = 10;
+
+//while (i > 0)
+//{
+//    Console.WriteLine(i--);
+//}
+
+//Console.WriteLine("Outside the loop");
+
+
+//for(int i = 0; i < 10; i++)
+//{
+//    Console.WriteLine("*");
+//}
+
+
+using ConsoleApp2;
+
+///
+string[] names = { "John", "Jane", "Mary", "Peter" };
+int[] ages = { 43, 32, 53, 23 };
+
+//Console.WriteLine(names.Length);
+
+
+//Console.WriteLine(names[len - 1]);
+
+//names = names.Append("Paul").ToArray();
+//ages = ages.Append(34).ToArray();
+
+//int len = names.Length;
+
+//for (int i = 0; i < len; i++)
+//{
+//    Console.WriteLine($"{names[i]} is {ages[i]} years old.");
+//}
+
+
+//Console.WriteLine($"Hello {names[0]}");
+//Console.WriteLine($"Your age is {ages[0]}");
+//Console.WriteLine($"In 10 years, your age will be {ages[0] + 10}");
+//Console.WriteLine($"In 20 years, your age will be {ages[0] + 20}");
+
+
+
+//Console.WriteLine($"Hello {names[1]}");
+//Console.WriteLine($"Your age is {ages[1]}");
+//Console.WriteLine($"In 10 years, your age will be {ages[1] + 11}");
+//Console.WriteLine($"In 20 years, your age will be {ages[1] + 21}");
+
+//void GreetUser(string name, int age)
+//{
+//    Console.WriteLine($"Hello {name}");
+//    Console.WriteLine($"Your age is {age}");
+//    Console.WriteLine($"In 10 years, your age will be {age + 10}");
+//    Console.WriteLine($"In 20 years, your age will be {age + 20}");
+//}
+
+//GreetUser("John", 43);
+
+//GreetUser("Jane", 32);
+
+//GreetUser("Mary", 53);
+
+//GreetUser("Peter", 23);
+
+int Add(int num1, int num2)
+{
+    int sum =  num1 + num2;
+
+    return sum;
+}
+
+
+//Console.WriteLine(Add(5, 4));
+//Console.WriteLine(Add(6, 8));
+
+
+//int Max(int a, int b)
+//{
+//    if (a > b)
+//    {
+//        return a;
+//    }
+//    else
+//    {
+//        return b;
+//    }
+//}
+
+//Console.WriteLine(Max(5, 6));
+//Console.WriteLine(Max(11, 3));
+
+//int Max(int a, int b, int c)
+//{
+//    if(a > b && a > c)
+//    {
+//        return a;
+//    }
+//    else if(b > a && b > c)
+//    {
+//        return b;
+//    }
+//    else
+//    {
+//        return c;
+//    }
+//}
+
+//int Max(int a, int b, int c)
+//{
+//    int max = a;
+
+//    if(b > max)
+//    {
+//        max = b;
+//    } 
+
+//    if(c > max)
+//    {
+//        max = c;
+//    }
+
+//    return max;
+//}
+
+//int[] nums = { 2, 4, 5, 6, 1 };
+
+//int addArrayItems(int[] args)
+//{
+//    int sum = 0;
+
+//    for (int i = 0; i < args.Length; i++)
+//    {
+//        sum += args[i];
+//    }
+
+//    return sum;
+//}
+
+//Console.WriteLine(addArrayItems(nums));
+
+
+
+//int[] nums = { 2, 4, 5, 6, 1 };
+// LOOPING
+// Step 1: i = 0, sum = 0, args[i] = 2
+// End Step 1: sum = 2, i = 1;
+
+// Step 2: i = 1, sum = 2, args[i] = 4
+// End Step 2: Sum = 6, i = 2
+
+// Step 3: i = 2, Sum = 6, args[i] = 5
+// End Step 3: Sum = 11, i = 3
+
+// Step 4: i = 3, Sum = 11, args[i] = 6
+// End Step 4: Sum = 17, i = 4
+
+// Step 5: i = 4, Sum =  17, args[i] = 1
+// End Step 5: Sum = 18, i = 5
+
+// Step 6: i = 5, Sum = 18
+
+
+//void display(int arg)
+//{
+//    for (int i = 0; i < arg; i++)
+//    {
+//        Console.WriteLine(i + 1);
+//    }
+//}
+
+//display(2);
+
+//void displayDesc(int arg)
+//{
+//    for (int i = arg; i >= 0; i--)
+//    {
+//        Console.WriteLine(i);
+//    }
+//}
+
+//displayDesc(20);
+
+
+int Min(int[] args)
+{
+    int min = args[0];
+
+    for(int i = 1; i < args.Length; i++)
+    {
+        if (args[i] < min)
+        {
+            min = args[i];
+        }
+    }
+
+    return min;
+}
+
+int[] nums = { 4, 5, -5, 2, 6, 1, 3 , 0};
+
+// Step 1: min = 4, i = 1, args[i] = 5;
+// End Step 1: min = 4, i = 2
+
+// Step 2: min = 4, i = 2, args[i] = 2;
+// End Step 2: min = 2, i = 3
+
+// Step 3: min = 2, i = 3, args[i] = 6
+// End Step 3: min = 2, i = 4
+
+// Step 4: min = 2, i = 4, args[i] = 1
+// End Step 4: min = 1, i = 5
+
+// Step 5: min = 1, i = 5, args[i] = 3
+// End Step 5: min = 1, i = 6
+
+// Step 6: min = 1, i = 6
+
+//Console.WriteLine(Min(nums));
+
+
+void Area(double r)
+{
+
+    double PI = 3.14;
+
+    double area = PI * r * r;
+
+    Console.WriteLine(area);
+}
+
+//Area(4.6);
+
+
+void perimeter(int length, int width)
+{
+    var p = 2*length + 2*width;
+
+    Console.WriteLine(p);
+}
+
+//perimeter(2, 3);
+//perimeter(3, 2);
+
+void factorial(int num)
+{
+
+    int fact = 1;
+
+    while (num >= 1)
+    {
+        fact *= num;
+        num--;
+    }
+
+    //if(num != 0)
+    //{
+    //    do
+    //    {
+    //        fact *= num;
+    //        num--;
+    //    }
+    //    while (num >= 1);
+    //}
+
+    Console.WriteLine(fact);
+}
+
+//factorial(5);
+
+
+//void reverse(string arg)
+//{
+//    string temp = "";
+
+//    for(int i = arg.Length - 1; i>= 0; i--)
+//    {
+//        temp += arg[i];
+//    }
+
+//    Console.WriteLine(temp);
+//}
+
+//reverse("John");
+//reverse("Peter");
+//reverse("Mary");
+//reverse("Thomas");
+
+int age = 33;
+
+//Car honda = new Car();
+//honda.model = "Civic";
+//honda.color = "black";
+
+//Car toyota = new Car();
+//toyota.model = "Camri";
+//toyota.color = "white";
+
+////Console.WriteLine(honda.model + " " + honda.color);
+////Console.WriteLine(toyota.model  + " " + toyota.color);
+
+//honda.drive();
+//toyota.drive();
+
+//Car honda = new Car("Civic", "Black");
+//Car toyota = new Car("Camri", "White");
+
+//Console.WriteLine(honda.model + " " + honda.color);
+//Console.WriteLine(toyota.model + " " + toyota.color);
+
+//class Car
+//{
+//    public string model;
+//    public string color;
+
+//    public Car(string model, string color)
+//    {
+//        this.model = model;
+//        this.color = color;
+//    }
+//    public void drive()
+//    {
+//        Console.WriteLine($"I am driving my {model}");
+//    }
+//}
+
+
+//Dog dog = new Dog();
+//dog.name = "Peace";
+
+//Cat cat = new Cat();
+//cat.name = "Love";
+
+//dog.MakeSound();
+//cat.MakeSound();
+
+//Animal animal = new Dog();
+//animal.MakeSound();
+
+//animal = new Cat();
+//animal.MakeSound();
+
+//class Animal
+//{
+//    public string name;
+
+//    public virtual void MakeSound()
+//    {
+//        Console.WriteLine("The animal is making sound");
+//    }
+//}
+
+//class Dog : Animal
+//{
+
+//    public override void MakeSound()
+//    {
+//        Console.WriteLine("The dog said woow woow");
+//    }
+//}
+
+//class Cat : Animal
+//{
+
+//    public override void MakeSound()
+//    {
+//        Console.WriteLine("The Cat said meow meow");
+//    }
+//}
+
+//Shape square = new Square(4);
+
+//square.Draw();
+
+//class Shape
+//{
+//    public int numberOfSides;
+
+//    public Shape(int x)
+//    {
+//        this.numberOfSides = x;
+//    }
+
+//    public virtual void Draw()
+//    {
+//        Console.WriteLine($"I am drawing a shape of {numberOfSides}");
+//    }
+//}
+
+//class Square : Shape
+//{
+//    public Square(int sides) : base(sides)
+//    {
+
+//    }
+//    public override void Draw()
+//    {
+//        Console.WriteLine("I am drawing a square");
+//    }
+//}
+
+
+
+DatabaseService dbService = new DatabaseService();
+
+//dbService.AddStudent("Thompson", "Walker", 'M', DateTime.Now);
+
+List<Student> students = dbService.GetStudents();
+
+
+for(int i=0; i < students.Count; i++)
+{
+    Console.WriteLine(new string('-', 30));
+
+    Console.WriteLine($"First Name : {students[i].FirstName}");
+    Console.WriteLine($"Last Name : {students[i].LastName}");
+    Console.WriteLine($"Gender : {students[i].Gender}");
+    Console.WriteLine($"Birth Date : {students[i].BirthDate}");
+
+    Console.WriteLine(new string('-', 30));
+
+}

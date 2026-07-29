@@ -1,0 +1,350 @@
+@{
+    ViewData["Title"] = "Create account";
+}
+
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Outfit:wght@400;500;600&display=swap');
+
+    :root {
+        --forest:      #1C3B2E;
+        --forest-mid:  #2E6B52;
+        --sage:        #4A9572;
+        --sage-light:  #EAF3EE;
+        --sage-muted:  #9CBDAD;
+        --amber:       #C9863A;
+        --amber-hover: #B5722A;
+        --ink:         #111318;
+        --muted:       #7C808C;
+        --line:        #E3E5EA;
+        --sand:        #F8F7F4;
+        --white:       #FFFFFF;
+        --font-d:      'Playfair Display', Georgia, serif;
+        --font-b:      'Outfit', system-ui, sans-serif;
+    }
+
+    .reg-page * { box-sizing: border-box; }
+    .reg-page {
+        font-family: var(--font-b);
+        min-height: calc(100vh - 64px);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    /* ── LEFT ── */
+    .reg-left {
+        background: var(--forest);
+        padding: 4rem 3.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .reg-left-eyebrow {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        color: var(--sage);
+        margin-bottom: 1.5rem;
+    }
+
+    .reg-left h2 {
+        font-family: var(--font-d);
+        font-size: 40px;
+        color: #fff;
+        font-weight: 600;
+        line-height: 1.15;
+        margin-bottom: 1.25rem;
+        letter-spacing: -0.3px;
+    }
+
+    .reg-left h2 em { font-style: italic; color: #A8D8BF; }
+
+    .reg-left > p {
+        font-size: 15px;
+        color: var(--sage-muted);
+        line-height: 1.75;
+        margin-bottom: 2.5rem;
+    }
+
+    /* steps */
+    .reg-steps { display: flex; flex-direction: column; gap: 1.1rem; }
+
+    .reg-step {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .rstep-num {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: rgba(74,149,114,0.18);
+        border: 1px solid rgba(74,149,114,0.3);
+        color: var(--sage);
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    .rstep-text strong {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 2px;
+    }
+
+    .rstep-text span { font-size: 12px; color: var(--sage-muted); }
+
+    /* ── RIGHT ── */
+    .reg-right {
+        background: var(--sand);
+        padding: 3.5rem 3.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        overflow-y: auto;
+    }
+
+    .reg-right h3 {
+        font-family: var(--font-d);
+        font-size: 28px;
+        color: var(--ink);
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+
+    .reg-right > p {
+        font-size: 14px;
+        color: var(--muted);
+        margin-bottom: 1.75rem;
+    }
+
+    .reg-right > p a {
+        color: var(--forest-mid);
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    .reg-right > p a:hover { color: var(--sage); }
+
+    .reg-form { display: flex; flex-direction: column; gap: 1rem; max-width: 420px; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+
+    .field label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--muted);
+    }
+
+    .field input {
+        padding: 11px 14px;
+        border: 1.5px solid var(--line);
+        border-radius: 9px;
+        font-size: 14px;
+        font-family: var(--font-b);
+        color: var(--ink);
+        background: var(--white);
+        outline: none;
+        transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .field input:focus {
+        border-color: var(--sage);
+        box-shadow: 0 0 0 3px rgba(74,149,114,0.12);
+    }
+
+    .val-error { font-size: 12px; color: #C0392B; }
+
+    .password-hint {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 2px;
+    }
+
+    .terms-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.5;
+    }
+
+    .terms-row input[type="checkbox"] {
+        margin-top: 2px;
+        accent-color: var(--forest);
+        flex-shrink: 0;
+    }
+
+    .terms-row a { color: var(--forest-mid); font-weight: 500; }
+
+    .btn-register {
+        background: var(--amber);
+        color: #fff;
+        border: none;
+        padding: 13px;
+        border-radius: 9px;
+        font-size: 15px;
+        font-weight: 600;
+        font-family: var(--font-b);
+        cursor: pointer;
+        width: 100%;
+        transition: background 0.15s;
+    }
+
+    .btn-register:hover { background: var(--amber-hover); }
+
+    .login-cta {
+        text-align: center;
+        font-size: 14px;
+        color: var(--muted);
+        margin-top: 0.5rem;
+    }
+
+    .login-cta a {
+        color: var(--forest-mid);
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .login-cta a:hover { color: var(--sage); }
+
+    @@media (max-width: 768px) {
+        .reg-page  { grid-template-columns: 1fr; }
+        .reg-left  { display: none; }
+        .reg-right { padding: 2.5rem 1.5rem; }
+        .form-row  { grid-template-columns: 1fr; }
+    }
+</style>
+
+<div class="reg-page">
+
+    <!-- LEFT -->
+    <div class="reg-left">
+        <p class="reg-left-eyebrow">Get started</p>
+        <h2>Your room,<br><em>your way.</em></h2>
+        <p>Create a free account and unlock room aesthetics and student storage — everything built for campus life.</p>
+
+        <div class="reg-steps">
+            <div class="reg-step">
+                <div class="rstep-num">1</div>
+                <div class="rstep-text">
+                    <strong>Create your account</strong>
+                    <span>Takes under a minute. No credit card required to sign up.</span>
+                </div>
+            </div>
+            <div class="reg-step">
+                <div class="rstep-num">2</div>
+                <div class="rstep-text">
+                    <strong>Browse &amp; choose</strong>
+                    <span>Pick an aesthetic style or select items to store during vacation.</span>
+                </div>
+            </div>
+            <div class="reg-step">
+                <div class="rstep-num">3</div>
+                <div class="rstep-text">
+                    <strong>Pay &amp; relax</strong>
+                    <span>Secure Paystack checkout. We handle pickup, storage, and return.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="reg-right">
+        <h3>Create your account</h3>
+        <p>Already have an account? <a asp-controller="Account" asp-action="Login">Log in here</a></p>
+
+        <form class="reg-form" asp-controller="Account" asp-action="Register" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="form-row">
+                <div class="field">
+                    <label>First name</label>
+                    <input type="text" name="FirstName" placeholder="Kwame" required autocomplete="given-name" />
+                    <span class="val-error">@Html.ValidationMessage("FirstName")</span>
+                </div>
+                <div class="field">
+                    <label>Last name</label>
+                    <input type="text" name="LastName" placeholder="Osei" required autocomplete="family-name" />
+                    <span class="val-error">@Html.ValidationMessage("LastName")</span>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Email address</label>
+                <input type="email" name="Email" placeholder="you@email.com" required autocomplete="email" />
+                <span class="val-error">@Html.ValidationMessage("Email")</span>
+            </div>
+
+            <div class="field">
+                <label>Phone number</label>
+                <input type="tel" name="Phone" placeholder="024 000 0000" autocomplete="tel" />
+            </div>
+
+            <div class="field">
+                <label>Password</label>
+                <input type="password" name="Password" placeholder="••••••••" required autocomplete="new-password" id="pwdInput" />
+                <span class="password-hint">At least 8 characters</span>
+                <span class="val-error">@Html.ValidationMessage("Password")</span>
+            </div>
+
+            <div class="field">
+                <label>Confirm password</label>
+                <input type="password" name="ConfirmPassword" placeholder="••••••••" required autocomplete="new-password" id="pwdConfirm" />
+                <span class="val-error" id="pwdMatchErr"></span>
+            </div>
+
+            @if (!string.IsNullOrEmpty(ViewData["RegisterError"]?.ToString()))
+            {
+                <div style="background:#FDECEA; border-left:3px solid #D94040; padding:10px 14px; border-radius:6px; font-size:13px; color:#7A1E1E;">
+                    @ViewData["RegisterError"]
+                </div>
+            }
+
+            <div class="terms-row">
+                <input type="hidden" name="AgreeTerms" value="false" />
+                <input type="checkbox" name="AgreeTerms" value="true" />
+                <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
+            </div>
+
+            <button type="submit" class="btn-register">Create account →</button>
+
+            <div class="login-cta">
+                Already have an account? <a asp-controller="Account" asp-action="Login">Log in</a>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+@section Scripts {
+<script>
+    // Live password match check
+    const pwd = document.getElementById('pwdInput');
+    const confirm = document.getElementById('pwdConfirm');
+    const err = document.getElementById('pwdMatchErr');
+
+    confirm.addEventListener('input', () => {
+        if (confirm.value && confirm.value !== pwd.value) {
+            err.textContent = 'Passwords do not match';
+            confirm.style.borderColor = '#D94040';
+        } else {
+            err.textContent = '';
+            confirm.style.borderColor = '';
+        }
+    });
+</script>
+}

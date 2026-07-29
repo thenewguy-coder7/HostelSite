@@ -1,0 +1,401 @@
+@{
+    ViewData["Title"] = "Payment Successful";
+    string payRef = Context.Request.Query["ref"].ToString();
+}
+
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Outfit:wght@400;500;600&display=swap');
+
+    :root {
+        --forest:      #1C3B2E;
+        --forest-mid:  #2E6B52;
+        --sage:        #4A9572;
+        --sage-light:  #EAF3EE;
+        --sage-muted:  #9CBDAD;
+        --amber:       #C9863A;
+        --amber-light: #FDF3E7;
+        --ink:         #111318;
+        --ink2:        #3D3F47;
+        --muted:       #7C808C;
+        --line:        #E3E5EA;
+        --sand:        #F8F7F4;
+        --white:       #FFFFFF;
+        --font-d:      'Playfair Display', Georgia, serif;
+        --font-b:      'Outfit', system-ui, sans-serif;
+        --r:           10px;
+    }
+
+    .success-page * { box-sizing: border-box; }
+    .success-page {
+        font-family: var(--font-b);
+        background: var(--sand);
+        min-height: calc(100vh - 64px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 1.5rem;
+        color: var(--ink);
+    }
+
+    .success-page p, .success-page h1,
+    .success-page h2, .success-page h3 { margin: 0; }
+
+    /* ── CHECKMARK ANIMATION ── */
+    .success-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: var(--sage-light);
+        border: 3px solid var(--sage);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.75rem;
+        animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    .success-icon i {
+        font-size: 38px;
+        color: var(--sage);
+        animation: fadeCheck 0.4s 0.3s both;
+    }
+
+    @@keyframes popIn {
+        from { transform: scale(0); opacity: 0; }
+        to   { transform: scale(1); opacity: 1; }
+    }
+
+    @@keyframes fadeCheck {
+        from { opacity: 0; transform: scale(0.5); }
+        to   { opacity: 1; transform: scale(1); }
+    }
+
+    /* ── HEADING ── */
+    .success-page h1 {
+        font-family: var(--font-d);
+        font-size: 38px;
+        font-weight: 600;
+        color: var(--ink);
+        text-align: center;
+        margin-bottom: 10px;
+        letter-spacing: -0.3px;
+    }
+
+    .success-page h1 em { font-style: italic; color: var(--forest-mid); }
+
+    .success-sub {
+        font-size: 16px;
+        color: var(--muted);
+        text-align: center;
+        line-height: 1.7;
+        max-width: 480px;
+        margin-bottom: 2.5rem;
+    }
+
+    /* ── REF BADGE ── */
+    .ref-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--white);
+        border: 1.5px solid var(--line);
+        border-radius: 99px;
+        padding: 8px 18px;
+        font-size: 13px;
+        color: var(--ink2);
+        margin-bottom: 2.5rem;
+    }
+
+    .ref-badge strong { color: var(--ink); font-weight: 600; }
+    .ref-badge i { font-size: 15px; color: var(--sage); }
+
+    /* ── NEXT STEPS ── */
+    .next-steps {
+        background: var(--white);
+        border: 1.5px solid var(--line);
+        border-radius: 16px;
+        padding: 2rem 2.5rem;
+        width: 100%;
+        max-width: 560px;
+        margin-bottom: 2rem;
+    }
+
+    .next-steps h3 {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--ink);
+        margin-bottom: 1.25rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .next-step {
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .next-step:last-child { border-bottom: none; padding-bottom: 0; }
+
+    .nstep-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        background: var(--sage-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .nstep-icon i { font-size: 18px; color: var(--forest-mid); }
+
+    .nstep-text strong {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--ink);
+        margin-bottom: 3px;
+    }
+
+    .nstep-text span {
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.55;
+    }
+
+    /* ── ORDER SNAPSHOT ── */
+    .order-snapshot {
+        background: var(--forest);
+        border-radius: 14px;
+        padding: 1.5rem 2rem;
+        width: 100%;
+        max-width: 560px;
+        margin-bottom: 2rem;
+        display: none;
+    }
+
+    .order-snapshot.show { display: block; }
+
+    .snapshot-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .snapshot-head h3 {
+        font-family: var(--font-d);
+        font-size: 17px;
+        color: #fff;
+    }
+
+    .snapshot-head span {
+        font-size: 12px;
+        color: var(--sage-muted);
+    }
+
+    .snapshot-items { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+
+    .snapshot-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+    }
+
+    .snapshot-item .sn-name { color: var(--sage-muted); }
+    .snapshot-item .sn-price { color: #fff; font-weight: 500; }
+
+    .snapshot-total {
+        border-top: 1px solid rgba(255,255,255,0.1);
+        padding-top: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .snapshot-total .st-label { font-size: 13px; color: var(--sage-muted); }
+
+    .snapshot-total .st-amount {
+        font-family: var(--font-d);
+        font-size: 22px;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    /* ── ACTION BUTTONS ── */
+    .success-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .btn-primary {
+        background: var(--forest);
+        color: #fff;
+        padding: 13px 28px;
+        border-radius: var(--r);
+        font-size: 15px;
+        font-weight: 600;
+        font-family: var(--font-b);
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: background 0.15s;
+        display: inline-block;
+    }
+
+    .btn-primary:hover { background: var(--forest-mid); color: #fff; }
+
+    .btn-secondary {
+        background: transparent;
+        color: var(--forest);
+        padding: 13px 28px;
+        border-radius: var(--r);
+        font-size: 15px;
+        font-weight: 600;
+        font-family: var(--font-b);
+        text-decoration: none;
+        border: 1.5px solid var(--line);
+        cursor: pointer;
+        transition: border-color 0.15s;
+        display: inline-block;
+    }
+
+    .btn-secondary:hover { border-color: var(--forest); color: var(--forest); }
+
+    @@media (max-width: 640px) {
+        .success-page h1 { font-size: 28px; }
+        .next-steps { padding: 1.5rem; }
+        .success-actions { flex-direction: column; align-items: center; }
+    }
+</style>
+
+<div class="success-page">
+
+    <!-- Animated checkmark -->
+    <div class="success-icon">
+        <i class="ti ti-check"></i>
+    </div>
+
+    <h1>You're all set,<br><em>sit back &amp; relax.</em></h1>
+    <p class="success-sub">
+        Your storage order has been confirmed and payment received. We'll be at your door on pickup day — you don't need to do anything else.
+    </p>
+
+    @if (!string.IsNullOrEmpty(payRef))
+    {
+        <div class="ref-badge">
+            <i class="ti ti-receipt"></i>
+            Payment reference: <strong>@payRef</strong>
+        </div>
+    }
+
+    <!-- Order snapshot from sessionStorage -->
+    <div class="order-snapshot" id="orderSnapshot">
+        <div class="snapshot-head">
+            <h3>Your order</h3>
+            <span id="snapDates"></span>
+        </div>
+        <div class="snapshot-items" id="snapItems"></div>
+        <div class="snapshot-total">
+            <span class="st-label">Total paid</span>
+            <span class="st-amount" id="snapTotal">GH₵ —</span>
+        </div>
+    </div>
+
+    <!-- What happens next -->
+    <div class="next-steps">
+        <h3>What happens next</h3>
+
+        <div class="next-step">
+            <div class="nstep-icon"><i class="ti ti-mail"></i></div>
+            <div class="nstep-text">
+                <strong>Confirmation email sent</strong>
+                <span>A receipt and order details have been sent to your email address.</span>
+            </div>
+        </div>
+
+        <div class="next-step">
+            <div class="nstep-icon"><i class="ti ti-truck"></i></div>
+            <div class="nstep-text">
+                <strong>We'll collect on pickup day</strong>
+                <span>Our team will arrive at your hostel on your chosen pickup date. Have your items ready.</span>
+            </div>
+        </div>
+
+        <div class="next-step">
+            <div class="nstep-icon"><i class="ti ti-building-warehouse"></i></div>
+            <div class="nstep-text">
+                <strong>Safe storage until you return</strong>
+                <span>All items are tagged, catalogued, and kept in our secure, insured facility.</span>
+            </div>
+        </div>
+
+        <div class="next-step">
+            <div class="nstep-icon"><i class="ti ti-home-check"></i></div>
+            <div class="nstep-text">
+                <strong>Returned on your schedule</strong>
+                <span>Everything will be delivered back to your hostel door on your return date.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="success-actions">
+        <a asp-controller="Logistics" asp-action="MyOrders" class="btn-primary">
+            View my orders
+        </a>
+        <a asp-controller="Home" asp-action="Index" class="btn-secondary">
+            Back to home
+        </a>
+    </div>
+
+</div>
+
+@section Scripts {
+<script>
+    // Pull last order from sessionStorage for the snapshot
+    window.addEventListener('DOMContentLoaded', () => {
+        const raw = sessionStorage.getItem('nestPayRef') ? null : sessionStorage.getItem('nestLastOrder');
+
+        // Try to show order snapshot from any saved data
+        const orderRaw = sessionStorage.getItem('nestOrder') || sessionStorage.getItem('nestLastOrder');
+        if (!orderRaw) return;
+
+        try {
+            const data  = JSON.parse(orderRaw);
+            const items = data.items;
+            const keys  = Object.keys(items || {});
+            if (!keys.length) return;
+
+            const snap = document.getElementById('orderSnapshot');
+            snap.classList.add('show');
+
+            document.getElementById('snapItems').innerHTML = keys.map(k => `
+                <div class="snapshot-item">
+                    <span class="sn-name">${items[k].name} × ${items[k].qty}</span>
+                    <span class="sn-price">GH₵ ${items[k].price * items[k].qty}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('snapTotal').textContent = `GH₵ ${data.total}`;
+
+            const fmt = d => d ? new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '';
+            const pickup = fmt(data.pickup);
+            const ret    = fmt(data.returnDate);
+            if (pickup && ret) {
+                document.getElementById('snapDates').textContent = `${pickup} → ${ret}`;
+            }
+
+            // Clear the order now that it's confirmed
+            sessionStorage.removeItem('nestOrder');
+        } catch (e) { /* silent */ }
+    });
+</script>
+}

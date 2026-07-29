@@ -1,0 +1,815 @@
+
+@{
+    ViewData["Title"] = "Item Storage";
+}
+
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Outfit:wght@400;500;600&display=swap');
+
+    :root {
+        --forest:      #1C3B2E;
+        --forest-dark: #0D201A;
+        --forest-mid:  #2E6B52;
+        --sage:        #4A9572;
+        --sage-light:  #EAF3EE;
+        --sage-muted:  #9CBDAD;
+        --amber:       #C9863A;
+        --amber-light: #FDF3E7;
+        --amber-hover: #B5722A;
+        --ink:         #111318;
+        --ink2:        #3D3F47;
+        --muted:       #7C808C;
+        --line:        #E3E5EA;
+        --sand:        #F8F7F4;
+        --white:       #FFFFFF;
+        --font-d:      'Playfair Display', Georgia, serif;
+        --font-b:      'Outfit', system-ui, sans-serif;
+        --r:           10px;
+    }
+
+    .log-page * { box-sizing: border-box; }
+    .log-page { font-family: var(--font-b); color: var(--ink); background: var(--sand); }
+    .log-page p, .log-page h1, .log-page h2, .log-page h3, .log-page h4 { margin: 0; }
+    .log-page a { text-decoration: none; }
+
+    /* PAGE HEADER */
+    .log-header {
+        background: var(--forest);
+        padding: 3rem 3rem 2.5rem;
+    }
+
+    .log-header-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .log-eyebrow {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        color: var(--sage);
+        margin-bottom: 10px;
+    }
+
+    .log-header h1 {
+        font-family: var(--font-d);
+        font-size: 40px;
+        font-weight: 600;
+        color: #fff;
+        line-height: 1.15;
+        margin-bottom: 10px;
+    }
+
+    .log-header p {
+        font-size: 16px;
+        color: var(--sage-muted);
+        max-width: 520px;
+        line-height: 1.7;
+    }
+
+    /* PICKUP DATE BAR */
+    .pickup-bar {
+        background: var(--amber-light);
+        border-bottom: 1px solid #F0D9BE;
+        padding: 1rem 3rem;
+    }
+
+    .pickup-bar-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .pickup-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #7A5020;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        white-space: nowrap;
+    }
+
+    .pickup-label i { font-size: 17px; color: var(--amber); }
+
+    .pickup-fields {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+        flex: 1;
+    }
+
+    .pickup-field {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .pickup-field label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #A0701A;
+    }
+
+    .pickup-field input[type="date"] {
+        font-family: var(--font-b);
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--ink);
+        background: var(--white);
+        border: 1px solid #F0D9BE;
+        border-radius: 7px;
+        padding: 7px 12px;
+        outline: none;
+        cursor: pointer;
+    }
+
+    .pickup-field input[type="date"]:focus {
+        border-color: var(--amber);
+    }
+
+    /* MAIN BODY */
+    .log-body {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 2.5rem 3rem;
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 2.5rem;
+        align-items: start;
+    }
+
+    /* CATALOG SIDE */
+    .catalog-filters {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 1.75rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        padding: 7px 16px;
+        border-radius: 99px;
+        border: 1px solid var(--line);
+        background: var(--white);
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--muted);
+        cursor: pointer;
+        font-family: var(--font-b);
+        transition: all 0.15s;
+    }
+
+    .filter-btn:hover { border-color: var(--sage); color: var(--forest); }
+    .filter-btn.active { background: var(--forest); color: #fff; border-color: var(--forest); }
+
+    .catalog-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+    }
+
+    .item-card {
+        background: var(--white);
+        border: 1.5px solid var(--line);
+        border-radius: 12px;
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        transition: border-color 0.15s, box-shadow 0.15s;
+        position: relative;
+    }
+
+    .item-card:hover {
+        border-color: var(--sage);
+        box-shadow: 0 4px 18px rgba(28,59,46,0.07);
+    }
+
+    .item-card.in-order {
+        border-color: var(--forest-mid);
+        background: var(--sage-light);
+    }
+
+    .item-icon-wrap {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        background: var(--sage-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .item-card.in-order .item-icon-wrap {
+        background: rgba(46,107,82,0.15);
+    }
+
+    .item-icon-wrap i { font-size: 22px; color: var(--forest-mid); }
+
+    .item-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--ink);
+        line-height: 1.3;
+    }
+
+    .item-desc {
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.5;
+        flex: 1;
+    }
+
+    .item-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: auto;
+    }
+
+    .item-price {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--amber);
+    }
+
+    .qty-control {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .qty-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: 1.5px solid var(--line);
+        background: var(--white);
+        color: var(--ink);
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        transition: background 0.12s, border-color 0.12s;
+        font-family: var(--font-b);
+    }
+
+    .qty-btn:hover { background: var(--sage-light); border-color: var(--sage); }
+
+    .qty-num {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--ink);
+        min-width: 20px;
+        text-align: center;
+    }
+
+    /* ORDER PANEL */
+    .order-panel {
+        background: var(--white);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        overflow: hidden;
+        position: sticky;
+        top: 84px;
+    }
+
+    .order-head {
+        background: var(--forest);
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .order-head h3 {
+        font-family: var(--font-d);
+        font-size: 18px;
+        color: #fff;
+    }
+
+    .order-badge {
+        background: var(--amber);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 3px 9px;
+        border-radius: 99px;
+        display: none;
+    }
+
+    .order-body { padding: 1.25rem 1.5rem; }
+
+    .order-empty {
+        text-align: center;
+        padding: 2rem 1rem;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .order-empty i {
+        font-size: 36px;
+        color: var(--line);
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .order-lines { display: flex; flex-direction: column; gap: 0; }
+
+    .order-line {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--line);
+        font-size: 13px;
+    }
+
+    .order-line:last-child { border-bottom: none; }
+
+    .ol-name { font-weight: 500; color: var(--ink); flex: 1; }
+    .ol-qty  { color: var(--muted); margin: 0 12px; }
+    .ol-price{ font-weight: 600; color: var(--ink2); }
+
+    .ol-remove {
+        background: none;
+        border: none;
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 16px;
+        padding: 0 0 0 8px;
+        line-height: 1;
+        transition: color 0.12s;
+    }
+
+    .ol-remove:hover { color: #D94040; }
+
+    .order-divider { height: 1px; background: var(--line); margin: 1rem 0; }
+
+    .order-total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 1.25rem;
+    }
+
+    .order-total-label { font-size: 13px; color: var(--muted); font-weight: 500; }
+
+    .order-total-amount {
+        font-family: var(--font-d);
+        font-size: 26px;
+        font-weight: 600;
+        color: var(--forest);
+    }
+
+    .btn-checkout {
+        display: block;
+        width: 100%;
+        background: var(--amber);
+        color: #fff;
+        border: none;
+        padding: 13px;
+        border-radius: var(--r);
+        font-size: 15px;
+        font-weight: 600;
+        font-family: var(--font-b);
+        cursor: pointer;
+        text-align: center;
+        transition: background 0.15s;
+        text-decoration: none;
+    }
+
+    .btn-checkout:hover { background: var(--amber-hover); color: #fff; }
+    .btn-checkout:disabled { background: var(--line); color: var(--muted); cursor: not-allowed; }
+
+    .order-note {
+        margin-top: 10px;
+        font-size: 11px;
+        color: var(--muted);
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .order-note i { font-size: 13px; }
+
+    /* EMPTY STATE */
+    .catalog-empty {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 3rem;
+        color: var(--muted);
+        font-size: 14px;
+    }
+
+    /* RESPONSIVE */
+    @@media (max-width: 900px) {
+        .log-body { grid-template-columns: 1fr; padding: 2rem 1.5rem; }
+        .order-panel { position: static; }
+        .catalog-grid { grid-template-columns: repeat(2, 1fr); }
+        .log-header { padding: 2.5rem 1.5rem 2rem; }
+        .pickup-bar { padding: 1rem 1.5rem; }
+    }
+
+    @@media (max-width: 500px) {
+        .catalog-grid { grid-template-columns: 1fr; }
+        .log-header h1 { font-size: 28px; }
+    }
+</style>
+
+<div class="log-page">
+
+    <!-- PAGE HEADER -->
+    <div class="log-header">
+        <div class="log-header-inner">
+            <p class="log-eyebrow">Logistics &amp; storage</p>
+            <h1>Store your items.<br>We'll keep them safe.</h1>
+            <p>Select what you need stored, pick a pickup date, and we'll handle the rest. Everything comes back when you return to campus.</p>
+        </div>
+    </div>
+
+    <!-- PICKUP DATE BAR -->
+    <div class="pickup-bar">
+        <div class="pickup-bar-inner">
+            <div class="pickup-label">
+                <i class="ti ti-calendar" aria-hidden="true"></i>
+                Schedule your pickup
+            </div>
+            <div class="pickup-fields">
+                <div class="pickup-field">
+                    <label for="pickup-date">Pickup date</label>
+                    <input type="date" id="pickup-date" />
+                </div>
+                <div class="pickup-field">
+                    <label for="return-date">Return date</label>
+                    <input type="date" id="return-date" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN BODY -->
+    <div class="log-body">
+
+        <!-- CATALOG -->
+        <div>
+            <div class="catalog-filters">
+                <button class="filter-btn active" data-cat="all">All items</button>
+                <button class="filter-btn" data-cat="appliances & electronics">Appliances & Electronics</button>
+                <button class="filter-btn" data-cat="bags & boxes">Bags & Boxes</button>
+                <button class="filter-btn" data-cat="furniture & bedding">Furniture & Bedding</button>
+                <button class="filter-btn" data-cat="kitchen & utility">Kitchen & Utility</button>
+            </div>
+
+            <div class="catalog-grid" id="catalog-grid">
+                @if (ViewBag.Items != null)
+                {
+                    @foreach (var item in (IEnumerable<HostelSite.ViewModels.LogisticsItemViewModel>)ViewBag.Items)
+                    {
+                        <div class="item-card" data-id="@item.Id" data-name="@item.Name" data-price="@item.Price" data-cat="@item.Category?.ToLower()">
+                            <div class="item-icon-wrap">
+                                <i class="ti ti-package" aria-hidden="true"></i>
+                            </div>
+                            <div class="item-name">@item.Name</div>
+                            <div class="item-desc">@item.Description</div>
+                            <div class="item-footer">
+                                <div class="item-price">GH₵ @item.Price.ToString("0.00")</div>
+                                <div class="qty-control">
+                                    <button class="qty-btn" onclick="changeQty(@item.Id, -1)" aria-label="Remove one">−</button>
+                                    <span class="qty-num" id="qty-@item.Id">0</span>
+                                    <button class="qty-btn" onclick="changeQty(@item.Id, 1)" aria-label="Add one">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <!-- Fallback static catalog — replace once DB is seeded -->
+                    <div class="item-card" data-id="1" data-name="Electric fan" data-price="30" data-cat="appliances">
+                        <div class="item-icon-wrap"><i class="ti ti-wind" aria-hidden="true"></i></div>
+                        <div class="item-name">Electric fan</div>
+                        <div class="item-desc">Standing or desk fan. Any size accepted.</div>
+                        <div class="item-footer">
+                            <div class="item-price">GH₵ 30.00</div>
+                            <div class="qty-control">
+                                <button class="qty-btn" onclick="changeQty(1,-1)" aria-label="Remove one">−</button>
+                                <span class="qty-num" id="qty-1">0</span>
+                                <button class="qty-btn" onclick="changeQty(1,1)" aria-label="Add one">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item-card" data-id="2" data-name="Mattress" data-price="50" data-cat="bedding">
+                        <div class="item-icon-wrap"><i class="ti ti-bed" aria-hidden="true"></i></div>
+                        <div class="item-name">Mattress</div>
+                        <div class="item-desc">Single or double. Wrapped and tagged securely.</div>
+                        <div class="item-footer">
+                            <div class="item-price">GH₵ 50.00</div>
+                            <div class="qty-control">
+                                <button class="qty-btn" onclick="changeQty(2,-1)" aria-label="Remove one">−</button>
+                                <span class="qty-num" id="qty-2">0</span>
+                                <button class="qty-btn" onclick="changeQty(2,1)" aria-label="Add one">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item-card" data-id="3" data-name="Television" data-price="60" data-cat="appliances">
+                        <div class="item-icon-wrap"><i class="ti ti-device-tv" aria-hidden="true"></i></div>
+                        <div class="item-name">Television</div>
+                        <div class="item-desc">Up to 43 inches. Padded and stored flat.</div>
+                        <div class="item-footer">
+                            <div class="item-price">GH₵ 60.00</div>
+                            <div class="qty-control">
+                                <button class="qty-btn" onclick="changeQty(3,-1)" aria-label="Remove one">−</button>
+                                <span class="qty-num" id="qty-3">0</span>
+                                <button class="qty-btn" onclick="changeQty(3,1)" aria-label="Add one">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item-card" data-id="4" data-name="Mini fridge" data-price="70" data-cat="appliances">
+                        <div class="item-icon-wrap"><i class="ti ti-fridge" aria-hidden="true"></i></div>
+                        <div class="item-name">Mini fridge</div>
+                        <div class="item-desc">Emptied and defrosted before pickup.</div>
+                        <div class="item-footer">
+                            <div class="item-price">GH₵ 70.00</div>
+                            <div class="qty-control">
+                                <button class="qty-btn" onclick="changeQty(4,-1)" aria-label="Remove one">−</button>
+                                <span class="qty-num" id="qty-4">0</span>
+                                <button class="qty-btn" onclick="changeQty(4,1)" aria-label="Add one">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item-card" data-id="5" data-name="Storage box" data-price="15" data-cat="boxes">
+                        <div class="item-icon-wrap"><i class="ti ti-box" aria-hidden="true"></i></div>
+                        <div class="item-name">Storage box</div>
+                        <div class="item-desc">Medium cardboard box (supplied by us if needed).</div>
+                        <div class="item-footer">
+                            <div class="item-price">GH₵ 15.00</div>
+                            <div class="qty-control">
+                                <button class="qty-btn" onclick="changeQty(5,-1)" aria-label="Remove one">−</button>
+                                <span class="qty-num" id="qty-5">0</span>
+                                <button class="qty-btn" onclick="changeQty(5,1)" aria-label="Add one">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item-card" data-id="6" data-name="Wardrobe items bag" data-price="20" data-cat="bedding">
+                        <div class="item-icon-wrap"><i class="ti ti-shirt" aria-hidden="true"></i></div>
+                        <div class="item-name">Wardrobe items bag</div>
+                        <div class="item-desc">Clothing, linen, or soft goods in one sealed bag.</div>
+                        <div class="item-footer">
+                            <div class="item-price">GH₵ 20.00</div>
+                            <div class="qty-control">
+                                <button class="qty-btn" onclick="changeQty(6,-1)" aria-label="Remove one">−</button>
+                                <span class="qty-num" id="qty-6">0</span>
+                                <button class="qty-btn" onclick="changeQty(6,1)" aria-label="Add one">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item-card" data-id="7" data-name="Microwave" data-price="45" data-cat="appliances">
+                        <div class="item-icon-wrap"><i class="ti ti-microwave" aria-hidden="true"></i></div>
+                        <div class="item-name">Microwave</div>
+                        <div class="item-desc">Cleaned and wrapped. Stored upright.</div>
+                        <div class="item-footer">
+                            <div class="item-price">GH₵ 45.00</div>
+                            <div class="qty-control">
+                                <button class="qty-btn" onclick="changeQty(7,-1)" aria-label="Remove one">−</button>
+                                <span class="qty-num" id="qty-7">0</span>
+                                <button class="qty-btn" onclick="changeQty(7,1)" aria-label="Add one">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item-card" data-id="8" data-name="Study chair" data-price="35" data-cat="furniture">
+                        <div class="item-icon-wrap"><i class="ti ti-armchair" aria-hidden="true"></i></div>
+                        <div class="item-name">Study chair</div>
+                        <div class="item-desc">Folding or fixed. Stored disassembled where possible.</div>
+                        <div class="item-footer">
+                            <div class="item-price">GH₵ 35.00</div>
+                            <div class="qty-control">
+                                <button class="qty-btn" onclick="changeQty(8,-1)" aria-label="Remove one">−</button>
+                                <span class="qty-num" id="qty-8">0</span>
+                                <button class="qty-btn" onclick="changeQty(8,1)" aria-label="Add one">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item-card" data-id="9" data-name="Duffel / travel bag" data-price="15" data-cat="boxes">
+                        <div class="item-icon-wrap"><i class="ti ti-luggage" aria-hidden="true"></i></div>
+                        <div class="item-name">Duffel / travel bag</div>
+                        <div class="item-desc">Packed bag stored as-is. One bag per unit.</div>
+                        <div class="item-footer">
+                            <div class="item-price">GH₵ 15.00</div>
+                            <div class="qty-control">
+                                <button class="qty-btn" onclick="changeQty(9,-1)" aria-label="Remove one">−</button>
+                                <span class="qty-num" id="qty-9">0</span>
+                                <button class="qty-btn" onclick="changeQty(9,1)" aria-label="Add one">+</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- ORDER PANEL -->
+        <div class="order-panel">
+            <div class="order-head">
+                <h3>My order</h3>
+                <span class="order-badge" id="order-badge">0</span>
+            </div>
+            <div class="order-body">
+                <div class="order-empty" id="order-empty">
+                    <i class="ti ti-package" aria-hidden="true"></i>
+                    Add items from the catalog to build your storage order.
+                </div>
+                <div class="order-lines" id="order-lines" style="display:none;"></div>
+
+                <div id="order-summary" style="display:none;">
+                    <div class="order-divider"></div>
+                    <div class="order-total-row">
+                        <span class="order-total-label">Total</span>
+                        <span class="order-total-amount" id="order-total">GH₵ 0</span>
+                    </div>
+                    <button class="btn-checkout" id="checkout-btn" onclick="goToCheckout()">
+                        Proceed to checkout →
+                    </button>
+                    <p class="order-note">
+                        <i class="ti ti-shield-check" aria-hidden="true"></i>
+                        All items insured from pickup
+                    </p>
+                </div>
+
+                <div id="order-empty-checkout" style="display:none; margin-top:1rem;">
+                    <button class="btn-checkout" disabled>Proceed to checkout →</button>
+                    <p class="order-note">
+                        <i class="ti ti-info-circle" aria-hidden="true"></i>
+                        Add at least one item to continue
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const order = {};
+
+    function changeQty(id, delta) {
+        const card  = document.querySelector(`.item-card[data-id="${id}"]`);
+        const name  = card.dataset.name;
+        const price = parseFloat(card.dataset.price);
+        const qtyEl = document.getElementById('qty-' + id);
+
+        order[id] = order[id] || { name, price, qty: 0 };
+        order[id].qty = Math.max(0, order[id].qty + delta);
+        qtyEl.textContent = order[id].qty;
+
+        if (order[id].qty === 0) delete order[id];
+
+        card.classList.toggle('in-order', !!(order[id] && order[id].qty > 0));
+        renderOrder();
+    }
+
+            function goToCheckout() {
+            const pickup = document.getElementById('pickup-date').value;
+            const ret    = document.getElementById('return-date').value;
+
+            if (Object.keys(order).length === 0) {
+                alert('Please add at least one item to your order.');
+                return;
+            }
+
+            if (!pickup) {
+                alert('Please select a pickup date.');
+                return;
+            }
+
+            if (!ret) {
+                alert('Please select a return date.');
+                return;
+            }
+
+            if (ret <= pickup) {
+                alert('Return date must be after your pickup date.');
+                return;
+            }
+
+            // Build the order payload matching CheckoutViewModel structure
+            const items = Object.keys(order).map(id => ({
+                itemId:   parseInt(id),
+                name:     order[id].name,
+                price:    order[id].price,
+                quantity: order[id].qty,
+                icon:     'ti-package'
+            }));
+
+            const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
+
+            sessionStorage.setItem('nestOrder', JSON.stringify({
+                items:      items,
+                total:      total,
+                pickup:     pickup,
+                returnDate: ret
+            }));
+
+            window.location.href = '@Url.Action("Checkout", "Logistics")';
+        }
+
+    function renderOrder() {
+        const ids    = Object.keys(order);
+        const empty  = document.getElementById('order-empty');
+        const lines  = document.getElementById('order-lines');
+        const summary= document.getElementById('order-summary');
+        const badge  = document.getElementById('order-badge');
+        const emptyC = document.getElementById('order-empty-checkout');
+
+        if (ids.length === 0) {
+            empty.style.display  = '';
+            lines.style.display  = 'none';
+            summary.style.display= 'none';
+            emptyC.style.display = 'none';
+            badge.style.display  = 'none';
+            return;
+        }
+
+        empty.style.display  = 'none';
+        lines.style.display  = '';
+        summary.style.display= '';
+        emptyC.style.display = 'none';
+        badge.style.display  = '';
+
+        let total    = 0;
+        let itemCount= 0;
+        lines.innerHTML = '';
+
+        ids.forEach(id => {
+            const { name, price, qty } = order[id];
+            const lineTotal = price * qty;
+            total     += lineTotal;
+            itemCount += qty;
+
+            const el  = document.createElement('div');
+            el.className = 'order-line';
+            el.innerHTML = `
+                <span class="ol-name">${name}</span>
+                <span class="ol-qty">x${qty}</span>
+                <span class="ol-price">GH₵ ${lineTotal.toFixed(2)}</span>
+                <button class="ol-remove" onclick="removeItem(${id})" aria-label="Remove ${name}">
+                    <i class="ti ti-x" aria-hidden="true"></i>
+                </button>`;
+            lines.appendChild(el);
+        });
+
+        badge.textContent = itemCount;
+        document.getElementById('order-total').textContent = 'GH₵ ' + total.toFixed(2);
+
+        // Pass order to checkout via sessionStorage
+        sessionStorage.setItem('nestOrder', JSON.stringify(order));
+    }
+
+    function removeItem(id) {
+        const card = document.querySelector(`.item-card[data-id="${id}"]`);
+        if (!card) return;
+        order[id] = undefined;
+        delete order[id];
+        const qtyEl = document.getElementById('qty-' + id);
+        if (qtyEl) qtyEl.textContent = '0';
+        card.classList.remove('in-order');
+        renderOrder();
+    }
+
+    // Category filters
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const cat = btn.dataset.cat;
+            document.querySelectorAll('.item-card').forEach(card => {
+                card.style.display = (cat === 'all' || card.dataset.cat === cat) ? '' : 'none';
+            });
+        });
+    });
+
+    // Set min date for pickup to tomorrow
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const fmt = d => d.toISOString().split('T')[0];
+    document.getElementById('pickup-date').min = fmt(tomorrow);
+    document.getElementById('pickup-date').addEventListener('change', function () {
+        const ret = document.getElementById('return-date');
+        ret.min = this.value;
+        if (ret.value && ret.value < this.value) ret.value = '';
+    });
+</script>
+}

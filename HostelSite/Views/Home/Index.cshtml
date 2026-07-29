@@ -1,0 +1,1251 @@
+@{
+    ViewData["Title"] = "Home";
+}
+
+<style>
+    /* ── Tokens ── */
+    :root {
+        --forest:       #1C3B2E;
+        --forest-dark:  #0D201A;
+        --forest-mid:   #2E6B52;
+        --sage:         #4A9572;
+        --sage-light:   #EAF3EE;
+        --sage-muted:   #9CBDAD;
+        --amber:        #C9863A;
+        --amber-light:  #FDF3E7;
+        --amber-hover:  #B5722A;
+        --ink:          #111318;
+        --ink2:         #3D3F47;
+        --muted:        #7C808C;
+        --line:         #E3E5EA;
+        --sand:         #F8F7F4;
+        --white:        #FFFFFF;
+        --font-d:       'Playfair Display', Georgia, serif;
+        --font-b:       'Outfit', system-ui, sans-serif;
+        --r:            10px;
+    }
+
+    /* ── Google Fonts ── */
+    @@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&family=Outfit:wght@400;500;600&display=swap');
+
+    /* ── Reset for page-level elements ── */
+    .nest-page * { box-sizing: border-box; }
+    .nest-page { font-family: var(--font-b); color: var(--ink); }
+    .nest-page a { text-decoration: none; }
+    .nest-page ul { list-style: none; padding: 0; margin: 0; }
+    .nest-page p { margin: 0; }
+    .nest-page h1, .nest-page h2, .nest-page h3, .nest-page h4 { margin: 0; }
+
+    /* ══ HERO ══ */
+    .hero {
+        background: var(--forest);
+        padding: 5rem 3rem 0;
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 3.5rem;
+        align-items: end;
+        overflow: hidden;
+    }
+
+    .hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        color: var(--sage);
+        background: rgba(74,149,114,0.12);
+        padding: 5px 12px;
+        border-radius: 99px;
+        border: 1px solid rgba(74,149,114,0.25);
+        margin-bottom: 1.5rem;
+    }
+
+    .hero-eyebrow span {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--sage);
+        display: inline-block;
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50%       { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .hero h1 {
+        font-family: var(--font-d);
+        font-size: 56px;
+        line-height: 1.1;
+        color: #fff;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        letter-spacing: -0.5px;
+    }
+
+    .hero h1 em {
+        font-style: italic;
+        color: #A8D8BF;
+    }
+
+    .hero-sub {
+        font-size: 17px;
+        color: var(--sage-muted);
+        line-height: 1.75;
+        max-width: 480px;
+        margin-bottom: 2rem;
+    }
+
+    .hero-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 3rem;
+    }
+
+    .btn-amber-lg {
+        background: var(--amber);
+        color: #fff;
+        border: none;
+        padding: 14px 30px;
+        border-radius: var(--r);
+        font-size: 15px;
+        font-weight: 600;
+        font-family: var(--font-b);
+        cursor: pointer;
+        transition: background 0.15s;
+        display: inline-block;
+    }
+
+    .btn-amber-lg:hover { background: var(--amber-hover); color: #fff; }
+
+    .btn-ghost-lg {
+        background: transparent;
+        color: #fff;
+        border: 1.5px solid rgba(255,255,255,0.25);
+        padding: 14px 30px;
+        border-radius: var(--r);
+        font-size: 15px;
+        font-weight: 500;
+        font-family: var(--font-b);
+        cursor: pointer;
+        transition: border-color 0.15s, background 0.15s;
+        display: inline-block;
+    }
+
+    .btn-ghost-lg:hover {
+        border-color: rgba(255,255,255,0.5);
+        background: rgba(255,255,255,0.05);
+        color: #fff;
+    }
+
+    /* hero stats */
+    .hero-stats {
+        display: flex;
+        gap: 2.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        margin-bottom: 0;
+    }
+
+    .hero-stat-num {
+        font-family: var(--font-d);
+        font-size: 26px;
+        font-weight: 600;
+        color: #fff;
+        line-height: 1;
+        margin-bottom: 4px;
+    }
+
+    .hero-stat-label {
+        font-size: 12px;
+        color: var(--sage-muted);
+        font-weight: 500;
+    }
+
+    /* hero card */
+    .hero-card-wrap {
+        align-self: stretch;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding-bottom: 0;
+    }
+
+    .hero-card {
+        background: var(--white);
+        border-radius: 16px 16px 0 0;
+        padding: 2rem;
+        box-shadow: 0 -8px 40px rgba(0,0,0,0.2);
+    }
+
+    .hero-card-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.4px;
+        color: var(--muted);
+        margin-bottom: 6px;
+    }
+
+    .hero-card h3 {
+        font-family: var(--font-d);
+        font-size: 20px;
+        color: var(--ink);
+        margin-bottom: 1.25rem;
+    }
+
+    .svc-tabs {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 1rem;
+        background: var(--sand);
+        padding: 4px;
+        border-radius: 8px;
+    }
+
+    .svc-tab {
+        flex: 1;
+        padding: 9px 12px;
+        border-radius: 6px;
+        border: none;
+        background: transparent;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--muted);
+        cursor: pointer;
+        font-family: var(--font-b);
+        transition: background 0.15s, color 0.15s;
+        text-align: center;
+    }
+
+    .svc-tab.active {
+        background: var(--white);
+        color: var(--forest);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+
+    .svc-detail {
+        background: var(--sand);
+        border-radius: 8px;
+        padding: 1rem 1.1rem;
+        font-size: 13px;
+        color: var(--ink2);
+        line-height: 1.65;
+        min-height: 90px;
+        margin-bottom: 1rem;
+        border: 1px solid var(--line);
+        transition: opacity 0.2s;
+    }
+
+    .svc-detail strong {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--ink);
+        margin-bottom: 5px;
+    }
+
+    .btn-forest {
+        display: block;
+        width: 100%;
+        background: var(--forest);
+        color: #fff;
+        border: none;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        font-family: var(--font-b);
+        cursor: pointer;
+        text-align: center;
+        transition: background 0.15s;
+    }
+
+    .btn-forest:hover { background: var(--forest-mid); color: #fff; }
+
+    /* ══ TRUST STRIP ══ */
+    .trust-strip {
+        background: var(--amber-light);
+        border-bottom: 1px solid #F0D9BE;
+        padding: 1.1rem 3rem;
+        display: flex;
+        gap: 0;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .trust-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #7A5020;
+        padding: 0.4rem 1.75rem;
+        border-right: 1px solid #F0D9BE;
+    }
+
+    .trust-item:last-child { border-right: none; }
+
+    .trust-item i { font-size: 17px; color: var(--amber); }
+
+    /* ══ SECTION BASE ══ */
+    .sec {
+        padding: 5rem 3rem;
+    }
+
+    .sec-eyebrow {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        color: var(--sage);
+        margin-bottom: 10px;
+    }
+
+    .sec-h {
+        font-family: var(--font-d);
+        font-size: 38px;
+        font-weight: 600;
+        color: var(--ink);
+        line-height: 1.15;
+        margin-bottom: 12px;
+        letter-spacing: -0.3px;
+    }
+
+    .sec-sub {
+        font-size: 16px;
+        color: var(--muted);
+        line-height: 1.75;
+        max-width: 540px;
+        margin-bottom: 3rem;
+    }
+
+    /* ══ AESTHETICS SECTION ══ */
+    .aes-section { background: var(--white); }
+
+    .aes-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+
+    .aes-card {
+        background: var(--white);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+    }
+
+    .aes-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+    }
+
+    .aes-swatch {
+        height: 170px;
+        display: flex;
+        align-items: flex-end;
+        padding: 1rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Each style's palette — the swatches ARE the preview */
+    .swatch-minimal {
+        background: #F2EFEA;
+    }
+    .swatch-minimal::before {
+        content: '';
+        position: absolute;
+        right: -20px; top: -20px;
+        width: 120px; height: 120px;
+        background: #D9D4CC;
+        border-radius: 50%;
+    }
+    .swatch-minimal::after {
+        content: '';
+        position: absolute;
+        left: 20px; bottom: 30px;
+        width: 60px; height: 4px;
+        background: #B8B2A8;
+        border-radius: 2px;
+        box-shadow: 0 12px 0 #B8B2A8, 0 24px 0 rgba(184,178,168,0.4);
+    }
+
+    .swatch-nordic {
+        background: #DDE8EF;
+    }
+    .swatch-nordic::before {
+        content: '';
+        position: absolute;
+        right: 24px; top: 20px;
+        width: 70px; height: 90px;
+        background: #B8CAD6;
+        border-radius: 6px 6px 0 0;
+    }
+    .swatch-nordic::after {
+        content: '';
+        position: absolute;
+        left: 24px; bottom: 20px;
+        width: 80px; height: 10px;
+        background: #C4A882;
+        border-radius: 3px;
+        box-shadow: 0 -18px 0 #C4A882, 0 16px 0 rgba(196,168,130,0.3);
+    }
+
+    .swatch-tropical {
+        background: #D4EAD1;
+    }
+    .swatch-tropical::before {
+        content: '';
+        position: absolute;
+        right: 16px; top: -10px;
+        width: 50px; height: 110px;
+        background: #4A9572;
+        clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        opacity: 0.7;
+    }
+    .swatch-tropical::after {
+        content: '';
+        position: absolute;
+        right: 36px; top: 20px;
+        width: 40px; height: 100px;
+        background: #2E6B52;
+        clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        opacity: 0.5;
+    }
+
+    .swatch-urban {
+        background: #2A2D35;
+    }
+    .swatch-urban::before {
+        content: '';
+        position: absolute;
+        left: 0; top: 0;
+        width: 100%; height: 100%;
+        background: linear-gradient(135deg, #1E2128 0%, #3A3D48 100%);
+    }
+    .swatch-urban::after {
+        content: '';
+        position: absolute;
+        right: 20px; top: 20px;
+        width: 60px; height: 60px;
+        border: 2px solid rgba(201,134,58,0.6);
+        border-radius: 50%;
+    }
+
+    .aes-badge {
+        position: relative;
+        z-index: 1;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 99px;
+        letter-spacing: 0.4px;
+    }
+
+    .badge-light  { background: rgba(255,255,255,0.85); color: var(--ink); }
+    .badge-dark   { background: rgba(0,0,0,0.5);        color: #fff; }
+
+    .aes-body {
+        padding: 1.1rem 1.2rem 1.35rem;
+    }
+
+    .aes-body h4 {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--ink);
+        margin-bottom: 5px;
+    }
+
+    .aes-body p {
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.55;
+        margin-bottom: 12px;
+    }
+
+    .aes-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .tag {
+        font-size: 11px;
+        font-weight: 500;
+        padding: 3px 10px;
+        border-radius: 99px;
+    }
+
+    .tag-sage   { background: var(--sage-light);  color: #1C5C40; }
+    .tag-amber  { background: var(--amber-light); color: #7A4B10; }
+    .tag-ink    { background: #ECEDF0;            color: var(--ink2); }
+
+    .aes-cta-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 2.5rem;
+    }
+
+    .link-underline {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--forest);
+        border-bottom: 1.5px solid var(--sage);
+        padding-bottom: 1px;
+        transition: color 0.15s;
+    }
+
+    .link-underline:hover { color: var(--sage); }
+
+    /* ══ LOGISTICS SECTION ══ */
+    .log-section { background: var(--sand); }
+
+    .log-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: start;
+    }
+
+    .log-items-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+
+    .log-item-card {
+        background: var(--white);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .log-item-card:hover {
+        border-color: var(--sage);
+        box-shadow: 0 4px 16px rgba(28,59,46,0.07);
+    }
+
+    .log-item-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 9px;
+        background: var(--sage-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .log-item-icon i { font-size: 20px; color: var(--forest-mid); }
+
+    .log-item-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--ink);
+    }
+
+    .log-item-price {
+        font-size: 13px;
+        color: var(--amber);
+        font-weight: 600;
+    }
+
+    /* order summary panel */
+    .order-panel {
+        background: var(--white);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        overflow: hidden;
+        position: sticky;
+        top: 88px;
+    }
+
+    .order-panel-head {
+        background: var(--forest);
+        padding: 1.25rem 1.5rem;
+    }
+
+    .order-panel-head h3 {
+        font-family: var(--font-d);
+        font-size: 18px;
+        color: #fff;
+        margin-bottom: 3px;
+    }
+
+    .order-panel-head p {
+        font-size: 12px;
+        color: var(--sage-muted);
+    }
+
+    .order-panel-body {
+        padding: 1.5rem;
+    }
+
+    .order-empty {
+        text-align: center;
+        padding: 2rem 1rem;
+        color: var(--muted);
+        font-size: 13px;
+    }
+
+    .order-empty i { font-size: 32px; color: var(--line); display: block; margin-bottom: 8px; }
+
+    .order-steps {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .order-step {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .ostep-num {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: var(--sage-light);
+        color: var(--forest-mid);
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+
+    .ostep-text strong {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ink);
+        margin-bottom: 2px;
+    }
+
+    .ostep-text span {
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.5;
+    }
+
+    .order-divider {
+        height: 1px;
+        background: var(--line);
+        margin: 1.25rem 0;
+    }
+
+    /* ══ HOW IT WORKS ══ */
+    .hiw-section {
+        background: var(--forest);
+        padding: 5rem 3rem;
+    }
+
+    .hiw-section .sec-eyebrow { color: var(--sage); }
+    .hiw-section .sec-h       { color: #fff; }
+    .hiw-section .sec-sub     { color: var(--sage-muted); }
+
+    .hiw-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+    }
+
+    .hiw-card {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.09);
+        border-radius: 14px;
+        padding: 1.75rem 1.5rem;
+        position: relative;
+    }
+
+    .hiw-num {
+        font-family: var(--font-d);
+        font-size: 36px;
+        font-weight: 600;
+        color: rgba(74,149,114,0.3);
+        line-height: 1;
+        margin-bottom: 14px;
+    }
+
+    .hiw-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        background: rgba(74,149,114,0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 14px;
+    }
+
+    .hiw-icon i { font-size: 22px; color: var(--sage); }
+
+    .hiw-card h4 {
+        font-size: 15px;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 8px;
+    }
+
+    .hiw-card p {
+        font-size: 13px;
+        color: var(--sage-muted);
+        line-height: 1.65;
+    }
+
+    /* connector arrow */
+    .hiw-card:not(:last-child)::after {
+        content: '→';
+        position: absolute;
+        right: -1.15rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: rgba(74,149,114,0.35);
+        font-size: 20px;
+        z-index: 1;
+    }
+
+    /* ══ SOCIAL PROOF ══ */
+    .proof-section { background: var(--white); padding: 5rem 3rem; }
+
+    .proof-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-top: 3rem;
+    }
+
+    .proof-card {
+        background: var(--sand);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 1.5rem;
+    }
+
+    .proof-stars {
+        display: flex;
+        gap: 3px;
+        margin-bottom: 12px;
+    }
+
+    .proof-stars i { font-size: 15px; color: var(--amber); }
+
+    .proof-card blockquote {
+        font-size: 14px;
+        color: var(--ink2);
+        line-height: 1.7;
+        margin: 0 0 16px;
+        font-style: italic;
+    }
+
+    .proof-author {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .proof-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 600;
+        flex-shrink: 0;
+    }
+
+    .av-a { background: var(--sage-light); color: var(--forest-mid); }
+    .av-b { background: var(--amber-light); color: #7A4B10; }
+    .av-c { background: #EEF0FA; color: #3A3870; }
+
+    .proof-name { font-size: 13px; font-weight: 600; color: var(--ink); }
+    .proof-meta { font-size: 12px; color: var(--muted); }
+
+    /* ══ CTA BANNER ══ */
+    .cta-section {
+        background: var(--forest-dark);
+        padding: 5rem 3rem;
+        text-align: center;
+    }
+
+    .cta-section h2 {
+        font-family: var(--font-d);
+        font-size: 42px;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 14px;
+        letter-spacing: -0.3px;
+    }
+
+    .cta-section h2 em { font-style: italic; color: #A8D8BF; }
+
+    .cta-section p {
+        font-size: 16px;
+        color: var(--sage-muted);
+        max-width: 480px;
+        margin: 0 auto 2.5rem;
+        line-height: 1.7;
+    }
+
+    .cta-btns { display: flex; gap: 14px; justify-content: center; }
+
+    /* ══ RESPONSIVE ══ */
+    @@media (max-width: 1024px) {
+        .hero                 { grid-template-columns: 1fr; padding-bottom: 3rem; }
+        .hero-card-wrap       { display: none; }
+        .aes-grid             { grid-template-columns: repeat(2, 1fr); }
+        .hiw-grid             { grid-template-columns: repeat(2, 1fr); }
+        .hiw-card::after      { display: none; }
+        .log-layout           { grid-template-columns: 1fr; }
+        .order-panel          { position: static; }
+        .proof-grid           { grid-template-columns: 1fr; }
+    }
+
+    @@media (max-width: 640px) {
+        .sec, .hiw-section,
+        .proof-section,
+        .cta-section          { padding: 3.5rem 1.5rem; }
+        .hero                 { padding: 3rem 1.5rem 2.5rem; }
+        .hero h1              { font-size: 38px; }
+        .sec-h                { font-size: 28px; }
+        .aes-grid,
+        .log-items-grid,
+        .hiw-grid             { grid-template-columns: 1fr; }
+        .trust-strip          { padding: 1rem 1.5rem; }
+        .trust-item           { border-right: none; padding: 0.3rem 0; }
+        .cta-btns             { flex-direction: column; align-items: center; }
+        .cta-section h2       { font-size: 30px; }
+    }
+</style>
+
+<div class="nest-page">
+
+    <!-- ══ HERO ══ -->
+    <section class="hero">
+        <div>
+            <div class="hero-eyebrow">
+                <span></span> For students — powered by Paystack
+            </div>
+            <h1>Your room.<br><em>Your aesthetic.</em><br>Your stuff, safe.</h1>
+            <p class="hero-sub">
+                Customise your hostel room with curated decoration styles, or store
+                your belongings with us during the vacation break. Two services built
+                entirely around campus life.
+            </p>
+            <div class="hero-actions">
+                <a asp-controller="Aesthetics" asp-action="Index" class="btn-amber-lg">
+                    Browse aesthetics
+                </a>
+                <a asp-controller="Logistics" asp-action="Index" class="btn-ghost-lg">
+                    Store my items
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div>
+                    <div class="hero-stat-num">5,000+</div>
+                    <div class="hero-stat-label">Students served</div>
+                </div>
+                <div>
+                    <div class="hero-stat-num">4</div>
+                    <div class="hero-stat-label">Aesthetic styles</div>
+                </div>
+                <div>
+                    <div class="hero-stat-num">100%</div>
+                    <div class="hero-stat-label">Items insured</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- floating card -->
+        <div class="hero-card-wrap">
+            <div class="hero-card">
+                <p class="hero-card-label">Quick start</p>
+                <h3>What are you looking for?</h3>
+                <div class="svc-tabs">
+                    <button class="svc-tab active" id="tab-aes" onclick="switchTab('aes')">
+                        Room aesthetics
+                    </button>
+                    <button class="svc-tab" id="tab-log" onclick="switchTab('log')">
+                        Item storage
+                    </button>
+                </div>
+                <div class="svc-detail" id="svc-detail">
+                    <strong>Customise your room</strong>
+                    Pick from curated decoration styles — minimal, nordic, tropical, or urban.
+                    We source everything and set it up for you before you move in.
+                </div>
+                <a asp-controller="Aesthetics" asp-action="Index" class="btn-forest" id="svc-cta">
+                    Browse aesthetic styles →
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ TRUST STRIP ══ -->
+    <div class="trust-strip">
+        <div class="trust-item">
+            <i class="ti ti-users" aria-hidden="true"></i> Trusted by 5,000+ students
+        </div>
+        <div class="trust-item">
+            <i class="ti ti-shield-check" aria-hidden="true"></i> Fully insured storage
+        </div>
+        <div class="trust-item">
+            <i class="ti ti-truck" aria-hidden="true"></i> Door-to-door pickup &amp; return
+        </div>
+        <div class="trust-item">
+            <i class="ti ti-credit-card" aria-hidden="true"></i> Pay with Paystack
+        </div>
+        <div class="trust-item">
+            <i class="ti ti-lock" aria-hidden="true"></i> Secure 24/7 facility
+        </div>
+    </div>
+
+    <!-- ══ AESTHETICS ══ -->
+    <section class="sec aes-section">
+        <p class="sec-eyebrow">Room aesthetics</p>
+        <h2 class="sec-h">Pick a style.<br>We handle the rest.</h2>
+        <p class="sec-sub">
+            Browse decoration styles curated specifically for hostel rooms. Submit a request,
+            and our team sources, arranges, and installs everything before you arrive.
+        </p>
+
+        <div class="aes-grid">
+            <!-- Minimal -->
+            <div class="aes-card">
+                <div class="aes-swatch swatch-minimal">
+                    <span class="aes-badge badge-light">Minimal calm</span>
+                </div>
+                <div class="aes-body">
+                    <h4>Minimal calm</h4>
+                    <p>Clean lines, muted tones, deliberate space. For students who think clearly in quiet rooms.</p>
+                    <div class="aes-tags">
+                        <span class="tag tag-sage">Neutral</span>
+                        <span class="tag tag-amber">Most popular</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nordic -->
+            <div class="aes-card">
+                <div class="aes-swatch swatch-nordic">
+                    <span class="aes-badge badge-light">Nordic light</span>
+                </div>
+                <div class="aes-body">
+                    <h4>Nordic light</h4>
+                    <p>Warm wood tones, cool blues, soft textures. Cosy without feeling crowded.</p>
+                    <div class="aes-tags">
+                        <span class="tag tag-sage">Warm</span>
+                        <span class="tag tag-ink">Cosy</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tropical -->
+            <div class="aes-card">
+                <div class="aes-swatch swatch-tropical">
+                    <span class="aes-badge badge-light">Tropical greens</span>
+                </div>
+                <div class="aes-body">
+                    <h4>Tropical greens</h4>
+                    <p>Lush plants, natural fibres, earthy prints. A breath of fresh air in any room.</p>
+                    <div class="aes-tags">
+                        <span class="tag tag-sage">Fresh</span>
+                        <span class="tag tag-sage">Natural</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Urban -->
+            <div class="aes-card">
+                <div class="aes-swatch swatch-urban">
+                    <span class="aes-badge badge-dark">Urban edge</span>
+                </div>
+                <div class="aes-body">
+                    <h4>Urban edge</h4>
+                    <p>Dark palette, bold accent pieces, moody lighting. For rooms with a point of view.</p>
+                    <div class="aes-tags">
+                        <span class="tag tag-amber">Bold</span>
+                        <span class="tag tag-ink">Dark</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="aes-cta-row">
+            <p style="font-size:14px; color:var(--muted);">
+                Not sure which style is right for you? Browse all options and filter by mood.
+            </p>
+            <a asp-controller="Aesthetics" asp-action="Index" class="link-underline">
+                See all styles →
+            </a>
+        </div>
+    </section>
+
+    <!-- ══ LOGISTICS ══ -->
+    <section class="sec log-section">
+        <div class="log-layout">
+            <div>
+                <p class="sec-eyebrow">Logistics &amp; storage</p>
+                <h2 class="sec-h">Leave for vacation<br>without the worry.</h2>
+                <p class="sec-sub">
+                    Select the items you want stored, pay securely, and we handle
+                    pickup from your hostel door. Everything comes back when you return.
+                </p>
+
+                <div class="log-items-grid">
+                    <div class="log-item-card">
+                        <div class="log-item-icon"><i class="ti ti-wind" aria-hidden="true"></i></div>
+                        <div class="log-item-name">Electric fan</div>
+                        <div class="log-item-price">GH₵ 30</div>
+                    </div>
+                    <div class="log-item-card">
+                        <div class="log-item-icon"><i class="ti ti-bed" aria-hidden="true"></i></div>
+                        <div class="log-item-name">Mattress</div>
+                        <div class="log-item-price">GH₵ 50</div>
+                    </div>
+                    <div class="log-item-card">
+                        <div class="log-item-icon"><i class="ti ti-device-tv" aria-hidden="true"></i></div>
+                        <div class="log-item-name">Television</div>
+                        <div class="log-item-price">GH₵ 60</div>
+                    </div>
+                    <div class="log-item-card">
+                        <div class="log-item-icon"><i class="ti ti-box" aria-hidden="true"></i></div>
+                        <div class="log-item-name">Storage box</div>
+                        <div class="log-item-price">GH₵ 15</div>
+                    </div>
+                    <div class="log-item-card">
+                        <div class="log-item-icon"><i class="ti ti-fridge" aria-hidden="true"></i></div>
+                        <div class="log-item-name">Mini fridge</div>
+                        <div class="log-item-price">GH₵ 70</div>
+                    </div>
+                    <div class="log-item-card">
+                        <div class="log-item-icon"><i class="ti ti-shirt" aria-hidden="true"></i></div>
+                        <div class="log-item-name">Wardrobe items</div>
+                        <div class="log-item-price">GH₵ 20</div>
+                    </div>
+                </div>
+
+                <a asp-controller="Logistics" asp-action="Index"
+                   class="btn-amber-lg" style="margin-top:2rem; display:inline-block;">
+                    See full item list &amp; prices →
+                </a>
+            </div>
+
+            <!-- order panel -->
+            <div class="order-panel">
+                <div class="order-panel-head">
+                    <h3>How your order works</h3>
+                    <p>Simple 4-step process, door to door</p>
+                </div>
+                <div class="order-panel-body">
+                    <div class="order-steps">
+                        <div class="order-step">
+                            <div class="ostep-num">1</div>
+                            <div class="ostep-text">
+                                <strong>Pick your items</strong>
+                                <span>Browse the full item catalog and select what you want stored, with quantities.</span>
+                            </div>
+                        </div>
+                        <div class="order-divider"></div>
+                        <div class="order-step">
+                            <div class="ostep-num">2</div>
+                            <div class="ostep-text">
+                                <strong>Choose pickup date</strong>
+                                <span>Select a date before your vacation starts. We'll be at your door on time.</span>
+                            </div>
+                        </div>
+                        <div class="order-divider"></div>
+                        <div class="order-step">
+                            <div class="ostep-num">3</div>
+                            <div class="ostep-text">
+                                <strong>Pay via Paystack</strong>
+                                <span>Card, mobile money, or bank transfer. Your items are insured from the moment we collect.</span>
+                            </div>
+                        </div>
+                        <div class="order-divider"></div>
+                        <div class="order-step">
+                            <div class="ostep-num">4</div>
+                            <div class="ostep-text">
+                                <strong>We return everything</strong>
+                                <span>Set your return date and your belongings will be waiting when you get back.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="order-divider"></div>
+                    <a asp-controller="Logistics" asp-action="Index" class="btn-forest">
+                        Start my storage order →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ HOW IT WORKS ══ -->
+    <section class="hiw-section">
+        <p class="sec-eyebrow">How it works</p>
+        <h2 class="sec-h" style="color:#fff; margin-bottom:10px;">Simple from start to finish</h2>
+        <p class="sec-sub">Whether you're decorating or storing, the whole process takes minutes online.</p>
+
+        <div class="hiw-grid">
+            <div class="hiw-card">
+                <div class="hiw-icon"><i class="ti ti-layout-grid" aria-hidden="true"></i></div>
+                <div class="hiw-num">01</div>
+                <h4>Choose a service</h4>
+                <p>Pick room aesthetics or item storage from the homepage and browse your options.</p>
+            </div>
+            <div class="hiw-card">
+                <div class="hiw-icon"><i class="ti ti-adjustments" aria-hidden="true"></i></div>
+                <div class="hiw-num">02</div>
+                <h4>Customise &amp; order</h4>
+                <p>Select your style or log the items you want stored. Add any notes or special instructions.</p>
+            </div>
+            <div class="hiw-card">
+                <div class="hiw-icon"><i class="ti ti-credit-card" aria-hidden="true"></i></div>
+                <div class="hiw-num">03</div>
+                <h4>Pay securely</h4>
+                <p>Checkout via Paystack — card, mobile money, or bank transfer all accepted instantly.</p>
+            </div>
+            <div class="hiw-card">
+                <div class="hiw-icon"><i class="ti ti-circle-check" aria-hidden="true"></i></div>
+                <div class="hiw-num">04</div>
+                <h4>We handle it</h4>
+                <p>Our team decorates your room or collects your items — you just show up and enjoy.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ TESTIMONIALS ══ -->
+    <section class="proof-section">
+        <p class="sec-eyebrow">Student reviews</p>
+        <h2 class="sec-h">What students are saying</h2>
+
+        <div class="proof-grid">
+            <div class="proof-card">
+                <div class="proof-stars">
+                    <i class="ti ti-star-filled" aria-hidden="true"></i>
+                    <i class="ti ti-star-filled" aria-hidden="true"></i>
+                    <i class="ti ti-star-filled" aria-hidden="true"></i>
+                    <i class="ti ti-star-filled" aria-hidden="true"></i>
+                    <i class="ti ti-star-filled" aria-hidden="true"></i>
+                </div>
+                <blockquote>
+                    "I went with the minimal calm style and my room honestly looks like something out of a magazine.
+                    The team set everything up the day before I arrived. Worth every pesewa."
+                </blockquote>
+                <div class="proof-author">
+                    <div class="proof-avatar av-a">AK</div>
+                    <div>
+                        <div class="proof-name">Abena K.</div>
+                        <div class="proof-meta">Level 300 · Engineering</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="proof-card">
+                <div class="proof-stars">
+                    <i class="ti ti-star-filled" aria-hidden="true"></i>
+                    <i class="ti ti-star-filled" aria-hidden="true"></i>
+                    <i class="ti ti-star-filled" aria-hidden="true"></i>
+                    <i class="ti ti-star-filled" aria-hidden="true"></i>
+                    <i class="ti ti-star-filled" aria-hidden="true"></i>
+                </div>
+                <blockquote>
+                    "Stored my fan, mattress, and mini fridge over the long vacation. They picked up on time,
+                    everything came back in perfect condition. Never doing it myself again."
+                </blockquote>
+                <div class="proof-author">
+                    <div class="proof-avatar av-b">KO</div>
+                    <div>
+                        <div class="proof-name">Kwame O.</div>
+                        <div class="proof-meta">Level 200 · Business</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="proof-card">
+                <div class="proof-stars">
+                    <i class="ti ti-star-filled" aria-hidden="true"></i>
+                    <i class="ti ti-star-filled" aria-hidden="true"></i>
+                    <i class="ti ti-star-filled" aria-hidden="true"></i>
+                    <i class="ti ti-star-filled" aria-hidden="true"></i>
+                    <i class="ti ti-star-half" aria-hidden="true"></i>
+                </div>
+                <blockquote>
+                    "The tropical greens setup took my room from a bare box to something I actually
+                    wanted to come back to. My roommate ended up requesting the same style."
+                </blockquote>
+                <div class="proof-author">
+                    <div class="proof-avatar av-c">EA</div>
+                    <div>
+                        <div class="proof-name">Esi A.</div>
+                        <div class="proof-meta">Level 400 · Pharmacy</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ CTA ══ -->
+    <section class="cta-section">
+        <h2>Ready to make your<br><em>room yours?</em></h2>
+        <p>Join thousands of students who've already upgraded their space or stored their stuff stress-free.</p>
+        <div class="cta-btns">
+            <a asp-controller="Aesthetics" asp-action="Index" class="btn-amber-lg">
+                Browse room styles
+            </a>
+            <a asp-controller="Logistics" asp-action="Index" class="btn-ghost-lg">
+                Plan my storage
+            </a>
+        </div>
+    </section>
+
+</div>
+
+@section Scripts {
+<script>
+    const tabData = {
+        aes: {
+            detail: '<strong>Customise your room</strong>Pick from curated decoration styles — minimal, nordic, tropical, or urban. We source everything and set it up for you before you move in.',
+            cta: 'Browse aesthetic styles →',
+            href: '@Url.Action("Index", "Aesthetics")'
+        },
+        log: {
+            detail: '<strong>Store your items</strong>Select what you want stored — fan, mattress, fridge and more. We pick up from your hostel door, keep everything safe, and return it when you\'re back.',
+            cta: 'Start my storage order →',
+            href: '@Url.Action("Index", "Logistics")'
+        }
+    };
+
+    function switchTab(key) {
+        document.querySelectorAll('.svc-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab-' + key).classList.add('active');
+
+        const detail = document.getElementById('svc-detail');
+        detail.style.opacity = '0';
+        setTimeout(() => {
+            detail.innerHTML = tabData[key].detail;
+            detail.style.opacity = '1';
+        }, 150);
+
+        const cta = document.getElementById('svc-cta');
+        cta.textContent = tabData[key].cta;
+        cta.href = tabData[key].href;
+    }
+</script>
+}

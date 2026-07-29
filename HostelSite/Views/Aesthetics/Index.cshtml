@@ -1,0 +1,640 @@
+@{
+    ViewData["Title"] = "Room Aesthetics";
+}
+
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Outfit:wght@400;500;600&display=swap');
+
+    :root {
+        --forest:      #1C3B2E;
+        --forest-dark: #0D201A;
+        --forest-mid:  #2E6B52;
+        --sage:        #4A9572;
+        --sage-light:  #EAF3EE;
+        --sage-muted:  #9CBDAD;
+        --amber:       #C9863A;
+        --amber-light: #FDF3E7;
+        --amber-hover: #B5722A;
+        --ink:         #111318;
+        --ink2:        #3D3F47;
+        --muted:       #7C808C;
+        --line:        #E3E5EA;
+        --sand:        #F8F7F4;
+        --white:       #FFFFFF;
+        --font-d:      'Playfair Display', Georgia, serif;
+        --font-b:      'Outfit', system-ui, sans-serif;
+        --r:           10px;
+    }
+
+    .aes-page * { box-sizing: border-box; }
+    .aes-page { font-family: var(--font-b); color: var(--ink); background: var(--sand); }
+    .aes-page p, .aes-page h1, .aes-page h2,
+    .aes-page h3, .aes-page h4 { margin: 0; }
+    .aes-page a { text-decoration: none; }
+
+    /* ── PAGE HEADER ── */
+    .aes-header {
+        background: var(--forest);
+        padding: 3.5rem 3rem 3rem;
+        text-align: center;
+    }
+
+    .aes-header-eyebrow {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        color: var(--sage);
+        margin-bottom: 14px;
+    }
+
+    .aes-header h1 {
+        font-family: var(--font-d);
+        font-size: 44px;
+        color: #fff;
+        font-weight: 600;
+        line-height: 1.15;
+        letter-spacing: -0.3px;
+        margin-bottom: 14px;
+    }
+
+    .aes-header h1 em { font-style: italic; color: #A8D8BF; }
+
+    .aes-header p {
+        font-size: 16px;
+        color: var(--sage-muted);
+        line-height: 1.75;
+        max-width: 520px;
+        margin: 0 auto;
+    }
+
+    /* ── STYLE GRID ── */
+    .aes-body {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 3rem 3rem 5rem;
+    }
+
+    .style-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 28px;
+    }
+
+    .style-card {
+        background: var(--white);
+        border: 1.5px solid var(--line);
+        border-radius: 18px;
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+    }
+
+    .style-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 16px 40px rgba(0,0,0,0.1);
+    }
+
+    .style-card.selected {
+        border-color: var(--sage);
+        box-shadow: 0 0 0 3px rgba(74,149,114,0.2);
+    }
+
+    /* ── CSS ART SWATCHES ── */
+    .swatch {
+        height: 220px;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: flex-end;
+        padding: 1.25rem;
+    }
+
+    /* MINIMAL */
+    .swatch-minimal { background: #EDEBE6; }
+    .swatch-minimal .s-circle {
+        position: absolute;
+        right: -30px; top: -30px;
+        width: 200px; height: 200px;
+        border-radius: 50%;
+        background: #D8D4CC;
+    }
+    .swatch-minimal .s-line {
+        position: absolute;
+        left: 36px; bottom: 60px;
+        width: 80px; height: 3px;
+        background: #B0A99E;
+        border-radius: 2px;
+        box-shadow: 0 14px 0 #B0A99E, 0 28px 0 rgba(176,169,158,0.4);
+    }
+    .swatch-minimal .s-rect {
+        position: absolute;
+        left: 36px; bottom: 120px;
+        width: 48px; height: 48px;
+        background: #C8C2B8;
+        border-radius: 4px;
+    }
+
+    /* NORDIC */
+    .swatch-nordic { background: #DDE8EF; }
+    .swatch-nordic .s-plank {
+        position: absolute;
+        right: 40px; top: 20px;
+        width: 90px; height: 110px;
+        background: #C4A882;
+        border-radius: 8px 8px 0 0;
+    }
+    .swatch-nordic .s-plank::after {
+        content: '';
+        position: absolute;
+        top: 10px; left: 10px;
+        right: 10px; bottom: 0;
+        background: #B8935A;
+        border-radius: 4px 4px 0 0;
+        opacity: 0.4;
+    }
+    .swatch-nordic .s-snow {
+        position: absolute;
+        left: 30px; top: 30px;
+        width: 70px; height: 70px;
+        background: rgba(255,255,255,0.6);
+        border-radius: 50%;
+    }
+    .swatch-nordic .s-stripe {
+        position: absolute;
+        left: 0; bottom: 50px;
+        width: 100%; height: 3px;
+        background: rgba(196,168,130,0.3);
+        box-shadow: 0 12px 0 rgba(196,168,130,0.15);
+    }
+
+    /* TROPICAL */
+    .swatch-tropical { background: #C8E0C6; }
+    .swatch-tropical .s-leaf {
+        position: absolute;
+        right: 20px; top: -15px;
+        width: 60px; height: 130px;
+        background: #2E6B52;
+        clip-path: polygon(50% 0%, 5% 100%, 95% 100%);
+        opacity: 0.8;
+    }
+    .swatch-tropical .s-leaf2 {
+        position: absolute;
+        right: 55px; top: 10px;
+        width: 45px; height: 100px;
+        background: #4A9572;
+        clip-path: polygon(50% 0%, 5% 100%, 95% 100%);
+        opacity: 0.6;
+    }
+    .swatch-tropical .s-leaf3 {
+        position: absolute;
+        right: 5px; top: 20px;
+        width: 35px; height: 80px;
+        background: #1C3B2E;
+        clip-path: polygon(50% 0%, 5% 100%, 95% 100%);
+        opacity: 0.5;
+    }
+    .swatch-tropical .s-pot {
+        position: absolute;
+        right: 30px; bottom: 30px;
+        width: 50px; height: 40px;
+        background: #C9863A;
+        border-radius: 5px 5px 12px 12px;
+    }
+
+    /* URBAN */
+    .swatch-urban { background: #23262F; }
+    .swatch-urban .s-bg {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, #1A1D24 0%, #2E3140 100%);
+    }
+    .swatch-urban .s-ring {
+        position: absolute;
+        right: 30px; top: 30px;
+        width: 80px; height: 80px;
+        border: 2px solid rgba(201,134,58,0.5);
+        border-radius: 50%;
+    }
+    .swatch-urban .s-ring2 {
+        position: absolute;
+        right: 45px; top: 45px;
+        width: 50px; height: 50px;
+        border: 1px solid rgba(201,134,58,0.25);
+        border-radius: 50%;
+    }
+    .swatch-urban .s-bar {
+        position: absolute;
+        left: 30px; top: 40px;
+        width: 5px; height: 80px;
+        background: var(--amber);
+        border-radius: 3px;
+        box-shadow: 16px 0 0 rgba(201,134,58,0.3), 32px 0 0 rgba(201,134,58,0.1);
+    }
+
+    /* style badge */
+    .style-badge {
+        position: relative;
+        z-index: 2;
+        padding: 6px 14px;
+        border-radius: 99px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+
+    .badge-on-light { background: rgba(255,255,255,0.88); color: var(--ink); }
+    .badge-on-dark  { background: rgba(0,0,0,0.55);       color: #fff; }
+
+    /* ── CARD BODY ── */
+    .style-body {
+        padding: 1.5rem 1.75rem 1.75rem;
+    }
+
+    .style-body-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 8px;
+    }
+
+    .style-body h3 {
+        font-family: var(--font-d);
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--ink);
+    }
+
+    .style-select-btn {
+        border: 1.5px solid var(--line);
+        background: transparent;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 500;
+        padding: 6px 14px;
+        border-radius: 99px;
+        cursor: pointer;
+        font-family: var(--font-b);
+        transition: all 0.15s;
+        white-space: nowrap;
+    }
+
+    .style-select-btn:hover,
+    .style-card.selected .style-select-btn {
+        background: var(--forest);
+        border-color: var(--forest);
+        color: #fff;
+    }
+
+    .style-body p {
+        font-size: 14px;
+        color: var(--muted);
+        line-height: 1.65;
+        margin-bottom: 14px;
+    }
+
+    .style-tags { display: flex; gap: 7px; flex-wrap: wrap; }
+
+    .stag {
+        font-size: 11px;
+        font-weight: 500;
+        padding: 4px 11px;
+        border-radius: 99px;
+    }
+
+    .stag-sage  { background: var(--sage-light);  color: #1C5C40; }
+    .stag-amber { background: var(--amber-light); color: #7A4B10; }
+    .stag-ink   { background: #ECEDF0;            color: var(--ink2); }
+
+    /* ── REQUEST FORM ── */
+    .request-section {
+        background: var(--forest);
+        padding: 4rem 3rem;
+        margin-top: 0;
+    }
+
+    .request-inner {
+        max-width: 760px;
+        margin: 0 auto;
+    }
+
+    .request-eyebrow {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        color: var(--sage);
+        margin-bottom: 10px;
+    }
+
+    .request-inner h2 {
+        font-family: var(--font-d);
+        font-size: 36px;
+        color: #fff;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .request-inner > p {
+        font-size: 15px;
+        color: var(--sage-muted);
+        line-height: 1.7;
+        margin-bottom: 2.5rem;
+    }
+
+    .request-form {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 16px;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+
+    .form-field { display: flex; flex-direction: column; gap: 6px; }
+
+    .form-field label {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--sage-muted);
+    }
+
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+        background: rgba(255,255,255,0.07);
+        border: 1.5px solid rgba(255,255,255,0.12);
+        border-radius: 8px;
+        padding: 11px 14px;
+        font-size: 14px;
+        font-family: var(--font-b);
+        color: #fff;
+        outline: none;
+        transition: border-color 0.15s, background 0.15s;
+        width: 100%;
+    }
+
+    .form-field input::placeholder,
+    .form-field textarea::placeholder { color: rgba(255,255,255,0.25); }
+
+    .form-field select option { background: var(--forest-dark); color: #fff; }
+
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus {
+        border-color: var(--sage);
+        background: rgba(255,255,255,0.1);
+    }
+
+    .form-field textarea { resize: vertical; min-height: 100px; }
+
+    /* selected style preview inside form */
+    .selected-style-preview {
+        background: rgba(74,149,114,0.12);
+        border: 1px solid rgba(74,149,114,0.25);
+        border-radius: 8px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 14px;
+        color: #A8D8BF;
+    }
+
+    .selected-style-preview strong { color: #fff; }
+    .selected-style-preview span { font-size: 12px; }
+
+    .btn-submit {
+        background: var(--amber);
+        border: none;
+        color: #fff;
+        padding: 14px;
+        border-radius: 9px;
+        font-size: 15px;
+        font-weight: 600;
+        font-family: var(--font-b);
+        cursor: pointer;
+        width: 100%;
+        transition: background 0.15s;
+        margin-top: 0.25rem;
+    }
+
+    .btn-submit:hover { background: var(--amber-hover); }
+
+    /* ── RESPONSIVE ── */
+    @@media (max-width: 900px) {
+        .style-grid { grid-template-columns: 1fr; }
+        .form-row   { grid-template-columns: 1fr; }
+    }
+
+    @@media (max-width: 640px) {
+        .aes-header  { padding: 2.5rem 1.5rem 2rem; }
+        .aes-header h1 { font-size: 32px; }
+        .aes-body    { padding: 2rem 1.5rem 3rem; }
+        .request-section { padding: 3rem 1.5rem; }
+    }
+</style>
+
+<div class="aes-page">
+
+    <!-- PAGE HEADER -->
+    <div class="aes-header">
+        <p class="aes-header-eyebrow">Room aesthetics</p>
+        <h1>Choose your style.<br><em>We bring it to life.</em></h1>
+        <p>Browse four curated decoration styles designed for hostel rooms. Pick the one that feels like you, fill in the request form, and our team handles everything.</p>
+    </div>
+
+    <!-- STYLE GRID -->
+    <div class="aes-body">
+        <div class="style-grid">
+
+            <!-- MINIMAL -->
+            <div class="style-card" id="card-minimal" onclick="selectStyle('minimal', 'Minimal calm')">
+                <div class="swatch swatch-minimal">
+                    <div class="s-circle"></div>
+                    <div class="s-rect"></div>
+                    <div class="s-line"></div>
+                    <span class="style-badge badge-on-light">Minimal calm</span>
+                </div>
+                <div class="style-body">
+                    <div class="style-body-top">
+                        <h3>Minimal calm</h3>
+                        <button class="style-select-btn" id="btn-minimal">Select style</button>
+                    </div>
+                    <p>Clean lines, muted tones, and deliberate space. For students who think clearly in quiet, uncluttered rooms.</p>
+                    <div class="style-tags">
+                        <span class="stag stag-sage">Neutral palette</span>
+                        <span class="stag stag-amber">Most popular</span>
+                        <span class="stag stag-ink">Calm</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NORDIC -->
+            <div class="style-card" id="card-nordic" onclick="selectStyle('nordic', 'Nordic light')">
+                <div class="swatch swatch-nordic">
+                    <div class="s-plank"></div>
+                    <div class="s-snow"></div>
+                    <div class="s-stripe"></div>
+                    <span class="style-badge badge-on-light">Nordic light</span>
+                </div>
+                <div class="style-body">
+                    <div class="style-body-top">
+                        <h3>Nordic light</h3>
+                        <button class="style-select-btn" id="btn-nordic">Select style</button>
+                    </div>
+                    <p>Warm wood tones, cool blues, and soft woven textures. Cosy without feeling heavy or crowded.</p>
+                    <div class="style-tags">
+                        <span class="stag stag-sage">Warm tones</span>
+                        <span class="stag stag-ink">Cosy</span>
+                        <span class="stag stag-ink">Textured</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TROPICAL -->
+            <div class="style-card" id="card-tropical" onclick="selectStyle('tropical', 'Tropical greens')">
+                <div class="swatch swatch-tropical">
+                    <div class="s-leaf"></div>
+                    <div class="s-leaf2"></div>
+                    <div class="s-leaf3"></div>
+                    <div class="s-pot"></div>
+                    <span class="style-badge badge-on-light">Tropical greens</span>
+                </div>
+                <div class="style-body">
+                    <div class="style-body-top">
+                        <h3>Tropical greens</h3>
+                        <button class="style-select-btn" id="btn-tropical">Select style</button>
+                    </div>
+                    <p>Lush plants, natural fibres, and earthy prints. A breath of fresh air in any hostel room.</p>
+                    <div class="style-tags">
+                        <span class="stag stag-sage">Fresh</span>
+                        <span class="stag stag-sage">Natural</span>
+                        <span class="stag stag-ink">Earthy</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- URBAN -->
+            <div class="style-card" id="card-urban" onclick="selectStyle('urban', 'Urban edge')">
+                <div class="swatch swatch-urban">
+                    <div class="s-bg"></div>
+                    <div class="s-ring"></div>
+                    <div class="s-ring2"></div>
+                    <div class="s-bar"></div>
+                    <span class="style-badge badge-on-dark">Urban edge</span>
+                </div>
+                <div class="style-body">
+                    <div class="style-body-top">
+                        <h3>Urban edge</h3>
+                        <button class="style-select-btn" id="btn-urban">Select style</button>
+                    </div>
+                    <p>Dark palette, bold accent pieces, and moody lighting. For rooms with a distinct point of view.</p>
+                    <div class="style-tags">
+                        <span class="stag stag-amber">Bold</span>
+                        <span class="stag stag-ink">Dark</span>
+                        <span class="stag stag-ink">Dramatic</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- REQUEST FORM -->
+    <section class="request-section" id="requestSection">
+        <div class="request-inner">
+            <p class="request-eyebrow">Submit a request</p>
+            <h2>Ready to get started?</h2>
+            <p>Fill in your details below and we'll be in touch to confirm your aesthetic setup and timeline.</p>
+
+            <form class="request-form" asp-controller="Aesthetics" asp-action="SubmitRequest" method="post">
+                @Html.AntiForgeryToken()
+
+                <!-- selected style indicator -->
+                <div class="selected-style-preview" id="stylePreview">
+                    <span>No style selected yet — <strong>pick one above</strong></span>
+                    <span>↑ scroll up</span>
+                </div>
+
+                <input type="hidden" name="StyleName" id="styleNameInput" value="" />
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>First name</label>
+                        <input type="text" name="FirstName" placeholder="Kwame" required />
+                    </div>
+                    <div class="form-field">
+                        <label>Last name</label>
+                        <input type="text" name="LastName" placeholder="Osei" required />
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label>Email address</label>
+                    <input type="email" name="Email" placeholder="kwame@email.com" required />
+                </div>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>Hostel / hall</label>
+                        <input type="text" name="Hostel" placeholder="e.g. Republic Hall" required />
+                    </div>
+                    <div class="form-field">
+                        <label>Room number</label>
+                        <input type="text" name="RoomNumber" placeholder="e.g. A204" required />
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label>Preferred setup date</label>
+                    <input type="date" name="PreferredDate" required />
+                </div>
+
+                <div class="form-field">
+                    <label>Additional notes (optional)</label>
+                    <textarea name="Notes" placeholder="Any specific preferences, colours you love or hate, items you already have in the room..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    Submit aesthetic request →
+                </button>
+            </form>
+        </div>
+    </section>
+
+</div>
+
+@section Scripts {
+<script>
+    let selectedStyle = null;
+
+    function selectStyle(key, label) {
+        // Deselect all
+        document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
+        document.querySelectorAll('.style-select-btn').forEach(b => b.textContent = 'Select style');
+
+        // Select chosen
+        document.getElementById('card-' + key).classList.add('selected');
+        document.getElementById('btn-' + key).textContent = '✓ Selected';
+        selectedStyle = key;
+
+        // Update form
+        document.getElementById('styleNameInput').value = label;
+        document.getElementById('stylePreview').innerHTML =
+            `<span>Selected style: <strong>${label}</strong></span><span>✓</span>`;
+
+        // Scroll to form smoothly
+        document.getElementById('requestSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Set min date to today
+    const dateInput = document.querySelector('input[name="PreferredDate"]');
+    if (dateInput) dateInput.min = new Date().toISOString().split('T')[0];
+</script>
+}

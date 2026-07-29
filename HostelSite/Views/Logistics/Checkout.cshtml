@@ -1,0 +1,741 @@
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Outfit:wght@400;500;600&display=swap');
+
+    :root {
+        --forest: #1C3B2E;
+        --forest-mid: #2E6B52;
+        --sage: #4A9572;
+        --sage-light: #EAF3EE;
+        --sage-muted: #9CBDAD;
+        --amber: #C9863A;
+        --amber-hover: #B5722A;
+        --amber-light: #FDF3E7;
+        --ink: #111318;
+        --ink2: #3D3F47;
+        --muted: #7C808C;
+        --line: #E3E5EA;
+        --sand: #F8F7F4;
+        --white: #FFFFFF;
+        --font-d: 'Playfair Display', Georgia, serif;
+        --font-b: 'Outfit', system-ui, sans-serif;
+        --r: 10px;
+    }
+
+    .checkout-page * {
+        box-sizing: border-box;
+    }
+
+    .checkout-page {
+        font-family: var(--font-b);
+        color: var(--ink);
+        background: var(--sand);
+    }
+
+        .checkout-page p, .checkout-page h1, .checkout-page h2,
+        .checkout-page h3, .checkout-page h4 {
+            margin: 0;
+        }
+
+    .co-header {
+        background: var(--forest);
+        padding: 2.5rem 3rem;
+    }
+
+    .co-header-inner {
+        max-width: 960px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .co-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--sage-muted);
+    }
+
+        .co-breadcrumb a {
+            color: var(--sage-muted);
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+
+            .co-breadcrumb a:hover {
+                color: #fff;
+            }
+
+    .co-header h1 {
+        font-family: var(--font-d);
+        font-size: 30px;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .co-steps {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 1.5rem 3rem 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .co-step {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--muted);
+        flex: 1;
+    }
+
+        .co-step.done {
+            color: var(--sage);
+        }
+
+        .co-step.active {
+            color: var(--forest);
+            font-weight: 600;
+        }
+
+    .step-dot {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        border: 2px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 600;
+        flex-shrink: 0;
+        background: var(--white);
+    }
+
+    .co-step.done .step-dot {
+        background: var(--sage);
+        border-color: var(--sage);
+        color: #fff;
+    }
+
+    .co-step.active .step-dot {
+        border-color: var(--forest);
+        color: var(--forest);
+    }
+
+    .step-line {
+        flex: 1;
+        height: 2px;
+        background: var(--line);
+        margin: 0 8px;
+    }
+
+    .co-body {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 2.5rem 3rem 5rem;
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 2.5rem;
+        align-items: start;
+    }
+
+    .co-section {
+        background: var(--white);
+        border: 1.5px solid var(--line);
+        border-radius: 14px;
+        overflow: hidden;
+        margin-bottom: 1.25rem;
+    }
+
+        .co-section:last-child {
+            margin-bottom: 0;
+        }
+
+    .co-section-head {
+        padding: 1.1rem 1.5rem;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+        .co-section-head h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--ink);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .co-section-head h3 i {
+                font-size: 17px;
+                color: var(--sage);
+            }
+
+        .co-section-head a {
+            font-size: 13px;
+            color: var(--forest-mid);
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+    .co-section-body {
+        padding: 1.5rem;
+    }
+
+    .co-items {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .co-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--line);
+    }
+
+        .co-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+    .co-item-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .co-item-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 9px;
+        background: var(--sage-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+        .co-item-icon i {
+            font-size: 18px;
+            color: var(--forest-mid);
+        }
+
+    .co-item-name {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--ink);
+    }
+
+    .co-item-meta {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 2px;
+    }
+
+    .co-item-price {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--ink);
+    }
+
+    .co-dates {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .co-date-box {
+        background: var(--sand);
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        padding: 1rem;
+    }
+
+    .co-date-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--muted);
+        margin-bottom: 5px;
+    }
+
+    .co-date-value {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--ink);
+    }
+
+    .co-notice {
+        display: flex;
+        gap: 10px;
+        background: var(--sage-light);
+        border: 1px solid rgba(74,149,114,0.25);
+        border-radius: 9px;
+        padding: 12px 14px;
+        font-size: 13px;
+        color: #1C5C40;
+        line-height: 1.55;
+    }
+
+        .co-notice i {
+            font-size: 18px;
+            color: var(--sage);
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+    .summary-panel {
+        position: sticky;
+        top: 84px;
+        background: var(--white);
+        border: 1.5px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .summary-head {
+        background: var(--forest);
+        padding: 1.25rem 1.5rem;
+    }
+
+        .summary-head h3 {
+            font-family: var(--font-d);
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .summary-head p {
+            font-size: 12px;
+            color: var(--sage-muted);
+        }
+
+    .summary-body {
+        padding: 1.5rem;
+    }
+
+    .summary-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        padding: 6px 0;
+    }
+
+        .summary-line .label {
+            color: var(--muted);
+        }
+
+        .summary-line .value {
+            font-weight: 500;
+            color: var(--ink);
+        }
+
+        .summary-line.free .value {
+            color: var(--sage);
+            font-weight: 600;
+        }
+
+    .summary-divider {
+        height: 1px;
+        background: var(--line);
+        margin: 10px 0;
+    }
+
+    .summary-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0 4px;
+    }
+
+        .summary-total .label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .summary-total .amount {
+            font-family: var(--font-d);
+            font-size: 26px;
+            font-weight: 600;
+            color: var(--forest);
+        }
+
+    .btn-pay {
+        display: block;
+        width: 100%;
+        background: var(--amber);
+        color: #fff;
+        border: none;
+        padding: 14px;
+        border-radius: 9px;
+        font-size: 15px;
+        font-weight: 600;
+        font-family: var(--font-b);
+        cursor: pointer;
+        text-align: center;
+        transition: background 0.15s;
+        margin-top: 1rem;
+    }
+
+        .btn-pay:hover {
+            background: var(--amber-hover);
+        }
+
+    .pay-note {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 10px;
+        text-align: center;
+    }
+
+    .paystack-brand {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px solid var(--line);
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    .paystack-badge {
+        background: #011B33;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: 4px;
+    }
+
+    .co-empty {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--muted);
+    }
+
+        .co-empty i {
+            font-size: 48px;
+            color: var(--line);
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .co-empty h3 {
+            font-size: 18px;
+            color: var(--ink2);
+            margin-bottom: 8px;
+        }
+
+        .co-empty p {
+            font-size: 14px;
+            line-height: 1.65;
+            margin-bottom: 1.5rem;
+        }
+
+    .btn-back {
+        display: inline-block;
+        background: var(--forest);
+        color: #fff;
+        padding: 12px 24px;
+        border-radius: var(--r);
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+        .btn-back:hover {
+            background: var(--forest-mid);
+            color: #fff;
+        }
+
+    @@media (max-width: 900px) {
+        .co-body {
+            grid-template-columns: 1fr;
+            padding: 2rem 1.5rem 3rem;
+        }
+
+        .summary-panel {
+            position: static;
+        }
+    }
+
+    @@media (max-width: 640px) {
+        .co-header {
+            padding: 2rem 1.5rem;
+        }
+
+        .co-steps {
+            padding: 1.25rem 1.5rem 0;
+        }
+
+        .co-step span {
+            display: none;
+        }
+
+        .co-dates {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="checkout-page">
+
+    <div class="co-header">
+        <div class="co-header-inner">
+            <div class="co-breadcrumb">
+                <a asp-controller="Logistics" asp-action="Index">
+                    <i class="ti ti-arrow-left"></i> Back to items
+                </a>
+            </div>
+            <h1>Checkout</h1>
+            <div style="width:120px"></div>
+        </div>
+    </div>
+
+    <div class="co-steps">
+        <div class="co-step done">
+            <div class="step-dot"><i class="ti ti-check" style="font-size:12px"></i></div>
+            <span>Select items</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="co-step active">
+            <div class="step-dot">2</div>
+            <span>Review &amp; pay</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="co-step">
+            <div class="step-dot">3</div>
+            <span>Confirmation</span>
+        </div>
+    </div>
+
+    <div class="co-body">
+
+        <div class="co-empty" id="coEmpty" style="display:none; grid-column:1/-1;">
+            <i class="ti ti-shopping-cart-off"></i>
+            <h3>No items in your order</h3>
+            <p>It looks like you haven't added any items yet.<br>Go back and select what you'd like to store.</p>
+            <a asp-controller="Logistics" asp-action="Index" class="btn-back">Browse items</a>
+        </div>
+
+        <div id="orderDetails" style="display:none">
+            <div class="co-section">
+                <div class="co-section-head">
+                    <h3><i class="ti ti-package"></i> Items to store</h3>
+                    <a asp-controller="Logistics" asp-action="Index">Edit</a>
+                </div>
+                <div class="co-section-body">
+                    <div class="co-items" id="coItemsList"></div>
+                </div>
+            </div>
+
+            <div class="co-section">
+                <div class="co-section-head">
+                    <h3><i class="ti ti-calendar"></i> Storage dates</h3>
+                </div>
+                <div class="co-section-body">
+                    <div class="co-dates">
+                        <div class="co-date-box">
+                            <div class="co-date-label">Pickup date</div>
+                            <div class="co-date-value" id="coPickup">—</div>
+                        </div>
+                        <div class="co-date-box">
+                            <div class="co-date-label">Return date</div>
+                            <div class="co-date-value" id="coReturn">—</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="co-notice">
+                <i class="ti ti-shield-check"></i>
+                <span>All items in this order are <strong>fully insured</strong> against damage or loss from the moment we collect them until they are returned to you.</span>
+            </div>
+        </div>
+
+        <div class="summary-panel" id="summaryPanel" style="display:none">
+            <div class="summary-head">
+                <h3>Order summary</h3>
+                <p>Pay once for the full storage period</p>
+            </div>
+            <div class="summary-body">
+                <div class="summary-line">
+                    <span class="label">Items subtotal</span>
+                    <span class="value" id="sumSubtotal">GH₵ 0</span>
+                </div>
+                <div class="summary-line free">
+                    <span class="label">Pickup &amp; return</span>
+                    <span class="value">Free</span>
+                </div>
+                <div class="summary-line free">
+                    <span class="label">Item insurance</span>
+                    <span class="value">Included</span>
+                </div>
+                <div class="summary-divider"></div>
+                <div class="summary-total">
+                    <span class="label">Total</span>
+                    <span class="amount" id="sumTotal">GH₵ 0</span>
+                </div>
+
+                <button class="btn-pay" onclick="initiatePayment()">
+                    Pay with Paystack
+                </button>
+
+                <p class="pay-note">
+                    <i class="ti ti-lock"></i>
+                    Your payment is encrypted and secure
+                </p>
+
+                <div class="paystack-brand">
+                    Powered by <span class="paystack-badge">Paystack</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    @Html.AntiForgeryToken()
+
+    <script>
+        let orderData = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const raw = sessionStorage.getItem('nestOrder');
+            if (!raw) { showEmpty(); return; }
+
+            try {
+                orderData = JSON.parse(raw);
+                const items = orderData.items;
+                if (!items || items.length === 0) { showEmpty(); return; }
+
+                document.getElementById('orderDetails').style.display = 'block';
+                document.getElementById('summaryPanel').style.display = 'block';
+
+                const list = document.getElementById('coItemsList');
+                list.innerHTML = items.map(item => `
+                    <div class="co-item">
+                        <div class="co-item-left">
+                            <div class="co-item-icon"><i class="ti ti-package"></i></div>
+                            <div>
+                                <div class="co-item-name">${item.name}</div>
+                                <div class="co-item-meta">Qty: ${item.quantity} &times; GH&#8373; ${parseFloat(item.price).toFixed(2)}</div>
+                            </div>
+                        </div>
+                        <div class="co-item-price">GH&#8373; ${(parseFloat(item.price) * item.quantity).toFixed(2)}</div>
+                    </div>`
+                ).join('');
+
+                const fmt = d => d ? new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '—';
+                document.getElementById('coPickup').textContent = fmt(orderData.pickup);
+                document.getElementById('coReturn').textContent = fmt(orderData.returnDate);
+
+                const total = orderData.total || items.reduce((s, i) => s + parseFloat(i.price) * i.quantity, 0);
+                document.getElementById('sumSubtotal').textContent = 'GH₵ ' + parseFloat(total).toFixed(2);
+                document.getElementById('sumTotal').textContent    = 'GH₵ ' + parseFloat(total).toFixed(2);
+
+            } catch (e) {
+                console.error('Order parse error:', e);
+                showEmpty();
+            }
+        });
+
+        function showEmpty() {
+            document.getElementById('coEmpty').style.display = 'block';
+        }
+
+        function initiatePayment() {
+            if (!orderData) { alert('No order data. Please go back and add items.'); return; }
+
+            const total       = parseFloat(orderData.total);
+            const email       = '@(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "student@nest.edu.gh")';
+            const paystackKey = '@ViewData["PaystackKey"]';
+            const verifyUrl   = '@Url.Action("Verify", "Payments")';
+            const successUrl  = '@Url.Action("Success", "Payments")';
+            const token       = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
+
+            const handler = PaystackPop.setup({
+                key:      paystackKey,
+                email:    email,
+                amount:   Math.round(total * 100),
+                currency: 'GHS',
+                ref:      'NEST-' + Date.now(),
+                metadata: {
+                    custom_fields: [
+                        { display_name: 'Order type',  variable_name: 'order_type',  value: 'Logistics storage' },
+                        { display_name: 'Pickup date', variable_name: 'pickup_date', value: orderData.pickup },
+                        { display_name: 'Return date', variable_name: 'return_date', value: orderData.returnDate }
+                    ]
+                },
+                callback: function(response) {
+                    const ref = response.reference;
+
+                    const payload = {
+                        reference: ref,
+                        orderData: JSON.stringify(orderData)
+                    };
+
+                    fetch(verifyUrl, {
+                        method:  'POST',
+                        headers: {
+                            'Content-Type':                  'application/json',
+                            'RequestVerificationToken':      token
+                        },
+                        body: JSON.stringify(payload)
+                    })
+                    .then(function(r) { return r.text(); })
+                    .then(function(text) {
+                        console.log('Verify response:', text);
+                        sessionStorage.removeItem('nestOrder');
+                        try {
+                            const result = JSON.parse(text);
+                            if (result.success) {
+                                window.location.href = successUrl + '?ref=' + ref;
+                            } else {
+                                alert('Verification issue: ' + result.message + '\n\nYour payment went through (ref: ' + ref + '). Contact support if your order does not appear.');
+                                window.location.href = successUrl + '?ref=' + ref;
+                            }
+                        } catch(e) {
+                            alert('Server error. Your payment went through (ref: ' + ref + '). Contact support.\n\nDetails: ' + text.substring(0, 300));
+                            window.location.href = successUrl + '?ref=' + ref;
+                        }
+                    })
+                    .catch(function(err) {
+                        sessionStorage.removeItem('nestOrder');
+                        alert('Network error during verification. Payment ref: ' + ref + '. Contact support.');
+                        window.location.href = successUrl + '?ref=' + ref;
+                    });
+                },
+                onClose: function() {}
+            });
+
+            handler.openIframe();
+        }
+    </script>
+}

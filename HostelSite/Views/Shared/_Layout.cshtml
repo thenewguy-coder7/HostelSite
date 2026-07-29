@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — Nest</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
+
+    <!-- Tabler Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/@@tabler/icons-webfont@latest/tabler-icons.min.css" rel="stylesheet" />
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- Site stylesheet -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", required: false)
+
+    <style>
+        :root {
+            --forest:       #1C3B2E;
+            --forest-dark:  #0D201A;
+            --forest-mid:   #2E6B52;
+            --sage:         #4A9572;
+            --sage-light:   #EAF3EE;
+            --sage-muted:   #9CBDAD;
+            --amber:        #C9863A;
+            --amber-hover:  #B5722A;
+            --amber-light:  #FDF3E7;
+            --ink:          #111318;
+            --ink2:         #3D3F47;
+            --muted:        #7C808C;
+            --line:         #E3E5EA;
+            --sand:         #F8F7F4;
+            --white:        #FFFFFF;
+            --font-d:       'Playfair Display', Georgia, serif;
+            --font-b:       'Outfit', system-ui, sans-serif;
+            --r:            10px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-b);
+            background: var(--sand);
+            color: var(--ink);
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        a { color: var(--amber); text-decoration: none; }
+        a:hover { color: var(--amber-hover); }
+
+        /* ── NAVBAR ── */
+        .site-nav {
+            background: var(--forest);
+            height: 68px;
+            display: flex;
+            align-items: center;
+            padding: 0 2.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            gap: 2rem;
+        }
+
+        .site-nav .brand {
+            font-family: var(--font-d);
+            font-size: 24px;
+            color: #fff;
+            text-decoration: none;
+            flex-shrink: 0;
+            letter-spacing: -0.3px;
+        }
+
+        .site-nav .brand em {
+            font-style: normal;
+            color: #7FBD9E;
+        }
+
+        .site-nav .nav-links {
+            display: flex;
+            gap: 1.75rem;
+            list-style: none;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        .site-nav .nav-links a {
+            color: var(--sage-muted);
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: color 0.15s;
+            letter-spacing: 0.2px;
+        }
+
+        .site-nav .nav-links a:hover { color: #fff; }
+
+        .site-nav .nav-links a.active {
+            color: #fff;
+            border-bottom: 1.5px solid #7FBD9E;
+            padding-bottom: 2px;
+        }
+
+        .site-nav .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .student-greeting {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--sage-muted);
+        }
+
+        /* Buttons */
+        .btn-nav-ghost {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.25);
+            color: #fff;
+            padding: 7px 18px;
+            border-radius: var(--r);
+            font-size: 13px;
+            font-weight: 500;
+            font-family: var(--font-b);
+            cursor: pointer;
+            text-decoration: none;
+            transition: border-color 0.15s, background 0.15s;
+            display: inline-block;
+        }
+
+        .btn-nav-ghost:hover {
+            border-color: rgba(255,255,255,0.5);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+        }
+
+        .btn-nav-amber {
+            background: var(--amber);
+            border: none;
+            color: #fff;
+            padding: 7px 18px;
+            border-radius: var(--r);
+            font-size: 13px;
+            font-weight: 600;
+            font-family: var(--font-b);
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.15s;
+            display: inline-block;
+        }
+
+        .btn-nav-amber:hover { background: var(--amber-hover); color: #fff; }
+
+        /* Mobile hamburger */
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            margin-left: auto;
+        }
+
+        .nav-toggle span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: #fff;
+            border-radius: 2px;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        /* Mobile drawer */
+        .mobile-drawer {
+            display: none;
+            background: var(--forest);
+            padding: 1rem 2rem 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .mobile-drawer .drawer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+        }
+
+        .mobile-drawer .drawer-links a {
+            color: var(--sage-muted);
+            font-size: 15px;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .mobile-drawer .drawer-links a:hover { color: #fff; }
+
+        .mobile-drawer.open { display: block; }
+
+        .drawer-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .drawer-actions a { flex: 1; text-align: center; }
+
+        /* ── ALERTS ── */
+        .alert-wrapper {
+            max-width: 960px;
+            margin: 1.25rem auto 0;
+            padding: 0 1.5rem;
+        }
+
+        .alert-nest {
+            padding: 0.7rem 1rem;
+            border-radius: var(--r);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-family: var(--font-b);
+        }
+
+        .alert-nest.success {
+            background: #E8F5EE;
+            border-left: 3px solid #2D9B5A;
+            color: #1A5C34;
+        }
+
+        .alert-nest.error {
+            background: #FDECEA;
+            border-left: 3px solid #D94040;
+            color: #7A1E1E;
+        }
+
+        .alert-nest.info {
+            background: var(--amber-light);
+            border-left: 3px solid var(--amber);
+            color: #7A4B10;
+        }
+
+        /* ── MAIN ── */
+        .site-main {
+            min-height: calc(100vh - 68px - 200px);
+        }
+
+        /* ── FOOTER ── */
+        .site-footer {
+            background: var(--forest-dark);
+            padding: 3rem 2.5rem 2rem;
+        }
+
+        .footer-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-brand {
+            font-family: var(--font-d);
+            font-size: 22px;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .footer-brand em {
+            font-style: normal;
+            color: #7FBD9E;
+        }
+
+        .site-footer p {
+            font-size: 13px;
+            color: #3A5A4C;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .site-footer h5 {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #7FBD9E;
+            margin-bottom: 12px;
+        }
+
+        .site-footer ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .site-footer ul li { margin-bottom: 8px; }
+
+        .site-footer ul a {
+            font-size: 13px;
+            color: #3A5A4C;
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+
+        .site-footer ul a:hover { color: #A8D8BF; }
+
+        .footer-bottom {
+            max-width: 1100px;
+            margin: 0 auto;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding-top: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #2A3D33;
+        }
+
+        .footer-bottom a { color: #3A5A4C; }
+        .footer-bottom a:hover { color: #7FBD9E; }
+
+        /* ── RESPONSIVE ── */
+        @@media (max-width: 768px) {
+            .site-nav .nav-links,
+            .site-nav .nav-actions { display: none; }
+            .nav-toggle { display: flex; }
+
+            .footer-inner {
+                grid-template-columns: 1fr 1fr;
+                gap: 2rem;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .site-nav { padding: 0 1.25rem; }
+            .footer-inner { grid-template-columns: 1fr; }
+            .footer-bottom { flex-direction: column; gap: 4px; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ══ NAVBAR ══ -->
+    <nav class="site-nav">
+        <a asp-controller="Home" asp-action="Index" class="brand">Nest<em>.</em></a>
+
+        <ul class="nav-links">
+            <li>
+                <a asp-controller="Home" asp-action="Index"
+                   class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")">
+                    Home
+                </a>
+            </li>
+            <li>
+                <a asp-controller="Aesthetics" asp-action="Index"
+                   class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Aesthetics" ? "active" : "")">
+                    Aesthetics
+                </a>
+            </li>
+            <li>
+                <a asp-controller="Logistics" asp-action="Index"
+                   class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Logistics" ? "active" : "")">
+                    Logistics
+                </a>
+            </li>
+        </ul>
+
+        <div class="nav-actions">
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                <span class="student-greeting">Hi, @User.Identity.Name</span>
+                <a asp-controller="Aesthetics" asp-action="MyRequests" class="btn-nav-ghost">My Requests</a>
+                <a asp-controller="Logistics" asp-action="MyOrders" class="btn-nav-ghost">My Orders</a>
+                <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn-nav-ghost">Log out</button>
+                </form>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Login" class="btn-nav-ghost">Log in</a>
+                <a asp-controller="Account" asp-action="Register" class="btn-nav-amber">Get started</a>
+            }
+        </div>
+
+        <!-- Mobile hamburger -->
+        <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </nav>
+
+    <!-- ══ MOBILE DRAWER ══ -->
+    <div class="mobile-drawer" id="mobileDrawer">
+        <ul class="drawer-links">
+            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li><a asp-controller="Aesthetics" asp-action="Index">Aesthetics</a></li>
+            <li><a asp-controller="Logistics" asp-action="Index">Logistics</a></li>
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                <li><a asp-controller="Aesthetics" asp-action="MyRequests">My Requests</a></li>
+                <li><a asp-controller="Logistics" asp-action="MyOrders">My Orders</a></li>
+            }
+        </ul>
+
+        @if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            <form asp-controller="Account" asp-action="Logout" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn-nav-ghost" style="width:100%;">Log out</button>
+            </form>
+        }
+        else
+        {
+            <div class="drawer-actions">
+                <a asp-controller="Account" asp-action="Login" class="btn-nav-ghost">Log in</a>
+                <a asp-controller="Account" asp-action="Register" class="btn-nav-amber">Get started</a>
+            </div>
+        }
+    </div>
+
+    <!-- ══ TEMPDATA ALERTS ══ -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert-wrapper">
+            <div class="alert-nest success">
+                <i class="ti ti-circle-check"></i> @TempData["Success"]
+            </div>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert-wrapper">
+            <div class="alert-nest error">
+                <i class="ti ti-circle-x"></i> @TempData["Error"]
+            </div>
+        </div>
+    }
+
+    @if (TempData["Info"] != null)
+    {
+        <div class="alert-wrapper">
+            <div class="alert-nest info">
+                <i class="ti ti-info-circle"></i> @TempData["Info"]
+            </div>
+        </div>
+    }
+
+    <!-- ══ PAGE CONTENT ══ -->
+    <main class="site-main">
+        @RenderBody()
+    </main>
+
+    <!-- ══ FOOTER ══ -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div>
+                <div class="footer-brand">Nest<em>.</em></div>
+                <p>Room aesthetics and item storage for students — designed around campus life.</p>
+            </div>
+
+            <div>
+                <h5>Services</h5>
+                <ul>
+                    <li><a asp-controller="Aesthetics" asp-action="Index">Room aesthetics</a></li>
+                    <li><a asp-controller="Logistics" asp-action="Index">Item storage</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h5>Account</h5>
+                <ul>
+                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                    {
+                        <li><a asp-controller="Aesthetics" asp-action="MyRequests">My requests</a></li>
+                        <li><a asp-controller="Logistics" asp-action="MyOrders">My orders</a></li>
+                    }
+                    else
+                    {
+                        <li><a asp-controller="Account" asp-action="Login">Log in</a></li>
+                        <li><a asp-controller="Account" asp-action="Register">Sign up</a></li>
+                    }
+                </ul>
+            </div>
+
+            <div>
+                <h5>Support</h5>
+                <ul>
+                    <li><a asp-controller="Home" asp-action="About">About</a></li>
+                    <li><a href="mailto:support@nest.edu.gh">Contact us</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <span>&copy; @DateTime.Now.Year Nest. All rights reserved.</span>
+            <span>Payments secured by <a href="https://paystack.com" target="_blank" rel="noopener">Paystack</a></span>
+        </div>
+    </footer>
+
+    <!-- ══ SCRIPTS ══ -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        // Mobile nav toggle
+        const toggle   = document.getElementById('navToggle');
+        const drawer   = document.getElementById('mobileDrawer');
+
+        if (toggle && drawer) {
+            toggle.addEventListener('click', () => {
+                const isOpen = drawer.classList.toggle('open');
+                toggle.setAttribute('aria-expanded', isOpen);
+            });
+        }
+
+        // Auto-dismiss alerts after 5s
+        document.querySelectorAll('.alert-nest').forEach(el => {
+            setTimeout(() => {
+                el.style.transition = 'opacity 0.4s';
+                el.style.opacity    = '0';
+                setTimeout(() => el.remove(), 400);
+            }, 5000);
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

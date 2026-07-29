@@ -1,0 +1,556 @@
+@{
+    ViewData["Title"] = "My Aesthetic Requests";
+}
+
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Outfit:wght@400;500;600&display=swap');
+
+    :root {
+        --forest:      #1C3B2E;
+        --forest-mid:  #2E6B52;
+        --sage:        #4A9572;
+        --sage-light:  #EAF3EE;
+        --sage-muted:  #9CBDAD;
+        --amber:       #C9863A;
+        --amber-light: #FDF3E7;
+        --ink:         #111318;
+        --ink2:        #3D3F47;
+        --muted:       #7C808C;
+        --line:        #E3E5EA;
+        --sand:        #F8F7F4;
+        --white:       #FFFFFF;
+        --font-d:      'Playfair Display', Georgia, serif;
+        --font-b:      'Outfit', system-ui, sans-serif;
+        --r:           10px;
+    }
+
+    .req-page * { box-sizing: border-box; }
+    .req-page { font-family: var(--font-b); color: var(--ink); background: var(--sand); min-height: calc(100vh - 64px); }
+    .req-page p, .req-page h1, .req-page h2,
+    .req-page h3, .req-page h4 { margin: 0; }
+
+    /* ── HEADER ── */
+    .req-header {
+        background: var(--forest);
+        padding: 3rem 3rem 2.5rem;
+    }
+
+    .req-header-inner {
+        max-width: 900px;
+        margin: 0 auto;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 1.5rem;
+    }
+
+    .req-eyebrow {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        color: var(--sage);
+        margin-bottom: 8px;
+    }
+
+    .req-header h1 {
+        font-family: var(--font-d);
+        font-size: 34px;
+        color: #fff;
+        font-weight: 600;
+        letter-spacing: -0.2px;
+    }
+
+    .req-header h1 em { font-style: italic; color: #A8D8BF; }
+
+    .btn-new-req {
+        background: var(--amber);
+        color: #fff;
+        border: none;
+        padding: 11px 22px;
+        border-radius: var(--r);
+        font-size: 14px;
+        font-weight: 600;
+        font-family: var(--font-b);
+        text-decoration: none;
+        white-space: nowrap;
+        transition: background 0.15s;
+        display: inline-block;
+    }
+
+    .btn-new-req:hover { background: #B5722A; color: #fff; }
+
+    /* ── BODY ── */
+    .req-body {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2.5rem 3rem 5rem;
+    }
+
+    /* ── FILTER TABS ── */
+    .filter-tabs {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-tab {
+        padding: 7px 18px;
+        border-radius: 99px;
+        border: 1.5px solid var(--line);
+        background: var(--white);
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--muted);
+        cursor: pointer;
+        font-family: var(--font-b);
+        transition: all 0.15s;
+    }
+
+    .filter-tab:hover { border-color: var(--sage); color: var(--forest); }
+    .filter-tab.active { background: var(--forest); border-color: var(--forest); color: #fff; }
+
+    /* ── REQUEST CARD ── */
+    .req-card {
+        background: var(--white);
+        border: 1.5px solid var(--line);
+        border-radius: 14px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+        transition: box-shadow 0.15s;
+    }
+
+    .req-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.07); }
+
+    .req-card-head {
+        padding: 1.25rem 1.5rem;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 1rem;
+        align-items: center;
+        border-bottom: 1px solid var(--line);
+        cursor: pointer;
+    }
+
+    .req-card-head:hover { background: var(--sand); }
+
+    /* style swatch mini */
+    .req-swatch {
+        width: 44px;
+        height: 44px;
+        border-radius: 9px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .swatch-minimal  { background: #EDEBE6; }
+    .swatch-nordic   { background: #DDE8EF; }
+    .swatch-tropical { background: #C8E0C6; }
+    .swatch-urban    { background: #23262F; }
+
+    .req-swatch i { font-size: 20px; }
+    .swatch-minimal  i, .swatch-nordic i, .swatch-tropical i { color: var(--forest); }
+    .swatch-urban    i { color: #A8D8BF; }
+
+    .req-meta { min-width: 0; }
+
+    .req-style-name {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--ink);
+        margin-bottom: 3px;
+    }
+
+    .req-submitted {
+        font-size: 12px;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .req-submitted i { font-size: 13px; }
+
+    .req-head-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+    }
+
+    /* Status badges */
+    .req-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 11px;
+        border-radius: 99px;
+    }
+
+    .req-badge i { font-size: 12px; }
+
+    .rbadge-pending    { background: #FFF8E6; color: #946800; }
+    .rbadge-reviewing  { background: #EEF4FF; color: #2B5CC8; }
+    .rbadge-approved   { background: var(--sage-light); color: #1C5C40; }
+    .rbadge-inprogress { background: var(--amber-light); color: #7A4B10; }
+    .rbadge-completed  { background: var(--sage-light); color: #1C5C40; }
+    .rbadge-cancelled  { background: #FDECEA; color: #7A1E1E; }
+
+    .req-chevron {
+        font-size: 16px;
+        color: var(--muted);
+        transition: transform 0.2s;
+    }
+
+    .req-card.expanded .req-chevron { transform: rotate(180deg); }
+
+    /* Expandable body */
+    .req-card-body {
+        display: none;
+        background: var(--sand);
+        border-top: 1px solid var(--line);
+    }
+
+    .req-card.expanded .req-card-body { display: block; }
+
+    .req-detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1px;
+        background: var(--line);
+        margin-bottom: 0;
+    }
+
+    .req-detail-cell {
+        background: var(--sand);
+        padding: 1rem 1.5rem;
+    }
+
+    .rdcell-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--muted);
+        margin-bottom: 4px;
+    }
+
+    .rdcell-value {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--ink);
+    }
+
+    /* notes section */
+    .req-notes {
+        padding: 1.25rem 1.5rem;
+        border-top: 1px solid var(--line);
+        background: var(--white);
+    }
+
+    .req-notes-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--muted);
+        margin-bottom: 6px;
+    }
+
+    .req-notes-text {
+        font-size: 14px;
+        color: var(--ink2);
+        line-height: 1.65;
+        font-style: italic;
+    }
+
+    /* timeline */
+    .req-timeline {
+        padding: 1.25rem 1.5rem;
+        border-top: 1px solid var(--line);
+    }
+
+    .req-timeline-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--muted);
+        margin-bottom: 1rem;
+    }
+
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+
+    .tl-item {
+        display: flex;
+        gap: 12px;
+        padding-bottom: 16px;
+        position: relative;
+    }
+
+    .tl-item:last-child { padding-bottom: 0; }
+
+    .tl-item::before {
+        content: '';
+        position: absolute;
+        left: 11px;
+        top: 24px;
+        bottom: 0;
+        width: 2px;
+        background: var(--line);
+    }
+
+    .tl-item:last-child::before { display: none; }
+
+    .tl-dot {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 2px solid var(--line);
+        background: var(--white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 11px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .tl-dot.done { background: var(--sage); border-color: var(--sage); color: #fff; }
+    .tl-dot.active { border-color: var(--amber); }
+
+    .tl-content strong {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ink);
+        margin-bottom: 2px;
+    }
+
+    .tl-content span { font-size: 12px; color: var(--muted); }
+
+    /* ── EMPTY STATE ── */
+    .req-empty {
+        text-align: center;
+        padding: 5rem 2rem;
+        color: var(--muted);
+    }
+
+    .req-empty i { font-size: 52px; color: var(--line); display: block; margin-bottom: 14px; }
+    .req-empty h3 { font-family: var(--font-d); font-size: 22px; color: var(--ink2); margin-bottom: 8px; }
+    .req-empty p { font-size: 15px; line-height: 1.65; max-width: 360px; margin: 0 auto 1.75rem; }
+
+    .btn-browse {
+        display: inline-block;
+        background: var(--amber);
+        color: #fff;
+        padding: 13px 28px;
+        border-radius: var(--r);
+        font-size: 15px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.15s;
+    }
+
+    .btn-browse:hover { background: #B5722A; color: #fff; }
+
+    @@media (max-width: 768px) {
+        .req-header { padding: 2.5rem 1.5rem 2rem; }
+        .req-header-inner { flex-direction: column; align-items: flex-start; }
+        .req-body { padding: 2rem 1.5rem 3rem; }
+        .req-detail-grid { grid-template-columns: 1fr; }
+        .req-card-head { grid-template-columns: auto 1fr; }
+        .req-head-right { grid-column: 1/-1; }
+    }
+</style>
+
+<div class="req-page">
+
+    <!-- HEADER -->
+    <div class="req-header">
+        <div class="req-header-inner">
+            <div>
+                <p class="req-eyebrow">Aesthetics</p>
+                <h1>My <em>aesthetic</em> requests</h1>
+            </div>
+            <a asp-controller="Aesthetics" asp-action="Index" class="btn-new-req">
+                + New request
+            </a>
+        </div>
+    </div>
+
+    <div class="req-body">
+
+        <!-- Filter tabs -->
+        <div class="filter-tabs">
+            <button class="filter-tab active" onclick="filterReq('all', this)">All requests</button>
+            <button class="filter-tab" onclick="filterReq('Pending', this)">Pending</button>
+            <button class="filter-tab" onclick="filterReq('Approved', this)">Approved</button>
+            <button class="filter-tab" onclick="filterReq('In Progress', this)">In progress</button>
+            <button class="filter-tab" onclick="filterReq('Completed', this)">Completed</button>
+        </div>
+
+        @if (ViewBag.Requests != null && ((IEnumerable<dynamic>)ViewBag.Requests).Any())
+        {
+            foreach (var req in ViewBag.Requests)
+            {
+                var swatchClass = req.StyleName?.ToLower() switch {
+                    var s when s?.Contains("minimal")  == true => "swatch-minimal",
+                    var s when s?.Contains("nordic")   == true => "swatch-nordic",
+                    var s when s?.Contains("tropical") == true => "swatch-tropical",
+                    var s when s?.Contains("urban")    == true => "swatch-urban",
+                    _ => "swatch-minimal"
+                };
+
+                var badgeClass = req.Status switch {
+                    "Pending"     => "rbadge-pending",
+                    "Reviewing"   => "rbadge-reviewing",
+                    "Approved"    => "rbadge-approved",
+                    "In Progress" => "rbadge-inprogress",
+                    "Completed"   => "rbadge-completed",
+                    "Cancelled"   => "rbadge-cancelled",
+                    _             => "rbadge-pending"
+                };
+
+                var statusIcon = req.Status switch {
+                    "Pending"     => "ti-clock",
+                    "Reviewing"   => "ti-eye",
+                    "Approved"    => "ti-circle-check",
+                    "In Progress" => "ti-paint",
+                    "Completed"   => "ti-star",
+                    "Cancelled"   => "ti-x",
+                    _             => "ti-clock"
+                };
+
+                var progStep = req.Status switch {
+                    "Pending"     => 0,
+                    "Reviewing"   => 1,
+                    "Approved"    => 2,
+                    "In Progress" => 3,
+                    "Completed"   => 4,
+                    _             => 0
+                };
+
+                <div class="req-card" data-status="@req.Status" id="req-@req.Id">
+                    <div class="req-card-head" onclick="toggleReq('@req.Id')">
+                        <div class="req-swatch @swatchClass">
+                            <i class="ti ti-palette"></i>
+                        </div>
+                        <div class="req-meta">
+                            <div class="req-style-name">@req.StyleName</div>
+                            <div class="req-submitted">
+                                <i class="ti ti-calendar"></i>
+                                Submitted @req.SubmittedAt.ToString("dd MMM yyyy")
+                                &nbsp;·&nbsp; Room @req.RoomNumber, @req.Hostel
+                            </div>
+                        </div>
+                        <div class="req-head-right">
+                            <span class="req-badge @badgeClass">
+                                <i class="ti @statusIcon"></i>
+                                @req.Status
+                            </span>
+                            <i class="ti ti-chevron-down req-chevron"></i>
+                        </div>
+                    </div>
+
+                    <div class="req-card-body">
+
+                        <!-- Details grid -->
+                        <div class="req-detail-grid">
+                            <div class="req-detail-cell">
+                                <div class="rdcell-label">Style</div>
+                                <div class="rdcell-value">@req.StyleName</div>
+                            </div>
+                            <div class="req-detail-cell">
+                                <div class="rdcell-label">Preferred setup date</div>
+                                <div class="rdcell-value">@req.PreferredDate?.ToString("dd MMM yyyy")</div>
+                            </div>
+                            <div class="req-detail-cell">
+                                <div class="rdcell-label">Hostel / hall</div>
+                                <div class="rdcell-value">@req.Hostel</div>
+                            </div>
+                            <div class="req-detail-cell">
+                                <div class="rdcell-label">Room number</div>
+                                <div class="rdcell-value">@req.RoomNumber</div>
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(req.Notes?.ToString()))
+                        {
+                            <div class="req-notes">
+                                <div class="req-notes-label">Your notes</div>
+                                <div class="req-notes-text">"@req.Notes"</div>
+                            </div>
+                        }
+
+                        <!-- Status timeline -->
+                        <div class="req-timeline">
+                            <div class="req-timeline-label">Request progress</div>
+                            <div class="timeline">
+                                @{
+                                    var tlSteps = new[] {
+                                        ("Request submitted",   "We received your request and it's in the queue."),
+                                        ("Under review",        "Our team is reviewing your style and room details."),
+                                        ("Approved",            "Your request is approved. We're preparing for setup."),
+                                        ("Setup in progress",   "Our team is sourcing and setting up your room."),
+                                        ("Completed",           "Your room aesthetic is ready. Enjoy your space!")
+                                    };
+
+                                    for (int ti = 0; ti < tlSteps.Length; ti++)
+                                    {
+                                        var dotCls = ti < progStep ? "done" : ti == progStep ? "active" : "";
+                                        <div class="tl-item">
+                                            <div class="tl-dot @dotCls">
+                                                @if (ti < progStep) { <i class="ti ti-check" style="font-size:11px"></i> }
+                                                else { <span>@(ti + 1)</span> }
+                                            </div>
+                                            <div class="tl-content">
+                                                <strong>@tlSteps[ti].Item1</strong>
+                                                <span>@tlSteps[ti].Item2</span>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="req-empty">
+                <i class="ti ti-palette-off"></i>
+                <h3>No requests yet</h3>
+                <p>You haven't submitted an aesthetic request. Browse our styles and make your room yours.</p>
+                <a asp-controller="Aesthetics" asp-action="Index" class="btn-browse">
+                    Browse aesthetic styles
+                </a>
+            </div>
+        }
+
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function toggleReq(id) {
+        document.getElementById('req-' + id).classList.toggle('expanded');
+    }
+
+    function filterReq(status, btn) {
+        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.req-card').forEach(card => {
+            card.style.display = (status === 'all' || card.dataset.status === status) ? 'block' : 'none';
+        });
+    }
+</script>
+}
