@@ -23,6 +23,10 @@ public partial class LogisticsOrder
 
     public DateOnly? ReturnDate { get; set; }
 
+    public bool IsDeleted { get; set; }
+
+    public DateTime? DeletedAt { get; set; }
+
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
     public virtual Student Student { get; set; } = null!;

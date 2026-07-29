@@ -50,7 +50,6 @@ namespace HostelSite.Controllers
 
             var key = _config["Paystack:PublicKey"];
             ViewData["PaystackKey"] = key;
-            ViewData["KeyDebug"] = string.IsNullOrEmpty(key) ? "KEY IS EMPTY — check appsettings.json" : "KEY FOUND: " + key.Substring(0, 10) + "...";
             return View();
         }
 

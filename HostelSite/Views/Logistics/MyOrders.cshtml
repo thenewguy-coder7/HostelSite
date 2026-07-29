@@ -466,9 +466,9 @@
                                 <div class="oi-row">
                                     <div class="oi-left">
                                         <i class="ti ti-package"></i>
-                                        @item.LogisticsItem.Name × @item.Quantity
+                                        @item.ItemName × @item.Quantity
                                     </div>
-                                    <div class="oi-price">GH₵ @(item.LogisticsItem.Price * item.Quantity)</div>
+                                    <div class="oi-price">GH₵ @(item.UnitPrice * item.Quantity)</div>
                                 </div>
                             }
                         </div>

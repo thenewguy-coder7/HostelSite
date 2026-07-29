@@ -696,39 +696,24 @@
                 callback: function(response) {
                     const ref = response.reference;
 
-                    const payload = {
-                        reference: ref,
-                        orderData: JSON.stringify(orderData)
-                    };
-
                     fetch(verifyUrl, {
                         method:  'POST',
                         headers: {
-                            'Content-Type':                  'application/json',
-                            'RequestVerificationToken':      token
+                            'Content-Type':             'application/json',
+                            'RequestVerificationToken': token
                         },
-                        body: JSON.stringify(payload)
+                        body: JSON.stringify({
+                            reference: ref,
+                            orderData: JSON.stringify(orderData)
+                        })
                     })
-                    .then(function(r) { return r.text(); })
-                    .then(function(text) {
-                        console.log('Verify response:', text);
+                    .then(function(r) { return r.json(); })
+                    .then(function(result) {
                         sessionStorage.removeItem('nestOrder');
-                        try {
-                            const result = JSON.parse(text);
-                            if (result.success) {
-                                window.location.href = successUrl + '?ref=' + ref;
-                            } else {
-                                alert('Verification issue: ' + result.message + '\n\nYour payment went through (ref: ' + ref + '). Contact support if your order does not appear.');
-                                window.location.href = successUrl + '?ref=' + ref;
-                            }
-                        } catch(e) {
-                            alert('Server error. Your payment went through (ref: ' + ref + '). Contact support.\n\nDetails: ' + text.substring(0, 300));
-                            window.location.href = successUrl + '?ref=' + ref;
-                        }
+                        window.location.href = successUrl + '?ref=' + ref;
                     })
-                    .catch(function(err) {
+                    .catch(function() {
                         sessionStorage.removeItem('nestOrder');
-                        alert('Network error during verification. Payment ref: ' + ref + '. Contact support.');
                         window.location.href = successUrl + '?ref=' + ref;
                     });
                 },

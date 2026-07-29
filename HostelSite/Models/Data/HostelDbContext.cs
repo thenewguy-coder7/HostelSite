@@ -15,6 +15,8 @@ public partial class HostelDbContext : DbContext
     {
     }
 
+    public virtual DbSet<Admin> Admins { get; set; }
+
     public virtual DbSet<AestheticRequest> AestheticRequests { get; set; }
 
     public virtual DbSet<Amenity> Amenities { get; set; }
@@ -41,6 +43,27 @@ public partial class HostelDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Admin>(entity =>
+        {
+            entity.HasKey(e => e.AdminId).HasName("PK__Admins__43AA414114E38AE8");
+
+            entity.HasIndex(e => e.Email, "UQ__Admins__AB6E6164B3C8F909").IsUnique();
+
+            entity.Property(e => e.AdminId).HasColumnName("admin_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnName("created_at");
+            entity.Property(e => e.Email)
+                .HasMaxLength(150)
+                .HasColumnName("email");
+            entity.Property(e => e.FullName)
+                .HasMaxLength(100)
+                .HasColumnName("full_name");
+            entity.Property(e => e.PasswordHash)
+                .HasMaxLength(255)
+                .HasColumnName("password_hash");
+        });
+
         modelBuilder.Entity<AestheticRequest>(entity =>
         {
             entity.HasKey(e => e.RequestId);
@@ -55,6 +78,8 @@ public partial class HostelDbContext : DbContext
 
             entity.Property(e => e.RequestId).HasColumnName("request_id");
             entity.Property(e => e.AestheticId).HasColumnName("aesthetic_id");
+            entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
+            entity.Property(e => e.IsDeleted).HasColumnName("is_deleted");
             entity.Property(e => e.Notes)
                 .HasMaxLength(500)
                 .HasColumnName("notes");
@@ -182,9 +207,11 @@ public partial class HostelDbContext : DbContext
             entity.HasIndex(e => e.StudentId, "IX_Logistics_Orders_Student");
 
             entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
             entity.Property(e => e.DeliveryNotes)
                 .HasMaxLength(500)
                 .HasColumnName("delivery_notes");
+            entity.Property(e => e.IsDeleted).HasColumnName("is_deleted");
             entity.Property(e => e.OrderStatus)
                 .HasMaxLength(20)
                 .HasDefaultValue("pending")
