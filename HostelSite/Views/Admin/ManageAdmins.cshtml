@@ -1,0 +1,322 @@
+@{
+    ViewData["Title"] = "Manage Admins";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Admins — PROSBEE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/@@tabler/icons-webfont@@latest/tabler-icons.min.css" rel="stylesheet" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --forest:     #1C3B2E;
+            --forest-mid: #2E6B52;
+            --sage:       #4A9572;
+            --sage-light: #EAF3EE;
+            --amber:      #C9863A;
+            --amber-light:#FDF3E7;
+            --ink:        #111318;
+            --ink2:       #3D3F47;
+            --muted:      #7C808C;
+            --line:       #E3E5EA;
+            --sand:       #F8F7F4;
+            --white:      #FFFFFF;
+            --font-d: 'Montserrat', Georgia, serif;
+            --font-b:     'Outfit', system-ui, sans-serif;
+        }
+
+        body { font-family: var(--font-b); background: var(--sand); color: var(--ink); }
+
+        .admin-layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+
+        .sidebar {
+            background: var(--forest);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .sidebar-brand { font-family: var(--font-d); font-size: 22px; color: #fff; margin-bottom: 4px; }
+        .sidebar-brand em { font-style: normal; color: #7FBD9E; }
+        .sidebar-sub { font-size: 11px; color: #5A7A6C; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2rem; }
+        .sidebar-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+
+        .sidebar-link {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; border-radius: 8px;
+            color: #9CBDAD; font-size: 14px; font-weight: 500;
+            text-decoration: none; transition: background 0.15s, color 0.15s;
+            cursor: pointer; border: none; background: transparent;
+            width: 100%; text-align: left; font-family: var(--font-b);
+        }
+
+        .sidebar-link:hover, .sidebar-link.active { background: rgba(255,255,255,0.08); color: #fff; }
+        .sidebar-link i { font-size: 18px; }
+
+        .sidebar-logout { margin-top: auto; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); }
+
+        .admin-main { padding: 2.5rem 3rem; }
+
+        .admin-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
+        .admin-topbar h1 { font-family: var(--font-d); font-size: 28px; font-weight: 600; color: var(--ink); }
+
+        .back-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 13px; color: var(--muted); text-decoration: none;
+            transition: color 0.15s;
+        }
+        .back-link:hover { color: var(--forest); }
+
+        /* ALERT */
+        .admin-alert { padding: 0.75rem 1rem; border-radius: 8px; font-size: 14px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; }
+        .admin-alert.success { background: #E8F5EE; border-left: 3px solid #2D9B5A; color: #1A5C34; }
+        .admin-alert.error   { background: #FDECEA; border-left: 3px solid #D94040; color: #7A1E1E; }
+
+        /* GRID */
+        .page-grid { display: grid; grid-template-columns: 1fr 380px; gap: 2rem; align-items: start; }
+
+        /* ADMINS TABLE */
+        .admin-section { background: var(--white); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+        .section-head { padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+        .section-head h2 { font-size: 15px; font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 8px; }
+        .section-head h2 i { font-size: 18px; color: var(--sage); }
+        .section-count { font-size: 12px; font-weight: 600; background: var(--sage-light); color: var(--forest-mid); padding: 3px 10px; border-radius: 99px; }
+
+        .admin-table { width: 100%; border-collapse: collapse; }
+        .admin-table th { padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); background: var(--sand); border-bottom: 1px solid var(--line); }
+        .admin-table td { padding: 14px 16px; font-size: 13px; color: var(--ink2); border-bottom: 1px solid var(--line); vertical-align: middle; }
+        .admin-table tr:last-child td { border-bottom: none; }
+        .admin-table tr:hover td { background: var(--sand); }
+
+        .td-name { font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+        .td-email { font-size: 12px; color: var(--muted); }
+
+        .you-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; background: var(--sage-light); color: var(--forest-mid); padding: 2px 8px; border-radius: 99px; }
+
+        .btn-remove {
+            background: #FDECEA; color: #D94040; border: none;
+            padding: 6px 12px; border-radius: 7px; font-size: 12px;
+            font-weight: 600; font-family: var(--font-b); cursor: pointer;
+            transition: background 0.15s;
+        }
+        .btn-remove:hover { background: #D94040; color: #fff; }
+
+        /* ADD ADMIN FORM */
+        .add-form-card {
+            background: var(--white);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            overflow: hidden;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .add-form-head {
+            background: var(--forest);
+            padding: 1.25rem 1.5rem;
+        }
+
+        .add-form-head h3 { font-family: var(--font-d); font-size: 18px; color: #fff; margin-bottom: 2px; }
+        .add-form-head p { font-size: 12px; color: #9CBDAD; }
+
+        .add-form-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+
+        .field { display: flex; flex-direction: column; gap: 5px; }
+        .field label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+        .field input {
+            padding: 10px 14px; border: 1.5px solid var(--line); border-radius: 8px;
+            font-size: 14px; font-family: var(--font-b); color: var(--ink);
+            background: var(--sand); outline: none; transition: border-color 0.15s;
+        }
+        .field input:focus { border-color: var(--sage); background: var(--white); }
+
+        .pwd-hint { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+        .btn-add {
+            display: block; width: 100%; background: var(--amber); color: #fff;
+            border: none; padding: 12px; border-radius: 8px; font-size: 14px;
+            font-weight: 600; font-family: var(--font-b); cursor: pointer;
+            transition: background 0.15s; margin-top: 0.25rem;
+        }
+        .btn-add:hover { background: #B5722A; }
+    </style>
+</head>
+<body>
+<div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">PROSBEE<em>.</em></div>
+        <div class="sidebar-sub">Admin panel</div>
+        <nav class="sidebar-nav">
+            <a class="sidebar-link" asp-controller="Admin" asp-action="Dashboard">
+                <i class="ti ti-layout-dashboard"></i> Dashboard
+            </a>
+            <a class="sidebar-link active" asp-controller="Admin" asp-action="ManageAdmins">
+                <i class="ti ti-users"></i> Manage admins
+            </a>
+        </nav>
+        <div class="sidebar-logout">
+            <form asp-controller="Admin" asp-action="Logout" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="sidebar-link" style="color:#9CBDAD;">
+                    <i class="ti ti-logout"></i> Log out
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="admin-main">
+
+        <div class="admin-topbar">
+            <h1>Manage admins</h1>
+            <a asp-controller="Admin" asp-action="Dashboard" class="back-link">
+                <i class="ti ti-arrow-left"></i> Back to dashboard
+            </a>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="admin-alert success">
+                <i class="ti ti-circle-check"></i> @TempData["Success"]
+            </div>
+        }
+
+        @if (TempData["AdminError"] != null)
+        {
+            <div class="admin-alert error">
+                <i class="ti ti-circle-x"></i> @TempData["AdminError"]
+            </div>
+        }
+
+        <div class="page-grid">
+
+            <!-- ADMINS LIST -->
+            <div class="admin-section">
+                <div class="section-head">
+                    <h2><i class="ti ti-shield-check"></i> Admin accounts</h2>
+                    <span class="section-count">@(((IEnumerable<dynamic>)ViewBag.Admins).Count()) admins</span>
+                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Admin</th>
+                            <th>Created</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            var currentId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0");
+                        }
+                        @foreach (var admin in ViewBag.Admins)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="td-name">
+                                        @admin.FullName
+                                        @if (admin.AdminId == currentId)
+                                        {
+                                            <span class="you-badge"><i class="ti ti-user"></i> You</span>
+                                        }
+                                    </div>
+                                    <div class="td-email">@admin.Email</div>
+                                </td>
+                                <td>@admin.CreatedAt?.ToString("dd MMM yyyy")</td>
+                                <td>
+                                    @if (admin.AdminId != currentId)
+                                    {
+                                        <form asp-controller="Admin" asp-action="RemoveAdmin" method="post"
+                                              onsubmit="return confirm('Remove admin account for @admin.FullName? This cannot be undone.')">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="adminId" value="@admin.AdminId" />
+                                            <button type="submit" class="btn-remove">
+                                                <i class="ti ti-trash"></i> Remove
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span style="font-size:12px; color:var(--muted);">Current session</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ADD ADMIN FORM -->
+            <div class="add-form-card">
+                <div class="add-form-head">
+                    <h3>Add new admin</h3>
+                    <p>They can log in immediately after creation</p>
+                </div>
+                <div class="add-form-body">
+                    <form asp-controller="Admin" asp-action="AddAdmin" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="field">
+                            <label>Full name</label>
+                            <input type="text" name="fullName" placeholder="Jane Doe" required />
+                        </div>
+
+                        <div class="field">
+                            <label>Email address</label>
+                            <input type="email" name="email" placeholder="jane@nest.edu.gh" required />
+                        </div>
+
+                        <div class="field">
+                            <label>Password</label>
+                            <input type="password" name="password" placeholder="••••••••" required id="newPwd" />
+                            <span class="pwd-hint">Minimum 8 characters</span>
+                        </div>
+
+                        <div class="field">
+                            <label>Confirm password</label>
+                            <input type="password" placeholder="••••••••" id="confirmPwd" required />
+                            <span style="font-size:12px; color:#D94040;" id="pwdErr"></span>
+                        </div>
+
+                        <button type="submit" class="btn-add">Create admin account →</button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script>
+    // Live password match check
+    const pwd     = document.getElementById('newPwd');
+    const confirm = document.getElementById('confirmPwd');
+    const err     = document.getElementById('pwdErr');
+
+    confirm.addEventListener('input', () => {
+        if (confirm.value && confirm.value !== pwd.value) {
+            err.textContent = 'Passwords do not match';
+        } else {
+            err.textContent = '';
+        }
+    });
+
+    // Prevent submit if passwords don't match
+    confirm.closest('form').addEventListener('submit', (e) => {
+        if (pwd.value !== confirm.value) {
+            e.preventDefault();
+            err.textContent = 'Passwords do not match';
+        }
+    });
+</script>
+</body>
+</html>

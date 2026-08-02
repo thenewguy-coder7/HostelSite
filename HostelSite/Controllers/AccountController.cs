@@ -67,7 +67,7 @@ namespace HostelSite.Controllers
 
                 await SignInStudent(student);
 
-                TempData["Success"] = $"Welcome to Nest, {student.FirstName}! Your account has been created.";
+                TempData["Success"] = $"Welcome to PROSBEE, {student.FirstName}! Your account has been created.";
                 return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)

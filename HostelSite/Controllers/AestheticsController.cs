@@ -76,7 +76,7 @@ namespace HostelSite.Controllers
 
             // Parse the stored Notes field back into display fields
             var requests = _db.AestheticRequests
-                .Where(r => r.StudentId == studentId)
+                .Where(r => r.StudentId == studentId && !r.IsDeleted)
                 .OrderByDescending(r => r.RequestedAt)
                 .ToList()
                 .Select(r => new AestheticRequestSummaryViewModel

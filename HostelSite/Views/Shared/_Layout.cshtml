@@ -3,13 +3,17 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] — Nest</title>
+    <title>@ViewData["Title"] — PROSBEE</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="~/images/prosbee-icon.png" />
+    <link rel="shortcut icon" type="image/png" href="~/images/prosbee-icon.png" />
 
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;900&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
 
     <!-- Tabler Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/@@tabler/icons-webfont@latest/tabler-icons.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/@@tabler/icons-webfont@@latest/tabler-icons.min.css" rel="stylesheet" />
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
@@ -21,31 +25,33 @@
 
     <style>
         :root {
-            --forest:       #1C3B2E;
-            --forest-dark:  #0D201A;
-            --forest-mid:   #2E6B52;
-            --sage:         #4A9572;
-            --sage-light:   #EAF3EE;
-            --sage-muted:   #9CBDAD;
-            --amber:        #C9863A;
-            --amber-hover:  #B5722A;
-            --amber-light:  #FDF3E7;
-            --ink:          #111318;
-            --ink2:         #3D3F47;
-            --muted:        #7C808C;
-            --line:         #E3E5EA;
-            --sand:         #F8F7F4;
-            --white:        #FFFFFF;
-            --font-d:       'Playfair Display', Georgia, serif;
-            --font-b:       'Outfit', system-ui, sans-serif;
-            --r:            10px;
+            --forest: #0F1A2E;
+            --forest-dark: #080F1D;
+            --forest-mid: #1A2E47;
+            --sage: #6BB5A6;
+            --sage-light: #E8F5F2;
+            --sage-muted: #A8CFC8;
+            --amber: #D4735A;
+            --amber-hover: #BE6048;
+            --amber-light: #FBEEE9;
+            --ink: #111318;
+            --ink2: #3D3F47;
+            --muted: #7C808C;
+            --line: #E3E5EA;
+            --sand: #F8F7F4;
+            --white: #FFFFFF;
+            --font-d: 'Montserrat', system-ui, sans-serif;
+            --font-b: 'Outfit', system-ui, sans-serif;
+            --r: 10px;
         }
 
-        *, *::before, *::after { box-sizing: border-box; }
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
 
         html, body {
-            margin: 0;
-            padding: 0;
+            margin: 0 !important;
+            padding: 0 !important;
             font-family: var(--font-b);
             background: var(--sand);
             color: var(--ink);
@@ -53,8 +59,44 @@
             line-height: 1.6;
         }
 
-        a { color: var(--amber); text-decoration: none; }
-        a:hover { color: var(--amber-hover); }
+        a {
+            color: var(--amber);
+            text-decoration: none;
+        }
+
+            a:hover {
+                color: var(--amber-hover);
+            }
+
+        /* ── HOW-IT-WORKS ICONS & NUMBERS — bright accent ── */
+        .hiw-icon {
+            background: rgba(212,115,90,0.18) !important;
+        }
+
+            .hiw-icon i {
+                color: #FFB05C !important; /* bright coral-orange */
+                font-size: 24px !important;
+            }
+
+        .hiw-num {
+            color: #FF9D3C !important; /* vivid orange numbers */
+            opacity: 1 !important;
+        }
+
+        /* ── HEADING FONTS ── */
+        h1 {
+            font-family: 'Montserrat', system-ui, sans-serif !important;
+            font-weight: 900 !important;
+        }
+
+        h2, h3, h4, h5, h6,
+        .sec-h, .log-header h1,
+        .aes-header h1, .co-header h1,
+        .summary-head h3, .order-panel-head h3,
+        .sidebar-brand, .admin-topbar h1 {
+            font-family: 'Montserrat', system-ui, sans-serif !important;
+            font-weight: 700 !important;
+        }
 
         /* ── NAVBAR ── */
         .site-nav {
@@ -69,51 +111,46 @@
             gap: 2rem;
         }
 
-        .site-nav .brand {
-            font-family: var(--font-d);
-            font-size: 24px;
-            color: #fff;
-            text-decoration: none;
-            flex-shrink: 0;
-            letter-spacing: -0.3px;
-        }
+            .site-nav .brand {
+                display: flex;
+                align-items: center;
+                flex-shrink: 0;
+                text-decoration: none;
+            }
 
-        .site-nav .brand em {
-            font-style: normal;
-            color: #7FBD9E;
-        }
+            .site-nav .nav-links {
+                display: flex;
+                gap: 1.75rem;
+                list-style: none;
+                margin: 0 auto;
+                padding: 0;
+            }
 
-        .site-nav .nav-links {
-            display: flex;
-            gap: 1.75rem;
-            list-style: none;
-            margin: 0 auto;
-            padding: 0;
-        }
+                .site-nav .nav-links a {
+                    color: var(--sage-muted);
+                    font-size: 14px;
+                    font-weight: 500;
+                    text-decoration: none;
+                    transition: color 0.15s;
+                    letter-spacing: 0.2px;
+                }
 
-        .site-nav .nav-links a {
-            color: var(--sage-muted);
-            font-size: 14px;
-            font-weight: 500;
-            text-decoration: none;
-            transition: color 0.15s;
-            letter-spacing: 0.2px;
-        }
+                    .site-nav .nav-links a:hover {
+                        color: #fff;
+                    }
 
-        .site-nav .nav-links a:hover { color: #fff; }
+                    .site-nav .nav-links a.active {
+                        color: #fff;
+                        border-bottom: 1.5px solid var(--sage);
+                        padding-bottom: 2px;
+                    }
 
-        .site-nav .nav-links a.active {
-            color: #fff;
-            border-bottom: 1.5px solid #7FBD9E;
-            padding-bottom: 2px;
-        }
-
-        .site-nav .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            flex-shrink: 0;
-        }
+            .site-nav .nav-actions {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                flex-shrink: 0;
+            }
 
         .student-greeting {
             font-size: 13px;
@@ -137,11 +174,11 @@
             display: inline-block;
         }
 
-        .btn-nav-ghost:hover {
-            border-color: rgba(255,255,255,0.5);
-            background: rgba(255,255,255,0.05);
-            color: #fff;
-        }
+            .btn-nav-ghost:hover {
+                border-color: rgba(255,255,255,0.5);
+                background: rgba(255,255,255,0.05);
+                color: #fff;
+            }
 
         .btn-nav-amber {
             background: var(--amber);
@@ -154,11 +191,120 @@
             font-family: var(--font-b);
             cursor: pointer;
             text-decoration: none;
-            transition: background 0.15s;
             display: inline-block;
         }
 
-        .btn-nav-amber:hover { background: var(--amber-hover); color: #fff; }
+            .btn-nav-amber:hover {
+                background: var(--amber-hover);
+                color: #fff;
+            }
+
+        /* ── BUTTON LIFT + GLOW ── */
+        .btn-amber-lg, .btn-nav-amber, .btn-pay, .btn-checkout, .btn-forest,
+        .btn-add, .btn-login, .btn-register, .btn-submit {
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.15s !important;
+        }
+
+            .btn-amber-lg:hover, .btn-nav-amber:hover, .btn-pay:hover, .btn-checkout:hover,
+            .btn-add:hover, .btn-register:hover, .btn-submit:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 24px rgba(212,115,90,0.4);
+            }
+
+            .btn-forest:hover, .btn-login:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 24px rgba(15,26,46,0.35);
+            }
+
+        /* ── TICKER BANNER ── */
+        .ticker-wrap {
+            background: var(--forest-dark);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            overflow: hidden;
+            white-space: nowrap;
+            height: 36px;
+            display: flex;
+            align-items: center;
+        }
+
+        .ticker-track {
+            display: inline-flex;
+            align-items: center;
+            gap: 0;
+            animation: ticker-scroll 35s linear infinite;
+            white-space: nowrap;
+        }
+
+        .ticker-wrap:hover .ticker-track {
+            animation-play-state: paused;
+        }
+
+        @@keyframes ticker-scroll {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        .ticker-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--sage-muted);
+            padding: 0 1.5rem;
+        }
+
+            .ticker-item i {
+                font-size: 13px;
+                color: var(--amber);
+            }
+
+        .ticker-dot {
+            color: rgba(255,255,255,0.2);
+            font-size: 10px;
+            flex-shrink: 0;
+        }
+
+        /* ── SCROLL REVEAL ── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+            .reveal.visible {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        /* ── CARD SHINE ── */
+        .aes-card, .item-card, .log-item-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+            .aes-card::after, .item-card::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -80%;
+                width: 50%;
+                height: 100%;
+                background: linear-gradient(105deg, transparent, rgba(255,255,255,0.35), transparent);
+                transition: left 0.6s ease;
+                pointer-events: none;
+            }
+
+            .aes-card:hover::after, .item-card:hover::after {
+                left: 130%;
+            }
 
         /* Mobile hamburger */
         .nav-toggle {
@@ -172,14 +318,14 @@
             margin-left: auto;
         }
 
-        .nav-toggle span {
-            display: block;
-            width: 22px;
-            height: 2px;
-            background: #fff;
-            border-radius: 2px;
-            transition: transform 0.2s, opacity 0.2s;
-        }
+            .nav-toggle span {
+                display: block;
+                width: 22px;
+                height: 2px;
+                background: #fff;
+                border-radius: 2px;
+                transition: transform 0.2s, opacity 0.2s;
+            }
 
         /* Mobile drawer */
         .mobile-drawer {
@@ -189,32 +335,39 @@
             border-top: 1px solid rgba(255,255,255,0.08);
         }
 
-        .mobile-drawer .drawer-links {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.9rem;
-        }
+            .mobile-drawer .drawer-links {
+                list-style: none;
+                padding: 0;
+                margin: 0 0 1rem;
+                display: flex;
+                flex-direction: column;
+                gap: 0.9rem;
+            }
 
-        .mobile-drawer .drawer-links a {
-            color: var(--sage-muted);
-            font-size: 15px;
-            font-weight: 500;
-            text-decoration: none;
-        }
+                .mobile-drawer .drawer-links a {
+                    color: var(--sage-muted);
+                    font-size: 15px;
+                    font-weight: 500;
+                    text-decoration: none;
+                }
 
-        .mobile-drawer .drawer-links a:hover { color: #fff; }
+                    .mobile-drawer .drawer-links a:hover {
+                        color: #fff;
+                    }
 
-        .mobile-drawer.open { display: block; }
+            .mobile-drawer.open {
+                display: block;
+            }
 
         .drawer-actions {
             display: flex;
             gap: 0.75rem;
         }
 
-        .drawer-actions a { flex: 1; text-align: center; }
+            .drawer-actions a {
+                flex: 1;
+                text-align: center;
+            }
 
         /* ── ALERTS ── */
         .alert-wrapper {
@@ -233,27 +386,29 @@
             font-family: var(--font-b);
         }
 
-        .alert-nest.success {
-            background: #E8F5EE;
-            border-left: 3px solid #2D9B5A;
-            color: #1A5C34;
-        }
+            .alert-nest.success {
+                background: #E8F5EE;
+                border-left: 3px solid #2D9B5A;
+                color: #1A5C34;
+            }
 
-        .alert-nest.error {
-            background: #FDECEA;
-            border-left: 3px solid #D94040;
-            color: #7A1E1E;
-        }
+            .alert-nest.error {
+                background: #FDECEA;
+                border-left: 3px solid #D94040;
+                color: #7A1E1E;
+            }
 
-        .alert-nest.info {
-            background: var(--amber-light);
-            border-left: 3px solid var(--amber);
-            color: #7A4B10;
-        }
+            .alert-nest.info {
+                background: var(--amber-light);
+                border-left: 3px solid var(--amber);
+                color: #7A4B10;
+            }
 
         /* ── MAIN ── */
         .site-main {
             min-height: calc(100vh - 68px - 200px);
+            margin-top: 0;
+            padding-top: 0;
         }
 
         /* ── FOOTER ── */
@@ -272,20 +427,12 @@
         }
 
         .footer-brand {
-            font-family: var(--font-d);
-            font-size: 22px;
-            color: #fff;
             margin-bottom: 10px;
-        }
-
-        .footer-brand em {
-            font-style: normal;
-            color: #7FBD9E;
         }
 
         .site-footer p {
             font-size: 13px;
-            color: #3A5A4C;
+            color: #5A7A8C;
             line-height: 1.7;
             margin: 0;
         }
@@ -295,7 +442,7 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: #7FBD9E;
+            color: var(--sage);
             margin-bottom: 12px;
         }
 
@@ -305,16 +452,20 @@
             margin: 0;
         }
 
-        .site-footer ul li { margin-bottom: 8px; }
+            .site-footer ul li {
+                margin-bottom: 8px;
+            }
 
-        .site-footer ul a {
-            font-size: 13px;
-            color: #3A5A4C;
-            text-decoration: none;
-            transition: color 0.15s;
-        }
+            .site-footer ul a {
+                font-size: 13px;
+                color: #5A7A8C;
+                text-decoration: none;
+                transition: color 0.15s;
+            }
 
-        .site-footer ul a:hover { color: #A8D8BF; }
+                .site-footer ul a:hover {
+                    color: var(--sage);
+                }
 
         .footer-bottom {
             max-width: 1100px;
@@ -325,17 +476,27 @@
             justify-content: space-between;
             align-items: center;
             font-size: 12px;
-            color: #2A3D33;
+            color: #3A4A5C;
         }
 
-        .footer-bottom a { color: #3A5A4C; }
-        .footer-bottom a:hover { color: #7FBD9E; }
+            .footer-bottom a {
+                color: #5A7A8C;
+            }
+
+                .footer-bottom a:hover {
+                    color: var(--sage);
+                }
 
         /* ── RESPONSIVE ── */
         @@media (max-width: 768px) {
             .site-nav .nav-links,
-            .site-nav .nav-actions { display: none; }
-            .nav-toggle { display: flex; }
+            .site-nav .nav-actions {
+                display: none;
+            }
+
+            .nav-toggle {
+                display: flex;
+            }
 
             .footer-inner {
                 grid-template-columns: 1fr 1fr;
@@ -344,9 +505,19 @@
         }
 
         @@media (max-width: 480px) {
-            .site-nav { padding: 0 1.25rem; }
-            .footer-inner { grid-template-columns: 1fr; }
-            .footer-bottom { flex-direction: column; gap: 4px; text-align: center; }
+            .site-nav {
+                padding: 0 1.25rem;
+            }
+
+            .footer-inner {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: 4px;
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -354,7 +525,9 @@
 
     <!-- ══ NAVBAR ══ -->
     <nav class="site-nav">
-        <a asp-controller="Home" asp-action="Index" class="brand">Nest<em>.</em></a>
+        <a asp-controller="Home" asp-action="Index" class="brand">
+            <img src="~/images/prosbee-logo.png" alt="PROSBEE" style="height:145px; width:auto; max-width:260px; object-fit:contain;" />
+        </a>
 
         <ul class="nav-links">
             <li>
@@ -402,6 +575,40 @@
             <span></span>
         </button>
     </nav>
+
+    <!-- ══ TICKER BANNER ══ -->
+    <div class="ticker-wrap">
+        <div class="ticker-track">
+            <span class="ticker-item"><i class="ti ti-shield-check"></i> Secure storage at affordable rates</span>
+            <span class="ticker-dot">•</span>
+            <span class="ticker-item"><i class="ti ti-truck"></i> Flexible pickup &amp; return schedules</span>
+            <span class="ticker-dot">•</span>
+            <span class="ticker-item"><i class="ti ti-map-pin"></i> Find us at the KNUST Islamic Center (KIC)</span>
+            <span class="ticker-dot">•</span>
+            <span class="ticker-item"><i class="ti ti-calendar"></i> Booking now open for next semester!</span>
+            <span class="ticker-dot">•</span>
+            <span class="ticker-item"><i class="ti ti-users"></i> Trusted by 5,000+ KNUST students</span>
+            <span class="ticker-dot">•</span>
+            <span class="ticker-item"><i class="ti ti-palette"></i> Room aesthetics now available</span>
+            <span class="ticker-dot">•</span>
+            <span class="ticker-item"><i class="ti ti-credit-card"></i> Pay securely with Paystack</span>
+            <span class="ticker-dot">•</span>
+            <span class="ticker-item"><i class="ti ti-shield-check"></i> Secure storage at affordable rates</span>
+            <span class="ticker-dot">•</span>
+            <span class="ticker-item"><i class="ti ti-truck"></i> Flexible pickup &amp; return schedules</span>
+            <span class="ticker-dot">•</span>
+            <span class="ticker-item"><i class="ti ti-map-pin"></i> Find us at the KNUST Islamic Center (KIC)</span>
+            <span class="ticker-dot">•</span>
+            <span class="ticker-item"><i class="ti ti-calendar"></i> Booking now open for next semester!</span>
+            <span class="ticker-dot">•</span>
+            <span class="ticker-item"><i class="ti ti-users"></i> Trusted by 5,000+ KNUST students</span>
+            <span class="ticker-dot">•</span>
+            <span class="ticker-item"><i class="ti ti-palette"></i> Room aesthetics now available</span>
+            <span class="ticker-dot">•</span>
+            <span class="ticker-item"><i class="ti ti-credit-card"></i> Pay securely with Paystack</span>
+            <span class="ticker-dot">•</span>
+        </div>
+    </div>
 
     <!-- ══ MOBILE DRAWER ══ -->
     <div class="mobile-drawer" id="mobileDrawer">
@@ -469,7 +676,9 @@
     <footer class="site-footer">
         <div class="footer-inner">
             <div>
-                <div class="footer-brand">Nest<em>.</em></div>
+                <div class="footer-brand">
+                    <img src="~/images/prosbee-logo.png" alt="PROSBEE" style="height:145px; width:auto;" />
+                </div>
                 <p>Room aesthetics and item storage for students — designed around campus life.</p>
             </div>
 
@@ -501,13 +710,13 @@
                 <h5>Support</h5>
                 <ul>
                     <li><a asp-controller="Home" asp-action="About">About</a></li>
-                    <li><a href="mailto:support@nest.edu.gh">Contact us</a></li>
+                    <li><a href="mailto:support@prosbee.com">Contact us</a></li>
                 </ul>
             </div>
         </div>
 
         <div class="footer-bottom">
-            <span>&copy; @DateTime.Now.Year Nest. All rights reserved.</span>
+            <span>&copy; @DateTime.Now.Year PROSBEE. All rights reserved.</span>
             <span>Payments secured by <a href="https://paystack.com" target="_blank" rel="noopener">Paystack</a></span>
         </div>
     </footer>
@@ -519,8 +728,8 @@
 
     <script>
         // Mobile nav toggle
-        const toggle   = document.getElementById('navToggle');
-        const drawer   = document.getElementById('mobileDrawer');
+        const toggle = document.getElementById('navToggle');
+        const drawer = document.getElementById('mobileDrawer');
 
         if (toggle && drawer) {
             toggle.addEventListener('click', () => {
@@ -537,6 +746,14 @@
                 setTimeout(() => el.remove(), 400);
             }, 5000);
         });
+
+        // Scroll reveal
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: 0.12 });
+
+        document.querySelectorAll('.sec, .hiw-card, .aes-card, .log-item-card, .proof-card, .item-card')
+            .forEach(el => { el.classList.add('reveal'); revealObserver.observe(el); });
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

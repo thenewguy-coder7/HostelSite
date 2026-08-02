@@ -64,7 +64,7 @@ namespace HostelSite.Controllers
             int studentId = GetStudentId();
 
             var orders = _db.LogisticsOrders
-                .Where(o => o.StudentId == studentId)
+                .Where(o => o.StudentId == studentId && !o.IsDeleted)
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.Item)
                 .OrderByDescending(o => o.OrderedAt)

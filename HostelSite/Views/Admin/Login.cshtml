@@ -1,0 +1,175 @@
+@{
+    ViewData["Title"] = "Admin Login";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login — PROSBEE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/@@tabler/icons-webfont@@latest/tabler-icons.min.css" rel="stylesheet" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Outfit', system-ui, sans-serif;
+            background: #0D201A;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .admin-card {
+            background: #fff;
+            border-radius: 18px;
+            width: 100%;
+            max-width: 420px;
+            overflow: hidden;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+        }
+
+        .admin-card-top {
+            background: #1C3B2E;
+            padding: 2.5rem 2.5rem 2rem;
+            text-align: center;
+        }
+
+        .admin-logo {
+            font-family: 'Montserrat', serif;
+            font-size: 28px;
+            color: #fff;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.3px;
+        }
+
+        .admin-logo em { font-style: normal; color: #7FBD9E; }
+
+        .admin-card-top h1 {
+            font-family: 'Montserrat', serif;
+            font-size: 26px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .admin-card-top p {
+            font-size: 13px;
+            color: #9CBDAD;
+        }
+
+        .admin-card-body {
+            padding: 2rem 2.5rem 2.5rem;
+        }
+
+        .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1rem; }
+
+        .field label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #7C808C;
+        }
+
+        .field input {
+            padding: 12px 14px;
+            border: 1.5px solid #E3E5EA;
+            border-radius: 9px;
+            font-size: 14px;
+            font-family: 'Outfit', sans-serif;
+            color: #111318;
+            background: #F8F7F4;
+            outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .field input:focus {
+            border-color: #4A9572;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(74,149,114,0.12);
+        }
+
+        .error-box {
+            background: #FDECEA;
+            border-left: 3px solid #D94040;
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #7A1E1E;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-login {
+            display: block;
+            width: 100%;
+            background: #C9863A;
+            color: #fff;
+            border: none;
+            padding: 13px;
+            border-radius: 9px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: background 0.15s;
+            margin-top: 0.5rem;
+        }
+
+        .btn-login:hover { background: #B5722A; }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 1.25rem;
+            font-size: 13px;
+            color: #7C808C;
+            text-decoration: none;
+        }
+
+        .back-link:hover { color: #1C3B2E; }
+    </style>
+</head>
+<body>
+    <div class="admin-card">
+        <div class="admin-card-top">
+            <div class="admin-logo">PROSBEE<em>.</em></div>
+            <h1>Admin Login</h1>
+            <p>Restricted access — authorised personnel only</p>
+        </div>
+
+        <div class="admin-card-body">
+            @if (ViewData["Error"] != null)
+            {
+                <div class="error-box">
+                    <i class="ti ti-circle-x"></i> @ViewData["Error"]
+                </div>
+            }
+
+            <form method="post" asp-controller="Admin" asp-action="Login">
+                @Html.AntiForgeryToken()
+
+                <div class="field">
+                    <label>Email address</label>
+                    <input type="email" name="email" placeholder="admin@nest.edu.gh" required autocomplete="email" />
+                </div>
+
+                <div class="field">
+                    <label>Password</label>
+                    <input type="password" name="password" placeholder="••••••••" required autocomplete="current-password" />
+                </div>
+
+                <button type="submit" class="btn-login">Log in to dashboard →</button>
+            </form>
+
+            <a href="/" class="back-link">← Back to site</a>
+        </div>
+    </div>
+</body>
+</html>

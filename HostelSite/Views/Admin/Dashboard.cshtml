@@ -1,0 +1,598 @@
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard — PROSBEE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/@@tabler/icons-webfont@@latest/tabler-icons.min.css" rel="stylesheet" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --forest:     #1C3B2E;
+            --forest-mid: #2E6B52;
+            --sage:       #4A9572;
+            --sage-light: #EAF3EE;
+            --amber:      #C9863A;
+            --amber-light:#FDF3E7;
+            --ink:        #111318;
+            --ink2:       #3D3F47;
+            --muted:      #7C808C;
+            --line:       #E3E5EA;
+            --sand:       #F8F7F4;
+            --white:      #FFFFFF;
+            --font-d: 'Montserrat', Georgia, serif;
+            --font-b:     'Outfit', system-ui, sans-serif;
+        }
+
+        body { font-family: var(--font-b); background: var(--sand); color: var(--ink); }
+
+        /* SIDEBAR */
+        .admin-layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+
+        .sidebar {
+            background: var(--forest);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .sidebar-brand {
+            font-family: var(--font-d);
+            font-size: 22px;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .sidebar-brand em { font-style: normal; color: #7FBD9E; }
+
+        .sidebar-sub {
+            font-size: 11px;
+            color: #5A7A6C;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            color: #9CBDAD;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background 0.15s, color 0.15s;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+            font-family: var(--font-b);
+        }
+
+        .sidebar-link:hover, .sidebar-link.active {
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+        }
+
+        .sidebar-link i { font-size: 18px; }
+
+        .sidebar-logout {
+            margin-top: auto;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+
+        /* MAIN */
+        .admin-main { padding: 2.5rem 3rem; overflow-y: auto; }
+
+        .admin-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .admin-topbar h1 {
+            font-family: var(--font-d);
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .admin-user {
+            font-size: 13px;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .admin-user strong { color: var(--ink); }
+
+        /* STAT CARDS */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-family: var(--font-d);
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--ink);
+            line-height: 1;
+        }
+
+        .stat-card.alert { border-left: 3px solid var(--amber); }
+        .stat-card.alert .stat-value { color: var(--amber); }
+        .stat-card.revenue .stat-value { color: var(--forest-mid); }
+
+        /* SECTION */
+        .admin-section {
+            background: var(--white);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .section-head {
+            padding: 1.1rem 1.5rem;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-head h2 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--ink);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-head h2 i { font-size: 18px; color: var(--sage); }
+
+        .section-count {
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--sage-light);
+            color: var(--forest-mid);
+            padding: 3px 10px;
+            border-radius: 99px;
+        }
+
+        /* TABLE */
+        .admin-table { width: 100%; border-collapse: collapse; }
+
+        .admin-table th {
+            padding: 10px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--muted);
+            background: var(--sand);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .admin-table td {
+            padding: 12px 16px;
+            font-size: 13px;
+            color: var(--ink2);
+            border-bottom: 1px solid var(--line);
+            vertical-align: middle;
+        }
+
+        .admin-table tr:last-child td { border-bottom: none; }
+        .admin-table tr:hover td { background: var(--sand); }
+
+        .td-name { font-weight: 600; color: var(--ink); }
+        .td-ref  { font-size: 12px; color: var(--muted); }
+
+        /* STATUS BADGE */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 99px;
+        }
+
+        .badge-pending    { background: #FFF8E6; color: #946800; }
+        .badge-confirmed  { background: var(--sage-light); color: #1C5C40; }
+        .badge-collected  { background: #EEF4FF; color: #2B5CC8; }
+        .badge-stored     { background: #F0EBFF; color: #5B2BB5; }
+        .badge-reviewing  { background: #EEF4FF; color: #2B5CC8; }
+        .badge-approved   { background: var(--sage-light); color: #1C5C40; }
+        .badge-inprogress { background: var(--amber-light); color: #7A4B10; }
+        .badge-completed  { background: #E8F5EE; color: #1A5C34; }
+
+        /* STATUS FORM */
+        .status-form { display: flex; align-items: center; gap: 8px; }
+
+        .status-select {
+            padding: 6px 10px;
+            border: 1.5px solid var(--line);
+            border-radius: 7px;
+            font-size: 12px;
+            font-family: var(--font-b);
+            color: var(--ink);
+            background: var(--white);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .status-select:focus { border-color: var(--sage); }
+
+        .btn-update {
+            background: var(--forest);
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font-b);
+            cursor: pointer;
+            transition: background 0.15s;
+            white-space: nowrap;
+        }
+
+        .btn-update:hover { background: var(--forest-mid); }
+
+        /* EMPTY */
+        .table-empty {
+            text-align: center;
+            padding: 3rem;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .table-empty i { font-size: 36px; color: var(--line); display: block; margin-bottom: 10px; }
+
+        /* RECENTLY COMPLETED */
+        .completed-section .section-head { background: #F0EDE8; }
+        .completed-section .section-head h2 i { color: var(--amber); }
+
+        /* ALERT */
+        .admin-alert {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .admin-alert.success { background: #E8F5EE; border-left: 3px solid #2D9B5A; color: #1A5C34; }
+
+        @@media (max-width: 1024px) {
+            .stat-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+    </style>
+</head>
+<body>
+<div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">PROSBEE<em>.</em></div>
+        <div class="sidebar-sub">Admin panel</div>
+
+            <nav class="sidebar-nav">
+                <a class="sidebar-link active" href="#orders">
+                    <i class="ti ti-package"></i> Logistics orders
+                </a>
+                <a class="sidebar-link" href="#requests">
+                    <i class="ti ti-palette"></i> Aesthetic requests
+                </a>
+                <a class="sidebar-link" href="#completed">
+                    <i class="ti ti-clock"></i> Recently completed
+                </a>
+                <a class="sidebar-link" asp-controller="Admin" asp-action="ManageAdmins">
+                    <i class="ti ti-users"></i> Manage admins
+                </a>
+            </nav>
+
+        <div class="sidebar-logout">
+            <form asp-controller="Admin" asp-action="Logout" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="sidebar-link" style="color:#9CBDAD;">
+                    <i class="ti ti-logout"></i> Log out
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="admin-main">
+
+        <div class="admin-topbar">
+            <h1>Dashboard</h1>
+            <div class="admin-user">
+                <i class="ti ti-shield-check" style="color:#4A9572"></i>
+                Logged in as <strong>@User.Identity?.Name</strong>
+            </div>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="admin-alert success">
+                <i class="ti ti-circle-check"></i> @TempData["Success"]
+            </div>
+        }
+
+        <!-- STATS -->
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total orders</div>
+                <div class="stat-value">@ViewBag.TotalOrders</div>
+            </div>
+            <div class="stat-card alert">
+                <div class="stat-label">Pending orders</div>
+                <div class="stat-value">@ViewBag.PendingOrders</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total requests</div>
+                <div class="stat-value">@ViewBag.TotalRequests</div>
+            </div>
+            <div class="stat-card alert">
+                <div class="stat-label">Pending requests</div>
+                <div class="stat-value">@ViewBag.PendingRequests</div>
+            </div>
+            <div class="stat-card revenue">
+                <div class="stat-label">Total revenue</div>
+                <div class="stat-value" style="font-size:20px;">GH₵ @ViewBag.TotalRevenue.ToString("0.00")</div>
+            </div>
+        </div>
+
+        <!-- LOGISTICS ORDERS -->
+        <div class="admin-section" id="orders">
+            <div class="section-head">
+                <h2><i class="ti ti-package"></i> Logistics orders</h2>
+                <span class="section-count">@(((IEnumerable<dynamic>)ViewBag.Orders).Count()) active</span>
+            </div>
+
+            @if (((IEnumerable<dynamic>)ViewBag.Orders).Any())
+            {
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Order</th>
+                            <th>Student</th>
+                            <th>Items</th>
+                            <th>Pickup</th>
+                            <th>Return</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Update</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in ViewBag.Orders)
+                        {
+                            var badgeClass = order.OrderStatus switch {
+                                "Confirmed" => "badge-confirmed",
+                                "Collected" => "badge-collected",
+                                "Stored"    => "badge-stored",
+                                _           => "badge-pending"
+                            };
+
+                            <tr>
+                                <td>
+                                    <div class="td-name">#@order.OrderId</div>
+                                    <div class="td-ref">@order.OrderedAt.ToString("dd MMM yyyy")</div>
+                                </td>
+                                <td>
+                                    <div class="td-name">@order.Student?.FirstName @order.Student?.LastName</div>
+                                    <div class="td-ref">@order.Student?.Email</div>
+                                </td>
+                                <td>@order.OrderItems.Count item type(s)</td>
+                                <td>@(order.PickupDate?.ToString("dd MMM yyyy") ?? "—")</td>
+                                <td>@(order.ReturnDate?.ToString("dd MMM yyyy") ?? "—")</td>
+                                <td><strong>GH₵ @order.TotalAmount.ToString("0.00")</strong></td>
+                                <td><span class="badge @badgeClass">@order.OrderStatus</span></td>
+                                <td>
+                                    <form class="status-form" asp-controller="Admin" asp-action="UpdateOrderStatus" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="orderId" value="@order.OrderId" />
+                                        <select name="status" class="status-select">
+                                                <option value="Confirmed" selected="@(order.OrderStatus == "Confirmed")">Confirmed</option>
+                                                <option value="Collected" selected="@(order.OrderStatus == "Collected")">Collected</option>
+                                                <option value="Stored" selected="@(order.OrderStatus == "Stored")">In storage</option>
+                                                <option value="Completed">Completed ✓</option>
+                                           
+                                        </select>
+                                        <button type="submit" class="btn-update">Update</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="table-empty">
+                    <i class="ti ti-package-off"></i>
+                    No active logistics orders
+                </div>
+            }
+        </div>
+
+        <!-- AESTHETIC REQUESTS -->
+        <div class="admin-section" id="requests">
+            <div class="section-head">
+                <h2><i class="ti ti-palette"></i> Aesthetic requests</h2>
+                <span class="section-count">@(((IEnumerable<dynamic>)ViewBag.Requests).Count()) active</span>
+            </div>
+
+            @if (((IEnumerable<dynamic>)ViewBag.Requests).Any())
+            {
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Request</th>
+                            <th>Student</th>
+                            <th>Style / details</th>
+                            <th>Preferred date</th>
+                            <th>Status</th>
+                            <th>Update</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var req in ViewBag.Requests)
+                        {
+                            var badgeClass = req.Status switch {
+                                "Pending"     => "badge-pending",
+                                "Reviewing"   => "badge-reviewing",
+                                "Approved"    => "badge-approved",
+                                "In Progress" => "badge-inprogress",
+                                _             => "badge-pending"
+                            };
+
+                            <tr>
+                                <td>
+                                    <div class="td-name">#@req.RequestId</div>
+                                    <div class="td-ref">@req.RequestedAt.ToString("dd MMM yyyy")</div>
+                                </td>
+                                <td>
+                                    <div class="td-name">@req.Student?.FirstName @req.Student?.LastName</div>
+                                    <div class="td-ref">@req.Student?.Email</div>
+                                </td>
+                                <td style="max-width:260px; font-size:12px; color:var(--muted);">@req.Notes</td>
+                                <td>@(req.ResolvedAt?.ToString("dd MMM yyyy") ?? "—")</td>
+                                <td><span class="badge @badgeClass">@req.Status</span></td>
+                                <td>
+                                    <form class="status-form" asp-controller="Admin" asp-action="UpdateRequestStatus" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="requestId" value="@req.RequestId" />
+                                        <select name="status" class="status-select">
+                                                <option value="Pending" selected="@(req.Status == "Pending")">Pending</option>
+                                                <option value="Reviewing" selected="@(req.Status == "Reviewing")">Reviewing</option>
+                                                <option value="Approved" selected="@(req.Status == "Approved")">Approved</option>
+                                                <option value="In Progress" selected="@(req.Status == "In Progress")">In progress</option>
+                                                <option value="Completed">Completed ✓</option>
+     
+                                        </select>
+                                        <button type="submit" class="btn-update">Update</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="table-empty">
+                    <i class="ti ti-palette-off"></i>
+                    No active aesthetic requests
+                </div>
+            }
+        </div>
+
+        <!-- RECENTLY COMPLETED (soft deleted, within 15 days) -->
+        <div class="admin-section completed-section" id="completed">
+            <div class="section-head">
+                <h2><i class="ti ti-clock" style="color:var(--amber)"></i> Recently completed — permanent delete in 15 days</h2>
+            </div>
+
+            @{
+                var completedOrders   = (IEnumerable<dynamic>)ViewBag.RecentlyCompleted;
+                var completedRequests = (IEnumerable<dynamic>)ViewBag.RecentlyCompletedRequests;
+            }
+
+            @if (completedOrders.Any() || completedRequests.Any())
+            {
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Reference</th>
+                            <th>Student</th>
+                            <th>Completed on</th>
+                            <th>Deletes on</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in completedOrders)
+                        {
+                            <tr>
+                                <td><span class="badge badge-confirmed">Order</span></td>
+                                <td class="td-name">#@order.OrderId</td>
+                                <td>@order.Student?.FirstName @order.Student?.LastName</td>
+                                <td>@order.DeletedAt?.ToString("dd MMM yyyy")</td>
+                                <td style="color:var(--amber); font-weight:600;">
+                                    @order.DeletedAt?.AddDays(15).ToString("dd MMM yyyy")
+                                </td>
+                            </tr>
+                        }
+                        @foreach (var req in completedRequests)
+                        {
+                            <tr>
+                                <td><span class="badge badge-inprogress">Request</span></td>
+                                <td class="td-name">#@req.RequestId</td>
+                                <td>@req.Student?.FirstName @req.Student?.LastName</td>
+                                <td>@req.DeletedAt?.ToString("dd MMM yyyy")</td>
+                                <td style="color:var(--amber); font-weight:600;">
+                                    @req.DeletedAt?.AddDays(15).ToString("dd MMM yyyy")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="table-empty">
+                    <i class="ti ti-circle-check"></i>
+                    No recently completed records
+                </div>
+            }
+        </div>
+
+    </main>
+</div>
+</body>
+</html>

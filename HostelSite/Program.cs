@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
-using HostelSite.Models;
 using HostelSite.Models.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,34 +16,46 @@ builder.Services.AddDbContext<HostelDbContext>(options =>
             maxRetryDelay: TimeSpan.FromSeconds(10),
             errorNumbersToAdd: null)));
 
-// ── COOKIE AUTHENTICATION ──
+// ── AUTHENTICATION — Student + Admin schemes ──
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
     {
-        options.LoginPath        = "/Account/Login";
-        options.LogoutPath       = "/Account/Logout";
+        options.LoginPath = "/Account/Login";
+        options.LogoutPath = "/Account/Logout";
         options.AccessDeniedPath = "/Account/Login";
-        options.ExpireTimeSpan   = TimeSpan.FromDays(30);
+        options.ExpireTimeSpan = TimeSpan.FromDays(30);
         options.SlidingExpiration = true;
-        options.Cookie.HttpOnly  = true;
+        options.Cookie.HttpOnly = true;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.Cookie.SameSite  = SameSiteMode.Strict;
+        options.Cookie.SameSite = SameSiteMode.Strict;
+        options.Cookie.Name = "NestStudent";
+    })
+    .AddCookie("AdminCookie", options =>
+    {
+        options.LoginPath = "/Admin/Login";
+        options.LogoutPath = "/Admin/Logout";
+        options.AccessDeniedPath = "/Admin/Login";
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        options.SlidingExpiration = true;
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.Strict;
+        options.Cookie.Name = "NestAdmin";
     });
 
 // ── AUTHORIZATION ──
 builder.Services.AddAuthorization();
 
-// ── HTTP CLIENT for Paystack API calls ──
+// ── HTTP CLIENT for Paystack ──
 builder.Services.AddHttpClient("Paystack", client =>
 {
     client.BaseAddress = new Uri("https://api.paystack.co/");
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
 
-// ── BUILD APP ──
+// ── BUILD ──
 var app = builder.Build();
 
-// ── PIPELINE ──
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -54,12 +65,9 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-
-// Order matters: Authentication before Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
-// ── ROUTES ──
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
