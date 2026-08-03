@@ -27,7 +27,6 @@ public partial class Student
 
     public virtual ICollection<AestheticRequest> AestheticRequests { get; set; } = new List<AestheticRequest>();
 
-    public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
     public virtual ICollection<LogisticsOrder> LogisticsOrders { get; set; } = new List<LogisticsOrder>();
 }

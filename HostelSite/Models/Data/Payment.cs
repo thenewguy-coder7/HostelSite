@@ -23,5 +23,4 @@ public partial class Payment
 
     public DateTime CreatedAt { get; set; }
 
-    public virtual Booking? Booking { get; set; }
 }

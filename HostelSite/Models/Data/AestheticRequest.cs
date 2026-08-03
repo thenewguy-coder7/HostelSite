@@ -27,7 +27,6 @@ public partial class AestheticRequest
 
     public virtual RoomAesthetic? Aesthetic { get; set; }
 
-    public virtual Room? Room { get; set; }
 
     public virtual Student Student { get; set; } = null!;
 }
