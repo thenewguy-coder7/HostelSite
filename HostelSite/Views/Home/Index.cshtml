@@ -5,36 +5,56 @@
 <style>
     /* ── Tokens ── */
     :root {
-        --forest:       #1C3B2E;
-        --forest-dark:  #0D201A;
-        --forest-mid:   #2E6B52;
-        --sage:         #4A9572;
-        --sage-light:   #EAF3EE;
-        --sage-muted:   #9CBDAD;
-        --amber:        #C9863A;
-        --amber-light:  #FDF3E7;
-        --amber-hover:  #B5722A;
-        --ink:          #111318;
-        --ink2:         #3D3F47;
-        --muted:        #7C808C;
-        --line:         #E3E5EA;
-        --sand:         #F8F7F4;
-        --white:        #FFFFFF;
-        --font-d:       'Montserrat', Georgia, serif;
-        --font-b:       'Outfit', system-ui, sans-serif;
-        --r:            10px;
+        --forest: #1C3B2E;
+        --forest-dark: #0D201A;
+        --forest-mid: #2E6B52;
+        --sage: #4A9572;
+        --sage-light: #EAF3EE;
+        --sage-muted: #9CBDAD;
+        --amber: #C9863A;
+        --amber-light: #FDF3E7;
+        --amber-hover: #B5722A;
+        --ink: #111318;
+        --ink2: #3D3F47;
+        --muted: #7C808C;
+        --line: #E3E5EA;
+        --sand: #F8F7F4;
+        --white: #FFFFFF;
+        --font-d: 'Montserrat', Georgia, serif;
+        --font-b: 'Outfit', system-ui, sans-serif;
+        --r: 10px;
     }
 
     /* ── Google Fonts ── */
     @@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&family=Outfit:wght@400;500;600&display=swap');
 
     /* ── Reset for page-level elements ── */
-    .nest-page * { box-sizing: border-box; }
-    .nest-page { font-family: var(--font-b); color: var(--ink); }
-    .nest-page a { text-decoration: none; }
-    .nest-page ul { list-style: none; padding: 0; margin: 0; }
-    .nest-page p { margin: 0; }
-    .nest-page h1, .nest-page h2, .nest-page h3, .nest-page h4 { margin: 0; }
+    .nest-page * {
+        box-sizing: border-box;
+    }
+
+    .nest-page {
+        font-family: var(--font-b);
+        color: var(--ink);
+    }
+
+        .nest-page a {
+            text-decoration: none;
+        }
+
+        .nest-page ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nest-page p {
+            margin: 0;
+        }
+
+        .nest-page h1, .nest-page h2, .nest-page h3, .nest-page h4 {
+            margin: 0;
+        }
 
     /* ══ HERO ══ */
     .hero {
@@ -63,18 +83,25 @@
         margin-bottom: 1.5rem;
     }
 
-    .hero-eyebrow span {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: var(--sage);
-        display: inline-block;
-        animation: pulse 2s infinite;
-    }
+        .hero-eyebrow span {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--sage);
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
 
     @@keyframes pulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50%       { opacity: 0.5; transform: scale(0.8); }
+        0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.5;
+            transform: scale(0.8);
+        }
     }
 
     .hero h1 {
@@ -87,10 +114,10 @@
         letter-spacing: -0.5px;
     }
 
-    .hero h1 em {
-        font-style: italic;
-        color: #A8D8BF;
-    }
+        .hero h1 em {
+            font-style: italic;
+            color: #A8D8BF;
+        }
 
     .hero-sub {
         font-size: 17px;
@@ -121,7 +148,10 @@
         display: inline-block;
     }
 
-    .btn-amber-lg:hover { background: var(--amber-hover); color: #fff; }
+        .btn-amber-lg:hover {
+            background: var(--amber-hover);
+            color: #fff;
+        }
 
     .btn-ghost-lg {
         background: transparent;
@@ -137,11 +167,11 @@
         display: inline-block;
     }
 
-    .btn-ghost-lg:hover {
-        border-color: rgba(255,255,255,0.5);
-        background: rgba(255,255,255,0.05);
-        color: #fff;
-    }
+        .btn-ghost-lg:hover {
+            border-color: rgba(255,255,255,0.5);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+        }
 
     /* hero stats */
     .hero-stats {
@@ -223,11 +253,11 @@
         text-align: center;
     }
 
-    .svc-tab.active {
-        background: var(--white);
-        color: var(--forest);
-        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-    }
+        .svc-tab.active {
+            background: var(--white);
+            color: var(--forest);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
 
     .svc-detail {
         background: var(--sand);
@@ -242,13 +272,13 @@
         transition: opacity 0.2s;
     }
 
-    .svc-detail strong {
-        display: block;
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--ink);
-        margin-bottom: 5px;
-    }
+        .svc-detail strong {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 5px;
+        }
 
     .btn-forest {
         display: block;
@@ -266,7 +296,10 @@
         transition: background 0.15s;
     }
 
-    .btn-forest:hover { background: var(--forest-mid); color: #fff; }
+        .btn-forest:hover {
+            background: var(--forest-mid);
+            color: #fff;
+        }
 
     /* ══ TRUST STRIP ══ */
     .trust-strip {
@@ -291,9 +324,14 @@
         border-right: 1px solid #F0D9BE;
     }
 
-    .trust-item:last-child { border-right: none; }
+        .trust-item:last-child {
+            border-right: none;
+        }
 
-    .trust-item i { font-size: 17px; color: var(--amber); }
+        .trust-item i {
+            font-size: 17px;
+            color: var(--amber);
+        }
 
     /* ══ SECTION BASE ══ */
     .sec {
@@ -328,7 +366,9 @@
     }
 
     /* ══ AESTHETICS SECTION ══ */
-    .aes-section { background: var(--white); }
+    .aes-section {
+        background: var(--white);
+    }
 
     .aes-grid {
         display: grid;
@@ -337,6 +377,8 @@
     }
 
     .aes-card {
+        display: block;
+        color: inherit;
         background: var(--white);
         border: 1px solid var(--line);
         border-radius: 14px;
@@ -345,106 +387,34 @@
         cursor: pointer;
     }
 
-    .aes-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 32px rgba(0,0,0,0.08);
-    }
+        .aes-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+            color: inherit;
+        }
 
     .aes-swatch {
         height: 170px;
-        display: flex;
-        align-items: flex-end;
-        padding: 1rem;
         position: relative;
         overflow: hidden;
     }
 
-    /* Each style's palette — the swatches ARE the preview */
-    .swatch-minimal {
-        background: #F2EFEA;
-    }
-    .swatch-minimal::before {
-        content: '';
-        position: absolute;
-        right: -20px; top: -20px;
-        width: 120px; height: 120px;
-        background: #D9D4CC;
-        border-radius: 50%;
-    }
-    .swatch-minimal::after {
-        content: '';
-        position: absolute;
-        left: 20px; bottom: 30px;
-        width: 60px; height: 4px;
-        background: #B8B2A8;
-        border-radius: 2px;
-        box-shadow: 0 12px 0 #B8B2A8, 0 24px 0 rgba(184,178,168,0.4);
-    }
+        .aes-swatch img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.35s ease;
+        }
 
-    .swatch-nordic {
-        background: #DDE8EF;
-    }
-    .swatch-nordic::before {
-        content: '';
-        position: absolute;
-        right: 24px; top: 20px;
-        width: 70px; height: 90px;
-        background: #B8CAD6;
-        border-radius: 6px 6px 0 0;
-    }
-    .swatch-nordic::after {
-        content: '';
-        position: absolute;
-        left: 24px; bottom: 20px;
-        width: 80px; height: 10px;
-        background: #C4A882;
-        border-radius: 3px;
-        box-shadow: 0 -18px 0 #C4A882, 0 16px 0 rgba(196,168,130,0.3);
-    }
-
-    .swatch-tropical {
-        background: #D4EAD1;
-    }
-    .swatch-tropical::before {
-        content: '';
-        position: absolute;
-        right: 16px; top: -10px;
-        width: 50px; height: 110px;
-        background: #4A9572;
-        clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-        opacity: 0.7;
-    }
-    .swatch-tropical::after {
-        content: '';
-        position: absolute;
-        right: 36px; top: 20px;
-        width: 40px; height: 100px;
-        background: #2E6B52;
-        clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-        opacity: 0.5;
-    }
-
-    .swatch-urban {
-        background: #2A2D35;
-    }
-    .swatch-urban::before {
-        content: '';
-        position: absolute;
-        left: 0; top: 0;
-        width: 100%; height: 100%;
-        background: linear-gradient(135deg, #1E2128 0%, #3A3D48 100%);
-    }
-    .swatch-urban::after {
-        content: '';
-        position: absolute;
-        right: 20px; top: 20px;
-        width: 60px; height: 60px;
-        border: 2px solid rgba(201,134,58,0.6);
-        border-radius: 50%;
+    .aes-card:hover .aes-swatch img {
+        transform: scale(1.06);
     }
 
     .aes-badge {
-        position: relative;
+        position: absolute;
+        left: 1rem;
+        bottom: 1rem;
         z-index: 1;
         font-size: 11px;
         font-weight: 600;
@@ -453,28 +423,39 @@
         letter-spacing: 0.4px;
     }
 
-    .badge-light  { background: rgba(255,255,255,0.85); color: var(--ink); }
-    .badge-dark   { background: rgba(0,0,0,0.5);        color: #fff; }
+    .badge-light {
+        background: rgba(255,255,255,0.9);
+        color: var(--ink);
+    }
+
+    .badge-dark {
+        background: rgba(0,0,0,0.55);
+        color: #fff;
+    }
 
     .aes-body {
         padding: 1.1rem 1.2rem 1.35rem;
     }
 
-    .aes-body h4 {
-        font-size: 15px;
-        font-weight: 600;
-        color: var(--ink);
-        margin-bottom: 5px;
-    }
+        .aes-body h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 5px;
+        }
 
-    .aes-body p {
-        font-size: 13px;
-        color: var(--muted);
-        line-height: 1.55;
-        margin-bottom: 12px;
-    }
+        .aes-body p {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.55;
+            margin-bottom: 12px;
+        }
 
-    .aes-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .aes-tags {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
 
     .tag {
         font-size: 11px;
@@ -483,9 +464,20 @@
         border-radius: 99px;
     }
 
-    .tag-sage   { background: var(--sage-light);  color: #1C5C40; }
-    .tag-amber  { background: var(--amber-light); color: #7A4B10; }
-    .tag-ink    { background: #ECEDF0;            color: var(--ink2); }
+    .tag-sage {
+        background: var(--sage-light);
+        color: #1C5C40;
+    }
+
+    .tag-amber {
+        background: var(--amber-light);
+        color: #7A4B10;
+    }
+
+    .tag-ink {
+        background: #ECEDF0;
+        color: var(--ink2);
+    }
 
     .aes-cta-row {
         display: flex;
@@ -503,10 +495,14 @@
         transition: color 0.15s;
     }
 
-    .link-underline:hover { color: var(--sage); }
+        .link-underline:hover {
+            color: var(--sage);
+        }
 
     /* ══ LOGISTICS SECTION ══ */
-    .log-section { background: var(--sand); }
+    .log-section {
+        background: var(--sand);
+    }
 
     .log-layout {
         display: grid;
@@ -532,10 +528,10 @@
         transition: border-color 0.15s, box-shadow 0.15s;
     }
 
-    .log-item-card:hover {
-        border-color: var(--sage);
-        box-shadow: 0 4px 16px rgba(28,59,46,0.07);
-    }
+        .log-item-card:hover {
+            border-color: var(--sage);
+            box-shadow: 0 4px 16px rgba(28,59,46,0.07);
+        }
 
     .log-item-icon {
         width: 40px;
@@ -547,7 +543,10 @@
         justify-content: center;
     }
 
-    .log-item-icon i { font-size: 20px; color: var(--forest-mid); }
+        .log-item-icon i {
+            font-size: 20px;
+            color: var(--forest-mid);
+        }
 
     .log-item-name {
         font-size: 14px;
@@ -576,17 +575,17 @@
         padding: 1.25rem 1.5rem;
     }
 
-    .order-panel-head h3 {
-        font-family: var(--font-d);
-        font-size: 18px;
-        color: #fff;
-        margin-bottom: 3px;
-    }
+        .order-panel-head h3 {
+            font-family: var(--font-d);
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 3px;
+        }
 
-    .order-panel-head p {
-        font-size: 12px;
-        color: var(--sage-muted);
-    }
+        .order-panel-head p {
+            font-size: 12px;
+            color: var(--sage-muted);
+        }
 
     .order-panel-body {
         padding: 1.5rem;
@@ -599,7 +598,12 @@
         font-size: 13px;
     }
 
-    .order-empty i { font-size: 32px; color: var(--line); display: block; margin-bottom: 8px; }
+        .order-empty i {
+            font-size: 32px;
+            color: var(--line);
+            display: block;
+            margin-bottom: 8px;
+        }
 
     .order-steps {
         display: flex;
@@ -654,9 +658,17 @@
         padding: 5rem 3rem;
     }
 
-    .hiw-section .sec-eyebrow { color: var(--sage); }
-    .hiw-section .sec-h       { color: #fff; }
-    .hiw-section .sec-sub     { color: var(--sage-muted); }
+        .hiw-section .sec-eyebrow {
+            color: var(--sage);
+        }
+
+        .hiw-section .sec-h {
+            color: #fff;
+        }
+
+        .hiw-section .sec-sub {
+            color: var(--sage-muted);
+        }
 
     .hiw-grid {
         display: grid;
@@ -692,7 +704,10 @@
         margin-bottom: 14px;
     }
 
-    .hiw-icon i { font-size: 22px; color: var(--sage); }
+        .hiw-icon i {
+            font-size: 22px;
+            color: var(--sage);
+        }
 
     .hiw-card h4 {
         font-size: 15px;
@@ -720,7 +735,10 @@
     }
 
     /* ══ SOCIAL PROOF ══ */
-    .proof-section { background: var(--white); padding: 5rem 3rem; }
+    .proof-section {
+        background: var(--white);
+        padding: 5rem 3rem;
+    }
 
     .proof-grid {
         display: grid;
@@ -742,7 +760,10 @@
         margin-bottom: 12px;
     }
 
-    .proof-stars i { font-size: 15px; color: var(--amber); }
+        .proof-stars i {
+            font-size: 15px;
+            color: var(--amber);
+        }
 
     .proof-card blockquote {
         font-size: 14px;
@@ -770,12 +791,31 @@
         flex-shrink: 0;
     }
 
-    .av-a { background: var(--sage-light); color: var(--forest-mid); }
-    .av-b { background: var(--amber-light); color: #7A4B10; }
-    .av-c { background: #EEF0FA; color: #3A3870; }
+    .av-a {
+        background: var(--sage-light);
+        color: var(--forest-mid);
+    }
 
-    .proof-name { font-size: 13px; font-weight: 600; color: var(--ink); }
-    .proof-meta { font-size: 12px; color: var(--muted); }
+    .av-b {
+        background: var(--amber-light);
+        color: #7A4B10;
+    }
+
+    .av-c {
+        background: #EEF0FA;
+        color: #3A3870;
+    }
+
+    .proof-name {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ink);
+    }
+
+    .proof-meta {
+        font-size: 12px;
+        color: var(--muted);
+    }
 
     /* ══ CTA BANNER ══ */
     .cta-section {
@@ -784,53 +824,112 @@
         text-align: center;
     }
 
-    .cta-section h2 {
-        font-family: var(--font-d);
-        font-size: 42px;
-        font-weight: 600;
-        color: #fff;
-        margin-bottom: 14px;
-        letter-spacing: -0.3px;
+        .cta-section h2 {
+            font-family: var(--font-d);
+            font-size: 42px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 14px;
+            letter-spacing: -0.3px;
+        }
+
+            .cta-section h2 em {
+                font-style: italic;
+                color: #A8D8BF;
+            }
+
+        .cta-section p {
+            font-size: 16px;
+            color: var(--sage-muted);
+            max-width: 480px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.7;
+        }
+
+    .cta-btns {
+        display: flex;
+        gap: 14px;
+        justify-content: center;
     }
-
-    .cta-section h2 em { font-style: italic; color: #A8D8BF; }
-
-    .cta-section p {
-        font-size: 16px;
-        color: var(--sage-muted);
-        max-width: 480px;
-        margin: 0 auto 2.5rem;
-        line-height: 1.7;
-    }
-
-    .cta-btns { display: flex; gap: 14px; justify-content: center; }
 
     /* ══ RESPONSIVE ══ */
     @@media (max-width: 1024px) {
-        .hero                 { grid-template-columns: 1fr; padding-bottom: 3rem; }
-        .hero-card-wrap       { display: none; }
-        .aes-grid             { grid-template-columns: repeat(2, 1fr); }
-        .hiw-grid             { grid-template-columns: repeat(2, 1fr); }
-        .hiw-card::after      { display: none; }
-        .log-layout           { grid-template-columns: 1fr; }
-        .order-panel          { position: static; }
-        .proof-grid           { grid-template-columns: 1fr; }
+        .hero {
+            grid-template-columns: 1fr;
+            padding-bottom: 3rem;
+        }
+
+        .hero-card-wrap {
+            display: none;
+        }
+
+        .aes-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .hiw-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .hiw-card::after {
+            display: none;
+        }
+
+        .log-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .order-panel {
+            position: static;
+        }
+
+        .proof-grid {
+            grid-template-columns: 1fr;
+        }
     }
 
     @@media (max-width: 640px) {
         .sec, .hiw-section,
         .proof-section,
-        .cta-section          { padding: 3.5rem 1.5rem; }
-        .hero                 { padding: 3rem 1.5rem 2.5rem; }
-        .hero h1              { font-size: 38px; }
-        .sec-h                { font-size: 28px; }
+        .cta-section {
+            padding: 3.5rem 1.5rem;
+        }
+
+        .hero {
+            padding: 3rem 1.5rem 2.5rem;
+        }
+
+            .hero h1 {
+                font-size: 38px;
+            }
+
+        .sec-h {
+            font-size: 28px;
+        }
+
         .aes-grid,
         .log-items-grid,
-        .hiw-grid             { grid-template-columns: 1fr; }
-        .trust-strip          { padding: 1rem 1.5rem; }
-        .trust-item           { border-right: none; padding: 0.3rem 0; }
-        .cta-btns             { flex-direction: column; align-items: center; }
-        .cta-section h2       { font-size: 30px; }
+        .hiw-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .trust-strip {
+            padding: 1rem 1.5rem;
+        }
+
+        .trust-item {
+            border-right: none;
+            padding: 0.3rem 0;
+        }
+
+        .cta-btns {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .cta-section h2 {
+            font-size: 30px;
+        }
     }
 </style>
 
@@ -839,7 +938,7 @@
     <!-- ══ HERO ══ -->
     <section class="hero">
         <div>
-           
+
             <div class="hero-eyebrow">
                 <span></span> For students — powered by Paystack
             </div>
@@ -863,7 +962,7 @@
                     <div class="hero-stat-label">Students served</div>
                 </div>
                 <div>
-                    <div class="hero-stat-num">4</div>
+                    <div class="hero-stat-num">5</div>
                     <div class="hero-stat-label">Aesthetic styles</div>
                 </div>
                 <div>
@@ -888,7 +987,7 @@
                 </div>
                 <div class="svc-detail" id="svc-detail">
                     <strong>Customise your room</strong>
-                    Pick from curated decoration styles — minimal, nordic, tropical, or urban.
+                    Pick from curated decoration styles — minimal, nordic, tropical, urban, or wallpaper art.
                     We source everything and set it up for you before you move in.
                 </div>
                 <a asp-controller="Aesthetics" asp-action="Index" class="btn-forest" id="svc-cta">
@@ -928,8 +1027,9 @@
 
         <div class="aes-grid">
             <!-- Minimal -->
-            <div class="aes-card">
-                <div class="aes-swatch swatch-minimal">
+            <a asp-controller="Aesthetics" asp-action="Index" class="aes-card">
+                <div class="aes-swatch">
+                    <img src="~/images/aesthetics/minimal-1.jpg" alt="Minimal calm" />
                     <span class="aes-badge badge-light">Minimal calm</span>
                 </div>
                 <div class="aes-body">
@@ -940,11 +1040,12 @@
                         <span class="tag tag-amber">Most popular</span>
                     </div>
                 </div>
-            </div>
+            </a>
 
             <!-- Nordic -->
-            <div class="aes-card">
-                <div class="aes-swatch swatch-nordic">
+            <a asp-controller="Aesthetics" asp-action="Index" class="aes-card">
+                <div class="aes-swatch">
+                    <img src="~/images/aesthetics/nordic-1.jpg" alt="Nordic light" />
                     <span class="aes-badge badge-light">Nordic light</span>
                 </div>
                 <div class="aes-body">
@@ -955,11 +1056,12 @@
                         <span class="tag tag-ink">Cosy</span>
                     </div>
                 </div>
-            </div>
+            </a>
 
             <!-- Tropical -->
-            <div class="aes-card">
-                <div class="aes-swatch swatch-tropical">
+            <a asp-controller="Aesthetics" asp-action="Index" class="aes-card">
+                <div class="aes-swatch">
+                    <img src="~/images/aesthetics/tropical-1.jpg" alt="Tropical greens" />
                     <span class="aes-badge badge-light">Tropical greens</span>
                 </div>
                 <div class="aes-body">
@@ -970,11 +1072,12 @@
                         <span class="tag tag-sage">Natural</span>
                     </div>
                 </div>
-            </div>
+            </a>
 
             <!-- Urban -->
-            <div class="aes-card">
-                <div class="aes-swatch swatch-urban">
+            <a asp-controller="Aesthetics" asp-action="Index" class="aes-card">
+                <div class="aes-swatch">
+                    <img src="~/images/aesthetics/urban-1.jpg" alt="Urban edge" />
                     <span class="aes-badge badge-dark">Urban edge</span>
                 </div>
                 <div class="aes-body">
@@ -985,12 +1088,12 @@
                         <span class="tag tag-ink">Dark</span>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
 
         <div class="aes-cta-row">
             <p style="font-size:14px; color:var(--muted);">
-                Not sure which style is right for you? Browse all options and filter by mood.
+                Not sure which style is right for you? Browse all options including our new Wallpaper art collage.
             </p>
             <a asp-controller="Aesthetics" asp-action="Index" class="link-underline">
                 See all styles →
@@ -1219,34 +1322,34 @@
 </div>
 
 @section Scripts {
-<script>
-    const tabData = {
-        aes: {
-            detail: '<strong>Customise your room</strong>Pick from curated decoration styles — minimal, nordic, tropical, or urban. We source everything and set it up for you before you move in.',
-            cta: 'Browse aesthetic styles →',
-            href: '@Url.Action("Index", "Aesthetics")'
-        },
-        log: {
-            detail: '<strong>Store your items</strong>Select what you want stored — fan, mattress, fridge and more. We pick up from your hostel door, keep everything safe, and return it when you\'re back.',
-            cta: 'Start my storage order →',
-            href: '@Url.Action("Index", "Logistics")'
+    <script>
+        const tabData = {
+            aes: {
+                detail: '<strong>Customise your room</strong>Pick from curated decoration styles — minimal, nordic, tropical, urban, or wallpaper art. We source everything and set it up for you before you move in.',
+                cta: 'Browse aesthetic styles →',
+                href: '@Url.Action("Index", "Aesthetics")'
+            },
+            log: {
+                detail: '<strong>Store your items</strong>Select what you want stored — fan, mattress, fridge and more. We pick up from your hostel door, keep everything safe, and return it when you\'re back.',
+                cta: 'Start my storage order →',
+                href: '@Url.Action("Index", "Logistics")'
+            }
+        };
+
+        function switchTab(key) {
+            document.querySelectorAll('.svc-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + key).classList.add('active');
+
+            const detail = document.getElementById('svc-detail');
+            detail.style.opacity = '0';
+            setTimeout(() => {
+                detail.innerHTML = tabData[key].detail;
+                detail.style.opacity = '1';
+            }, 150);
+
+            const cta = document.getElementById('svc-cta');
+            cta.textContent = tabData[key].cta;
+            cta.href = tabData[key].href;
         }
-    };
-
-    function switchTab(key) {
-        document.querySelectorAll('.svc-tab').forEach(t => t.classList.remove('active'));
-        document.getElementById('tab-' + key).classList.add('active');
-
-        const detail = document.getElementById('svc-detail');
-        detail.style.opacity = '0';
-        setTimeout(() => {
-            detail.innerHTML = tabData[key].detail;
-            detail.style.opacity = '1';
-        }, 150);
-
-        const cta = document.getElementById('svc-cta');
-        cta.textContent = tabData[key].cta;
-        cta.href = tabData[key].href;
-    }
-</script>
+    </script>
 }

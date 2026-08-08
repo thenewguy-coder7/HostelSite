@@ -6,33 +6,45 @@
     @@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Outfit:wght@400;500;600&display=swap');
 
     :root {
-        --forest:      #1C3B2E;
+        --forest: #1C3B2E;
         --forest-dark: #0D201A;
-        --forest-mid:  #2E6B52;
-        --sage:        #4A9572;
-        --sage-light:  #EAF3EE;
-        --sage-muted:  #9CBDAD;
-        --amber:       #C9863A;
+        --forest-mid: #2E6B52;
+        --sage: #4A9572;
+        --sage-light: #EAF3EE;
+        --sage-muted: #9CBDAD;
+        --amber: #C9863A;
         --amber-light: #FDF3E7;
         --amber-hover: #B5722A;
-        --ink:         #111318;
-        --ink2:        #3D3F47;
-        --muted:       #7C808C;
-        --line:        #E3E5EA;
-        --sand:        #F8F7F4;
-        --white:       #FFFFFF;
+        --ink: #111318;
+        --ink2: #3D3F47;
+        --muted: #7C808C;
+        --line: #E3E5EA;
+        --sand: #F8F7F4;
+        --white: #FFFFFF;
         --font-d: 'Montserrat', Georgia, serif;
-        --font-b:      'Outfit', system-ui, sans-serif;
-        --r:           10px;
+        --font-b: 'Outfit', system-ui, sans-serif;
+        --r: 10px;
     }
 
-    .aes-page * { box-sizing: border-box; }
-    .aes-page { font-family: var(--font-b); color: var(--ink); background: var(--sand); }
-    .aes-page p, .aes-page h1, .aes-page h2,
-    .aes-page h3, .aes-page h4 { margin: 0; }
-    .aes-page a { text-decoration: none; }
+    .aes-page * {
+        box-sizing: border-box;
+    }
 
-    /* ── PAGE HEADER ── */
+    .aes-page {
+        font-family: var(--font-b);
+        color: var(--ink);
+        background: var(--sand);
+    }
+
+        .aes-page p, .aes-page h1, .aes-page h2, .aes-page h3, .aes-page h4 {
+            margin: 0;
+        }
+
+        .aes-page a {
+            text-decoration: none;
+        }
+
+    /* HEADER */
     .aes-header {
         background: var(--forest);
         padding: 3.5rem 3rem 3rem;
@@ -58,17 +70,20 @@
         margin-bottom: 14px;
     }
 
-    .aes-header h1 em { font-style: italic; color: #A8D8BF; }
+        .aes-header h1 em {
+            font-style: italic;
+            color: #A8D8BF;
+        }
 
     .aes-header p {
         font-size: 16px;
         color: var(--sage-muted);
         line-height: 1.75;
-        max-width: 520px;
+        max-width: 560px;
         margin: 0 auto;
     }
 
-    /* ── STYLE GRID ── */
+    /* STYLE GRID */
     .aes-body {
         max-width: 1200px;
         margin: 0 auto;
@@ -87,152 +102,46 @@
         border-radius: 18px;
         overflow: hidden;
         transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+        .style-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.1);
+        }
+
+        .style-card.selected {
+            border-color: var(--sage);
+            box-shadow: 0 0 0 3px rgba(74,149,114,0.2);
+        }
+
+    .style-photo-wrap {
+        position: relative;
+        height: 260px;
+        overflow: hidden;
         cursor: pointer;
     }
 
-    .style-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 16px 40px rgba(0,0,0,0.1);
-    }
+        .style-photo-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+            display: block;
+        }
 
-    .style-card.selected {
-        border-color: var(--sage);
-        box-shadow: 0 0 0 3px rgba(74,149,114,0.2);
-    }
+        .style-photo-wrap:hover img {
+            transform: scale(1.05);
+        }
 
-    /* ── CSS ART SWATCHES ── */
-    .swatch {
-        height: 220px;
-        position: relative;
-        overflow: hidden;
-        display: flex;
-        align-items: flex-end;
-        padding: 1.25rem;
-    }
-
-    /* MINIMAL */
-    .swatch-minimal { background: #EDEBE6; }
-    .swatch-minimal .s-circle {
-        position: absolute;
-        right: -30px; top: -30px;
-        width: 200px; height: 200px;
-        border-radius: 50%;
-        background: #D8D4CC;
-    }
-    .swatch-minimal .s-line {
-        position: absolute;
-        left: 36px; bottom: 60px;
-        width: 80px; height: 3px;
-        background: #B0A99E;
-        border-radius: 2px;
-        box-shadow: 0 14px 0 #B0A99E, 0 28px 0 rgba(176,169,158,0.4);
-    }
-    .swatch-minimal .s-rect {
-        position: absolute;
-        left: 36px; bottom: 120px;
-        width: 48px; height: 48px;
-        background: #C8C2B8;
-        border-radius: 4px;
-    }
-
-    /* NORDIC */
-    .swatch-nordic { background: #DDE8EF; }
-    .swatch-nordic .s-plank {
-        position: absolute;
-        right: 40px; top: 20px;
-        width: 90px; height: 110px;
-        background: #C4A882;
-        border-radius: 8px 8px 0 0;
-    }
-    .swatch-nordic .s-plank::after {
-        content: '';
-        position: absolute;
-        top: 10px; left: 10px;
-        right: 10px; bottom: 0;
-        background: #B8935A;
-        border-radius: 4px 4px 0 0;
-        opacity: 0.4;
-    }
-    .swatch-nordic .s-snow {
-        position: absolute;
-        left: 30px; top: 30px;
-        width: 70px; height: 70px;
-        background: rgba(255,255,255,0.6);
-        border-radius: 50%;
-    }
-    .swatch-nordic .s-stripe {
-        position: absolute;
-        left: 0; bottom: 50px;
-        width: 100%; height: 3px;
-        background: rgba(196,168,130,0.3);
-        box-shadow: 0 12px 0 rgba(196,168,130,0.15);
-    }
-
-    /* TROPICAL */
-    .swatch-tropical { background: #C8E0C6; }
-    .swatch-tropical .s-leaf {
-        position: absolute;
-        right: 20px; top: -15px;
-        width: 60px; height: 130px;
-        background: #2E6B52;
-        clip-path: polygon(50% 0%, 5% 100%, 95% 100%);
-        opacity: 0.8;
-    }
-    .swatch-tropical .s-leaf2 {
-        position: absolute;
-        right: 55px; top: 10px;
-        width: 45px; height: 100px;
-        background: #4A9572;
-        clip-path: polygon(50% 0%, 5% 100%, 95% 100%);
-        opacity: 0.6;
-    }
-    .swatch-tropical .s-leaf3 {
-        position: absolute;
-        right: 5px; top: 20px;
-        width: 35px; height: 80px;
-        background: #1C3B2E;
-        clip-path: polygon(50% 0%, 5% 100%, 95% 100%);
-        opacity: 0.5;
-    }
-    .swatch-tropical .s-pot {
-        position: absolute;
-        right: 30px; bottom: 30px;
-        width: 50px; height: 40px;
-        background: #C9863A;
-        border-radius: 5px 5px 12px 12px;
-    }
-
-    /* URBAN */
-    .swatch-urban { background: #23262F; }
-    .swatch-urban .s-bg {
+    .style-photo-overlay {
         position: absolute;
         inset: 0;
-        background: linear-gradient(135deg, #1A1D24 0%, #2E3140 100%);
-    }
-    .swatch-urban .s-ring {
-        position: absolute;
-        right: 30px; top: 30px;
-        width: 80px; height: 80px;
-        border: 2px solid rgba(201,134,58,0.5);
-        border-radius: 50%;
-    }
-    .swatch-urban .s-ring2 {
-        position: absolute;
-        right: 45px; top: 45px;
-        width: 50px; height: 50px;
-        border: 1px solid rgba(201,134,58,0.25);
-        border-radius: 50%;
-    }
-    .swatch-urban .s-bar {
-        position: absolute;
-        left: 30px; top: 40px;
-        width: 5px; height: 80px;
-        background: var(--amber);
-        border-radius: 3px;
-        box-shadow: 16px 0 0 rgba(201,134,58,0.3), 32px 0 0 rgba(201,134,58,0.1);
+        background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 45%);
+        display: flex;
+        align-items: flex-end;
+        padding: 1rem 1.25rem;
     }
 
-    /* style badge */
     .style-badge {
         position: relative;
         z-index: 2;
@@ -241,12 +150,31 @@
         font-size: 12px;
         font-weight: 600;
         letter-spacing: 0.3px;
+        background: rgba(255,255,255,0.92);
+        color: var(--ink);
     }
 
-    .badge-on-light { background: rgba(255,255,255,0.88); color: var(--ink); }
-    .badge-on-dark  { background: rgba(0,0,0,0.55);       color: #fff; }
+    .view-gallery-hint {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: rgba(0,0,0,0.55);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 5px 10px;
+        border-radius: 99px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        z-index: 2;
+    }
 
-    /* ── CARD BODY ── */
+        .view-gallery-hint i {
+            font-size: 13px;
+        }
+
+    /* CARD BODY */
     .style-body {
         padding: 1.5rem 1.75rem 1.75rem;
     }
@@ -279,12 +207,11 @@
         white-space: nowrap;
     }
 
-    .style-select-btn:hover,
-    .style-card.selected .style-select-btn {
-        background: var(--forest);
-        border-color: var(--forest);
-        color: #fff;
-    }
+        .style-select-btn:hover, .style-card.selected .style-select-btn {
+            background: var(--forest);
+            border-color: var(--forest);
+            color: #fff;
+        }
 
     .style-body p {
         font-size: 14px;
@@ -293,7 +220,11 @@
         margin-bottom: 14px;
     }
 
-    .style-tags { display: flex; gap: 7px; flex-wrap: wrap; }
+    .style-tags {
+        display: flex;
+        gap: 7px;
+        flex-wrap: wrap;
+    }
 
     .stag {
         font-size: 11px;
@@ -302,15 +233,149 @@
         border-radius: 99px;
     }
 
-    .stag-sage  { background: var(--sage-light);  color: #1C5C40; }
-    .stag-amber { background: var(--amber-light); color: #7A4B10; }
-    .stag-ink   { background: #ECEDF0;            color: var(--ink2); }
+    .stag-sage {
+        background: var(--sage-light);
+        color: #1C5C40;
+    }
 
-    /* ── REQUEST FORM ── */
+    .stag-amber {
+        background: var(--amber-light);
+        color: #7A4B10;
+    }
+
+    .stag-ink {
+        background: #ECEDF0;
+        color: var(--ink2);
+    }
+
+    /* LIGHTBOX */
+    .lightbox-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(13,32,26,0.92);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+        .lightbox-overlay.open {
+            display: flex;
+        }
+
+    .lightbox-content {
+        max-width: 900px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.25rem;
+    }
+
+    .lightbox-main {
+        position: relative;
+        width: 100%;
+        max-height: 70vh;
+        border-radius: 14px;
+        overflow: hidden;
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .lightbox-main img {
+            max-width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+            display: block;
+        }
+
+    .lightbox-nav-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255,255,255,0.15);
+        border: none;
+        color: #fff;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        transition: background 0.15s;
+        z-index: 2;
+    }
+
+        .lightbox-nav-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .lightbox-nav-btn.prev {
+            left: 12px;
+        }
+
+        .lightbox-nav-btn.next {
+            right: 12px;
+        }
+
+    .lightbox-close {
+        position: absolute;
+        top: -3rem;
+        right: 0;
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 28px;
+        cursor: pointer;
+        line-height: 1;
+    }
+
+    .lightbox-thumbs {
+        display: flex;
+        gap: 10px;
+    }
+
+    .lightbox-thumb {
+        width: 64px;
+        height: 64px;
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+        border: 2px solid transparent;
+        opacity: 0.6;
+        transition: opacity 0.15s, border-color 0.15s;
+    }
+
+        .lightbox-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .lightbox-thumb.active {
+            opacity: 1;
+            border-color: var(--sage);
+        }
+
+    .lightbox-title {
+        color: #fff;
+        font-family: var(--font-d);
+        font-size: 18px;
+        font-weight: 600;
+        text-align: center;
+        position: relative;
+    }
+
+    /* REQUEST FORM */
     .request-section {
         background: var(--forest);
         padding: 4rem 3rem;
-        margin-top: 0;
     }
 
     .request-inner {
@@ -352,48 +417,58 @@
         gap: 1.25rem;
     }
 
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
-
-    .form-field { display: flex; flex-direction: column; gap: 6px; }
-
-    .form-field label {
-        font-size: 12px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: var(--sage-muted);
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
     }
 
-    .form-field input,
-    .form-field select,
-    .form-field textarea {
-        background: rgba(255,255,255,0.07);
-        border: 1.5px solid rgba(255,255,255,0.12);
-        border-radius: 8px;
-        padding: 11px 14px;
-        font-size: 14px;
-        font-family: var(--font-b);
-        color: #fff;
-        outline: none;
-        transition: border-color 0.15s, background 0.15s;
-        width: 100%;
+    .form-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
     }
 
-    .form-field input::placeholder,
-    .form-field textarea::placeholder { color: rgba(255,255,255,0.25); }
+        .form-field label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--sage-muted);
+        }
 
-    .form-field select option { background: var(--forest-dark); color: #fff; }
+        .form-field input, .form-field select, .form-field textarea {
+            background: rgba(255,255,255,0.07);
+            border: 1.5px solid rgba(255,255,255,0.12);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font-size: 14px;
+            font-family: var(--font-b);
+            color: #fff;
+            outline: none;
+            transition: border-color 0.15s, background 0.15s;
+            width: 100%;
+        }
 
-    .form-field input:focus,
-    .form-field select:focus,
-    .form-field textarea:focus {
-        border-color: var(--sage);
-        background: rgba(255,255,255,0.1);
-    }
+            .form-field input::placeholder, .form-field textarea::placeholder {
+                color: rgba(255,255,255,0.25);
+            }
 
-    .form-field textarea { resize: vertical; min-height: 100px; }
+            .form-field select option {
+                background: var(--forest-dark);
+                color: #fff;
+            }
 
-    /* selected style preview inside form */
+            .form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+                border-color: var(--sage);
+                background: rgba(255,255,255,0.1);
+            }
+
+        .form-field textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
     .selected-style-preview {
         background: rgba(74,149,114,0.12);
         border: 1px solid rgba(74,149,114,0.25);
@@ -406,8 +481,13 @@
         color: #A8D8BF;
     }
 
-    .selected-style-preview strong { color: #fff; }
-    .selected-style-preview span { font-size: 12px; }
+        .selected-style-preview strong {
+            color: #fff;
+        }
+
+        .selected-style-preview span {
+            font-size: 12px;
+        }
 
     .btn-submit {
         background: var(--amber);
@@ -424,19 +504,51 @@
         margin-top: 0.25rem;
     }
 
-    .btn-submit:hover { background: var(--amber-hover); }
+        .btn-submit:hover {
+            background: var(--amber-hover);
+        }
 
-    /* ── RESPONSIVE ── */
     @@media (max-width: 900px) {
-        .style-grid { grid-template-columns: 1fr; }
-        .form-row   { grid-template-columns: 1fr; }
+        .style-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .lightbox-nav-btn {
+            width: 36px;
+            height: 36px;
+            font-size: 16px;
+        }
     }
 
     @@media (max-width: 640px) {
-        .aes-header  { padding: 2.5rem 1.5rem 2rem; }
-        .aes-header h1 { font-size: 32px; }
-        .aes-body    { padding: 2rem 1.5rem 3rem; }
-        .request-section { padding: 3rem 1.5rem; }
+        .aes-header {
+            padding: 2.5rem 1.5rem 2rem;
+        }
+
+            .aes-header h1 {
+                font-size: 32px;
+            }
+
+        .aes-body {
+            padding: 2rem 1.5rem 3rem;
+        }
+
+        .request-section {
+            padding: 3rem 1.5rem;
+        }
+
+        .style-photo-wrap {
+            height: 200px;
+        }
+
+        .lightbox-thumbs {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
     }
 </style>
 
@@ -446,25 +558,26 @@
     <div class="aes-header">
         <p class="aes-header-eyebrow">Room aesthetics</p>
         <h1>Choose your style.<br><em>We bring it to life.</em></h1>
-        <p>Browse four curated decoration styles designed for hostel rooms. Pick the one that feels like you, fill in the request form, and our team handles everything.</p>
+        <p>Browse five curated decoration styles designed for hostel rooms. Pick the one that feels like you, fill in the request form, and our team handles everything.</p>
     </div>
 
     <!-- STYLE GRID -->
     <div class="aes-body">
         <div class="style-grid">
 
-            <!-- MINIMAL -->
-            <div class="style-card" id="card-minimal" onclick="selectStyle('minimal', 'Minimal calm')">
-                <div class="swatch swatch-minimal">
-                    <div class="s-circle"></div>
-                    <div class="s-rect"></div>
-                    <div class="s-line"></div>
-                    <span class="style-badge badge-on-light">Minimal calm</span>
+            <!-- MINIMAL CALM -->
+            <div class="style-card" id="card-minimal" data-style="Minimal calm">
+                <div class="style-photo-wrap" onclick="openLightbox('minimal')">
+                    <img src="~/images/aesthetics/minimal-1.jpg" alt="Minimal calm room" />
+                    <div class="style-photo-overlay">
+                        <span class="style-badge">Minimal calm</span>
+                    </div>
+                    <span class="view-gallery-hint"><i class="ti ti-photo"></i> 3 photos</span>
                 </div>
                 <div class="style-body">
                     <div class="style-body-top">
                         <h3>Minimal calm</h3>
-                        <button class="style-select-btn" id="btn-minimal">Select style</button>
+                        <button class="style-select-btn" id="btn-minimal" onclick="selectStyle('minimal', 'Minimal calm')">Select style</button>
                     </div>
                     <p>Clean lines, muted tones, and deliberate space. For students who think clearly in quiet, uncluttered rooms.</p>
                     <div class="style-tags">
@@ -475,20 +588,21 @@
                 </div>
             </div>
 
-            <!-- NORDIC -->
-            <div class="style-card" id="card-nordic" onclick="selectStyle('nordic', 'Nordic light')">
-                <div class="swatch swatch-nordic">
-                    <div class="s-plank"></div>
-                    <div class="s-snow"></div>
-                    <div class="s-stripe"></div>
-                    <span class="style-badge badge-on-light">Nordic light</span>
+            <!-- NORDIC LIGHT -->
+            <div class="style-card" id="card-nordic" data-style="Nordic light">
+                <div class="style-photo-wrap" onclick="openLightbox('nordic')">
+                    <img src="~/images/aesthetics/nordic-1.jpg" alt="Nordic light room" />
+                    <div class="style-photo-overlay">
+                        <span class="style-badge">Nordic light</span>
+                    </div>
+                    <span class="view-gallery-hint"><i class="ti ti-photo"></i> 3 photos</span>
                 </div>
                 <div class="style-body">
                     <div class="style-body-top">
                         <h3>Nordic light</h3>
-                        <button class="style-select-btn" id="btn-nordic">Select style</button>
+                        <button class="style-select-btn" id="btn-nordic" onclick="selectStyle('nordic', 'Nordic light')">Select style</button>
                     </div>
-                    <p>Warm wood tones, cool blues, and soft woven textures. Cosy without feeling heavy or crowded.</p>
+                    <p>Warm string lights, soft wood tones, and cosy layered textures. Inviting without feeling cluttered.</p>
                     <div class="style-tags">
                         <span class="stag stag-sage">Warm tones</span>
                         <span class="stag stag-ink">Cosy</span>
@@ -497,44 +611,44 @@
                 </div>
             </div>
 
-            <!-- TROPICAL -->
-            <div class="style-card" id="card-tropical" onclick="selectStyle('tropical', 'Tropical greens')">
-                <div class="swatch swatch-tropical">
-                    <div class="s-leaf"></div>
-                    <div class="s-leaf2"></div>
-                    <div class="s-leaf3"></div>
-                    <div class="s-pot"></div>
-                    <span class="style-badge badge-on-light">Tropical greens</span>
+            <!-- TROPICAL GREENS -->
+            <div class="style-card" id="card-tropical" data-style="Tropical greens">
+                <div class="style-photo-wrap" onclick="openLightbox('tropical')">
+                    <img src="~/images/aesthetics/tropical-1.jpg" alt="Tropical greens room" />
+                    <div class="style-photo-overlay">
+                        <span class="style-badge">Tropical greens</span>
+                    </div>
+                    <span class="view-gallery-hint"><i class="ti ti-photo"></i> 3 photos</span>
                 </div>
                 <div class="style-body">
                     <div class="style-body-top">
                         <h3>Tropical greens</h3>
-                        <button class="style-select-btn" id="btn-tropical">Select style</button>
+                        <button class="style-select-btn" id="btn-tropical" onclick="selectStyle('tropical', 'Tropical greens')">Select style</button>
                     </div>
-                    <p>Lush plants, natural fibres, and earthy prints. A breath of fresh air in any hostel room.</p>
+                    <p>Hanging vines, fairy lights, and lush greenery. A dreamy escape that still feels grounded.</p>
                     <div class="style-tags">
                         <span class="stag stag-sage">Fresh</span>
                         <span class="stag stag-sage">Natural</span>
-                        <span class="stag stag-ink">Earthy</span>
+                        <span class="stag stag-ink">Dreamy</span>
                     </div>
                 </div>
             </div>
 
-            <!-- URBAN -->
-            <div class="style-card" id="card-urban" onclick="selectStyle('urban', 'Urban edge')">
-                <div class="swatch swatch-urban">
-                    <div class="s-bg"></div>
-                    <div class="s-ring"></div>
-                    <div class="s-ring2"></div>
-                    <div class="s-bar"></div>
-                    <span class="style-badge badge-on-dark">Urban edge</span>
+            <!-- URBAN EDGE -->
+            <div class="style-card" id="card-urban" data-style="Urban edge">
+                <div class="style-photo-wrap" onclick="openLightbox('urban')">
+                    <img src="~/images/aesthetics/urban-1.jpg" alt="Urban edge room" />
+                    <div class="style-photo-overlay">
+                        <span class="style-badge">Urban edge</span>
+                    </div>
+                    <span class="view-gallery-hint"><i class="ti ti-photo"></i> 3 photos</span>
                 </div>
                 <div class="style-body">
                     <div class="style-body-top">
                         <h3>Urban edge</h3>
-                        <button class="style-select-btn" id="btn-urban">Select style</button>
+                        <button class="style-select-btn" id="btn-urban" onclick="selectStyle('urban', 'Urban edge')">Select style</button>
                     </div>
-                    <p>Dark palette, bold accent pieces, and moody lighting. For rooms with a distinct point of view.</p>
+                    <p>Neon accent lighting, dark palette, and bold statement pieces. For rooms with a distinct point of view.</p>
                     <div class="style-tags">
                         <span class="stag stag-amber">Bold</span>
                         <span class="stag stag-ink">Dark</span>
@@ -543,6 +657,43 @@
                 </div>
             </div>
 
+            <!-- WALLPAPER ART (full width) -->
+            <div class="style-card" id="card-wallpaper" data-style="Wallpaper art" style="grid-column: 1 / -1;">
+                <div class="style-photo-wrap" onclick="openLightbox('wallpaper')" style="height:220px;">
+                    <img src="~/images/aesthetics/wallpaper-1.jpg" alt="Wallpaper art room" style="object-position: center 20%;" />
+                    <div class="style-photo-overlay">
+                        <span class="style-badge">Wallpaper art</span>
+                    </div>
+                    <span class="view-gallery-hint"><i class="ti ti-photo"></i> 3 photos</span>
+                </div>
+                <div class="style-body">
+                    <div class="style-body-top">
+                        <h3>Wallpaper art</h3>
+                        <button class="style-select-btn" id="btn-wallpaper" onclick="selectStyle('wallpaper', 'Wallpaper art')">Select style</button>
+                    </div>
+                    <p>A curated poster and print collage covering your wall — music, film, and pop culture, arranged into one striking gallery wall.</p>
+                    <div class="style-tags">
+                        <span class="stag stag-amber">Statement wall</span>
+                        <span class="stag stag-ink">Gallery style</span>
+                        <span class="stag stag-sage">Personal</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- LIGHTBOX -->
+    <div class="lightbox-overlay" id="lightboxOverlay">
+        <div class="lightbox-content">
+            <button class="lightbox-close" onclick="closeLightbox()"><i class="ti ti-x"></i></button>
+            <div class="lightbox-title" id="lightboxTitle">Style</div>
+            <div class="lightbox-main">
+                <button class="lightbox-nav-btn prev" onclick="lightboxNav(-1)"><i class="ti ti-chevron-left"></i></button>
+                <img id="lightboxImage" src="" alt="" />
+                <button class="lightbox-nav-btn next" onclick="lightboxNav(1)"><i class="ti ti-chevron-right"></i></button>
+            </div>
+            <div class="lightbox-thumbs" id="lightboxThumbs"></div>
         </div>
     </div>
 
@@ -556,7 +707,6 @@
             <form class="request-form" asp-controller="Aesthetics" asp-action="SubmitRequest" method="post">
                 @Html.AntiForgeryToken()
 
-                <!-- selected style indicator -->
                 <div class="selected-style-preview" id="stylePreview">
                     <span>No style selected yet — <strong>pick one above</strong></span>
                     <span>↑ scroll up</span>
@@ -583,7 +733,7 @@
                 <div class="form-row">
                     <div class="form-field">
                         <label>Hostel / hall</label>
-                        <input type="text" name="Hostel" placeholder="e.g. Republic Hall" required />
+                        <input type="text" name="Hostel" placeholder="e.g. Fortune Royal" required />
                     </div>
                     <div class="form-field">
                         <label>Room number</label>
@@ -611,30 +761,86 @@
 </div>
 
 @section Scripts {
-<script>
-    let selectedStyle = null;
+    <script>
+        let selectedStyle = null;
 
-    function selectStyle(key, label) {
-        // Deselect all
-        document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
-        document.querySelectorAll('.style-select-btn').forEach(b => b.textContent = 'Select style');
+        // Photo galleries — 3 images per style
+        const galleries = {
+            minimal:   { title: 'Minimal calm',    images: ['/images/aesthetics/minimal-1.jpg',   '/images/aesthetics/minimal-2.jpg',   '/images/aesthetics/minimal-3.jpg'] },
+            nordic:    { title: 'Nordic light',     images: ['/images/aesthetics/nordic-1.jpg',    '/images/aesthetics/nordic-2.jpg',    '/images/aesthetics/nordic-3.jpg'] },
+            tropical:  { title: 'Tropical greens',  images: ['/images/aesthetics/tropical-1.jpg',  '/images/aesthetics/tropical-2.jpg',  '/images/aesthetics/tropical-3.jpg'] },
+            urban:     { title: 'Urban edge',       images: ['/images/aesthetics/urban-1.jpg',     '/images/aesthetics/urban-2.jpg',     '/images/aesthetics/urban-3.jpg'] },
+            wallpaper: { title: 'Wallpaper art',     images: ['/images/aesthetics/wallpaper-1.jpg', '/images/aesthetics/wallpaper-2.jpg', '/images/aesthetics/wallpaper-3.jpg'] }
+        };
 
-        // Select chosen
-        document.getElementById('card-' + key).classList.add('selected');
-        document.getElementById('btn-' + key).textContent = '✓ Selected';
-        selectedStyle = key;
+        let currentGallery = null;
+        let currentIndex = 0;
 
-        // Update form
-        document.getElementById('styleNameInput').value = label;
-        document.getElementById('stylePreview').innerHTML =
-            `<span>Selected style: <strong>${label}</strong></span><span>✓</span>`;
+        function openLightbox(key) {
+            currentGallery = key;
+            currentIndex = 0;
+            renderLightbox();
+            document.getElementById('lightboxOverlay').classList.add('open');
+        }
 
-        // Scroll to form smoothly
-        document.getElementById('requestSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+        function closeLightbox() {
+            document.getElementById('lightboxOverlay').classList.remove('open');
+        }
 
-    // Set min date to today
-    const dateInput = document.querySelector('input[name="PreferredDate"]');
-    if (dateInput) dateInput.min = new Date().toISOString().split('T')[0];
-</script>
+        function lightboxNav(direction) {
+            const imgs = galleries[currentGallery].images;
+            currentIndex = (currentIndex + direction + imgs.length) % imgs.length;
+            renderLightbox();
+        }
+
+        function renderLightbox() {
+            const g = galleries[currentGallery];
+            document.getElementById('lightboxTitle').textContent = g.title;
+            document.getElementById('lightboxImage').src = g.images[currentIndex];
+            document.getElementById('lightboxImage').alt = g.title;
+
+            const thumbsEl = document.getElementById('lightboxThumbs');
+            thumbsEl.innerHTML = g.images.map((src, i) => `
+                <div class="lightbox-thumb ${i === currentIndex ? 'active' : ''}" onclick="jumpTo(${i})">
+                    <img src="${src}" alt="thumb" />
+                </div>
+            `).join('');
+        }
+
+        function jumpTo(i) {
+            currentIndex = i;
+            renderLightbox();
+        }
+
+        // Close on outside click
+        document.getElementById('lightboxOverlay').addEventListener('click', function (e) {
+            if (e.target === this) closeLightbox();
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function (e) {
+            if (!document.getElementById('lightboxOverlay').classList.contains('open')) return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') lightboxNav(-1);
+            if (e.key === 'ArrowRight') lightboxNav(1);
+        });
+
+        function selectStyle(key, label) {
+            document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
+            document.querySelectorAll('.style-select-btn').forEach(b => b.textContent = 'Select style');
+
+            document.getElementById('card-' + key).classList.add('selected');
+            document.getElementById('btn-' + key).textContent = '✓ Selected';
+            selectedStyle = key;
+
+            document.getElementById('styleNameInput').value = label;
+            document.getElementById('stylePreview').innerHTML =
+                `<span>Selected style: <strong>${label}</strong></span><span>✓</span>`;
+
+            document.getElementById('requestSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        const dateInput = document.querySelector('input[name="PreferredDate"]');
+        if (dateInput) dateInput.min = new Date().toISOString().split('T')[0];
+    </script>
 }

@@ -300,6 +300,16 @@
             margin-top: 1px;
         }
 
+        .co-notice.warning {
+            background: var(--amber-light);
+            border-color: rgba(201,134,58,0.3);
+            color: #7A4B10;
+        }
+
+            .co-notice.warning i {
+                color: var(--amber);
+            }
+
     .summary-panel {
         position: sticky;
         top: 84px;
@@ -555,17 +565,25 @@
 
             <div class="co-section">
                 <div class="co-section-head">
-                    <h3><i class="ti ti-calendar"></i> Storage dates</h3>
+                    <h3><i class="ti ti-calendar"></i> Pickup &amp; return details</h3>
                 </div>
                 <div class="co-section-body">
                     <div class="co-dates">
                         <div class="co-date-box">
-                            <div class="co-date-label">Pickup date</div>
+                            <div class="co-date-label">Pickup date &amp; time</div>
                             <div class="co-date-value" id="coPickup">—</div>
                         </div>
                         <div class="co-date-box">
-                            <div class="co-date-label">Return date</div>
+                            <div class="co-date-label">Fixed return date</div>
                             <div class="co-date-value" id="coReturn">—</div>
+                        </div>
+                        <div class="co-date-box">
+                            <div class="co-date-label">Current hostel</div>
+                            <div class="co-date-value" id="coPrevHostel">—</div>
+                        </div>
+                        <div class="co-date-box">
+                            <div class="co-date-label">Return to hostel</div>
+                            <div class="co-date-value" id="coNewHostel">—</div>
                         </div>
                     </div>
                 </div>
@@ -574,6 +592,11 @@
             <div class="co-notice">
                 <i class="ti ti-shield-check"></i>
                 <span>All items in this order are <strong>fully insured</strong> against damage or loss from the moment we collect them until they are returned to you.</span>
+            </div>
+
+            <div class="co-notice warning" style="margin-top:0.75rem;">
+                <i class="ti ti-alert-triangle"></i>
+                <span>All items are returned on the fixed date shown above. <strong>Failure to be present for return on this day will result in delivery charges.</strong></span>
             </div>
         </div>
 
@@ -652,9 +675,13 @@
                     </div>`
                 ).join('');
 
-                const fmt = d => d ? new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '—';
-                document.getElementById('coPickup').textContent = fmt(orderData.pickup);
-                document.getElementById('coReturn').textContent = fmt(orderData.returnDate);
+                const fmtDate = d => d ? new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '—';
+
+                document.getElementById('coPickup').textContent =
+                    fmtDate(orderData.pickup) + (orderData.pickupTime ? ' at ' + orderData.pickupTime : '');
+                document.getElementById('coReturn').textContent = orderData.returnDate || '—';
+                document.getElementById('coPrevHostel').textContent = orderData.previousHostel || '—';
+                document.getElementById('coNewHostel').textContent = orderData.newHostel || '—';
 
                 const total = orderData.total || items.reduce((s, i) => s + parseFloat(i.price) * i.quantity, 0);
                 document.getElementById('sumSubtotal').textContent = 'GH₵ ' + parseFloat(total).toFixed(2);
@@ -674,7 +701,7 @@
             if (!orderData) { alert('No order data. Please go back and add items.'); return; }
 
             const total       = parseFloat(orderData.total);
-            const email       = '@(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "student@nest.edu.gh")';
+            const email       = '@(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "student@prosbee.com")';
             const paystackKey = '@ViewData["PaystackKey"]';
             const verifyUrl   = '@Url.Action("Verify", "Payments")';
             const successUrl  = '@Url.Action("Success", "Payments")';
@@ -685,12 +712,15 @@
                 email:    email,
                 amount:   Math.round(total * 100),
                 currency: 'GHS',
-                ref:      'NEST-' + Date.now(),
+                ref:      'PROSBEE-' + Date.now(),
                 metadata: {
                     custom_fields: [
-                        { display_name: 'Order type',  variable_name: 'order_type',  value: 'Logistics storage' },
-                        { display_name: 'Pickup date', variable_name: 'pickup_date', value: orderData.pickup },
-                        { display_name: 'Return date', variable_name: 'return_date', value: orderData.returnDate }
+                        { display_name: 'Order type',      variable_name: 'order_type',      value: 'Logistics storage' },
+                        { display_name: 'Pickup date',      variable_name: 'pickup_date',      value: orderData.pickup },
+                        { display_name: 'Pickup time',      variable_name: 'pickup_time',      value: orderData.pickupTime },
+                        { display_name: 'Current hostel',   variable_name: 'previous_hostel',  value: orderData.previousHostel },
+                        { display_name: 'Return to hostel', variable_name: 'new_hostel',       value: orderData.newHostel },
+                        { display_name: 'Return date',      variable_name: 'return_date',      value: orderData.returnDate }
                     ]
                 },
                 callback: function(response) {

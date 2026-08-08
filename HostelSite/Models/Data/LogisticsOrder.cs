@@ -27,6 +27,10 @@ public partial class LogisticsOrder
 
     public DateTime? DeletedAt { get; set; }
 
+    public TimeOnly? PickupTime { get; set; }
+    public string? PreviousHostel { get; set; }
+    public string? NewHostel { get; set; }
+
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
     public virtual Student Student { get; set; } = null!;

@@ -152,6 +152,9 @@ public partial class HostelDbContext : DbContext
             entity.HasOne(d => d.Student).WithMany(p => p.LogisticsOrders)
                 .HasForeignKey(d => d.StudentId)
                 .HasConstraintName("logistics_orders_student_id_fkey");
+            entity.Property(e => e.PickupTime).HasColumnName("pickup_time");
+            entity.Property(e => e.PreviousHostel).HasMaxLength(150).HasColumnName("previous_hostel");
+            entity.Property(e => e.NewHostel).HasMaxLength(150).HasColumnName("new_hostel");
         });
 
         modelBuilder.Entity<OrderItem>(entity =>

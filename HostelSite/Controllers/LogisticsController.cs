@@ -22,8 +22,9 @@ namespace HostelSite.Controllers
         public IActionResult Index()
         {
             ViewData["PaystackKey"] = _config["Paystack:PublicKey"];
+            ViewBag.FixedReturnDate = _config["LogisticsSettings:FixedReturnDateDisplay"];
             var items = _db.LogisticsItems
-                .Where(i => i.IsActive)
+                        .Where(i => i.IsActive)
                 .OrderBy(i => i.Category)
                 .ThenBy(i => i.ItemName)
                 .Select(i => new LogisticsItemViewModel
@@ -47,6 +48,8 @@ namespace HostelSite.Controllers
             if (User.Identity?.IsAuthenticated != true)
                 return RedirectToAction("Login", "Account",
                     new { returnUrl = Url.Action("Checkout", "Logistics") });
+
+            ViewBag.FixedReturnDate = _config["LogisticsSettings:FixedReturnDateDisplay"];
 
             var key = _config["Paystack:PublicKey"];
             ViewData["PaystackKey"] = key;

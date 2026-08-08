@@ -93,12 +93,11 @@ namespace HostelSite.Controllers
                             TotalAmount = (decimal)amountPesewas / 100m,
                             OrderStatus = "Confirmed",
                             DeliveryNotes = deliveryNotes,
-                            PickupDate = !string.IsNullOrEmpty(orderItems.Pickup)
-                                                ? DateOnly.FromDateTime(DateTime.Parse(orderItems.Pickup))
-                                                : null,
-                            ReturnDate = !string.IsNullOrEmpty(orderItems.ReturnDate)
-                                                ? DateOnly.FromDateTime(DateTime.Parse(orderItems.ReturnDate))
-                                                : null,
+                            PickupDate = !string.IsNullOrEmpty(orderItems.Pickup) ? DateOnly.FromDateTime(DateTime.Parse(orderItems.Pickup)) : null,
+                            PickupTime = !string.IsNullOrEmpty(orderItems.PickupTime) ? TimeOnly.Parse(orderItems.PickupTime) : null,
+                            PreviousHostel = orderItems.PreviousHostel,
+                            NewHostel = orderItems.NewHostel,
+                            ReturnDate = !string.IsNullOrEmpty(orderItems.ReturnDate) ? DateOnly.Parse(orderItems.ReturnDate, System.Globalization.CultureInfo.GetCultureInfo("en-GB")) : null,
                             OrderedAt = DateTime.UtcNow,
                             UpdatedAt = DateTime.UtcNow
                         };
@@ -216,6 +215,9 @@ namespace HostelSite.Controllers
         public List<OrderLineItem> Items { get; set; } = new();
         public decimal Total { get; set; }
         public string? Pickup { get; set; }
+        public string? PickupTime { get; set; }
+        public string? PreviousHostel { get; set; }
+        public string? NewHostel { get; set; }
         public string? ReturnDate { get; set; }
     }
 
