@@ -23,6 +23,8 @@ namespace HostelSite.Controllers
         {
             ViewData["PaystackKey"] = _config["Paystack:PublicKey"];
             ViewBag.FixedReturnDate = _config["LogisticsSettings:FixedReturnDateDisplay"];
+            ViewBag.FixedPickupTime = _config["LogisticsSettings:FixedPickupTime"];
+            ViewBag.FixedPickupTimeDisplay = _config["LogisticsSettings:FixedPickupTimeDisplay"];
             var items = _db.LogisticsItems
                         .Where(i => i.IsActive)
                 .OrderBy(i => i.Category)
@@ -50,6 +52,8 @@ namespace HostelSite.Controllers
                     new { returnUrl = Url.Action("Checkout", "Logistics") });
 
             ViewBag.FixedReturnDate = _config["LogisticsSettings:FixedReturnDateDisplay"];
+            ViewBag.FixedPickupTime = _config["LogisticsSettings:FixedPickupTime"];
+            ViewBag.FixedPickupTimeDisplay = _config["LogisticsSettings:FixedPickupTimeDisplay"];
 
             var key = _config["Paystack:PublicKey"];
             ViewData["PaystackKey"] = key;

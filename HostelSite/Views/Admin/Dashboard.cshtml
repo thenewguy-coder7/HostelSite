@@ -550,7 +550,7 @@
                                         </td>
                                         <td>@order.OrderItems.Count item type(s)</td>
                                         <td>@(order.PickupDate?.ToString("dd MMM yyyy") ?? "—")</td>
-                                        <td>@(order.PickupTime?.ToString("h:mm tt") ?? "—")</td>
+                                        <td>@(order.PickupTime.HasValue ? (string)ViewBag.FixedPickupTimeDisplay : "—")</td>
                                         <td>
                                             <div class="hostel-flow">
                                                 <span>@(order.PreviousHostel ?? "—")</span>

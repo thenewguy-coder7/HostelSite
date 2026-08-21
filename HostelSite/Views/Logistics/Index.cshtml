@@ -153,6 +153,38 @@
             border-color: var(--amber);
         }
 
+    .pickup-fixed-value {
+        font-family: var(--font-b);
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ink);
+        background: var(--white);
+        border: 1px solid #F0D9BE;
+        border-radius: 7px;
+        padding: 7px 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+    }
+
+        .pickup-fixed-value i {
+            font-size: 14px;
+            color: var(--amber);
+        }
+
+    .fixed-tag {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--amber);
+        background: var(--amber-light);
+        padding: 2px 7px;
+        border-radius: 99px;
+        margin-left: 2px;
+    }
+
     .return-notice {
         max-width: 1100px;
         margin: 0.75rem auto 0;
@@ -560,7 +592,9 @@
                 </div>
                 <div class="pickup-field">
                     <label for="pickup-time">Pickup time</label>
-                    <input type="time" id="pickup-time" />
+                    <div class="pickup-fixed-value" id="pickup-time">
+                        <i class="ti ti-clock" aria-hidden="true"></i> @ViewBag.FixedPickupTimeDisplay <span class="fixed-tag">Fixed</span>
+                    </div>
                 </div>
                 <div class="pickup-field">
                     <label for="previous-hostel">Current hostel</label>
@@ -684,7 +718,8 @@
 
         function goToCheckout() {
             const pickup     = document.getElementById('pickup-date').value;
-            const time       = document.getElementById('pickup-time').value;
+            const time        = '@ViewBag.FixedPickupTime';        // window start, stored as the order's TimeOnly value — not user-selectable
+            const timeDisplay = '@ViewBag.FixedPickupTimeDisplay'; // e.g. "5:00 PM – 6:00 PM" — for display only
             const prevHostel = document.getElementById('previous-hostel').value.trim();
             const newHostel  = document.getElementById('new-hostel').value.trim();
 
@@ -693,7 +728,6 @@
                 return;
             }
             if (!pickup) { alert('Please select a pickup date.'); return; }
-            if (!time) { alert('Please select a pickup time.'); return; }
             if (!prevHostel) { alert('Please enter your current hostel.'); return; }
             if (!newHostel) { alert('Please enter the hostel to return items to.'); return; }
 
@@ -708,13 +742,14 @@
             const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
 
             sessionStorage.setItem('nestOrder', JSON.stringify({
-                items:          items,
-                total:          total,
-                pickup:         pickup,
-                pickupTime:     time,
-                previousHostel: prevHostel,
-                newHostel:      newHostel,
-                returnDate:     '@ViewBag.FixedReturnDate'
+                items:             items,
+                total:             total,
+                pickup:            pickup,
+                pickupTime:        time,
+                pickupTimeDisplay: timeDisplay,
+                previousHostel:    prevHostel,
+                newHostel:         newHostel,
+                returnDate:        '@ViewBag.FixedReturnDate'
             }));
 
             window.location.href = '@Url.Action("Checkout", "Logistics")';

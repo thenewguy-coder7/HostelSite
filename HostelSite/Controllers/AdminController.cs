@@ -12,10 +12,12 @@ namespace HostelSite.Controllers
     public class AdminController : Controller
     {
         private readonly HostelDbContext _db;
+        private readonly IConfiguration _config;
 
-        public AdminController(HostelDbContext db)
+        public AdminController(HostelDbContext db, IConfiguration config)
         {
             _db = db;
+            _config = config;
         }
 
         // ── GET /Admin/Login ──
@@ -88,6 +90,8 @@ namespace HostelSite.Controllers
 
             // Purge permanently — delete records soft-deleted more than 15 days ago
             PurgeOldRecords();
+
+            ViewBag.FixedPickupTimeDisplay = _config["LogisticsSettings:FixedPickupTimeDisplay"];
 
             // Stats
             ViewBag.TotalOrders = _db.LogisticsOrders.Count(o => !o.IsDeleted);

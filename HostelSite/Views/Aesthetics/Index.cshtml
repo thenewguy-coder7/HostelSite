@@ -558,7 +558,7 @@
     <div class="aes-header">
         <p class="aes-header-eyebrow">Room aesthetics</p>
         <h1>Choose your style.<br><em>We bring it to life.</em></h1>
-        <p>Browse five curated decoration styles designed for hostel rooms. Pick the one that feels like you, fill in the request form, and our team handles everything.</p>
+        <p>Browse six curated decoration styles designed for hostel rooms. Pick the one that feels like you, fill in the request form, and our team handles everything.</p>
     </div>
 
     <!-- STYLE GRID -->
@@ -572,7 +572,7 @@
                     <div class="style-photo-overlay">
                         <span class="style-badge">Minimal calm</span>
                     </div>
-                    <span class="view-gallery-hint"><i class="ti ti-photo"></i> 3 photos</span>
+                    <span class="view-gallery-hint"><i class="ti ti-photo"></i> 6 photos</span>
                 </div>
                 <div class="style-body">
                     <div class="style-body-top">
@@ -595,7 +595,7 @@
                     <div class="style-photo-overlay">
                         <span class="style-badge">Nordic light</span>
                     </div>
-                    <span class="view-gallery-hint"><i class="ti ti-photo"></i> 3 photos</span>
+                    <span class="view-gallery-hint"><i class="ti ti-photo"></i> 5 photos</span>
                 </div>
                 <div class="style-body">
                     <div class="style-body-top">
@@ -641,7 +641,7 @@
                     <div class="style-photo-overlay">
                         <span class="style-badge">Urban edge</span>
                     </div>
-                    <span class="view-gallery-hint"><i class="ti ti-photo"></i> 3 photos</span>
+                    <span class="view-gallery-hint"><i class="ti ti-photo"></i> 8 photos</span>
                 </div>
                 <div class="style-body">
                     <div class="style-body-top">
@@ -653,6 +653,29 @@
                         <span class="stag stag-amber">Bold</span>
                         <span class="stag stag-ink">Dark</span>
                         <span class="stag stag-ink">Dramatic</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ECLECTIC GALLERY -->
+            <div class="style-card" id="card-eclectic" data-style="Eclectic gallery">
+                <div class="style-photo-wrap" onclick="openLightbox('eclectic')">
+                    <img src="~/images/aesthetics/eclectic-1.jpg" alt="Eclectic gallery room" />
+                    <div class="style-photo-overlay">
+                        <span class="style-badge">Eclectic gallery</span>
+                    </div>
+                    <span class="view-gallery-hint"><i class="ti ti-photo"></i> 4 photos</span>
+                </div>
+                <div class="style-body">
+                    <div class="style-body-top">
+                        <h3>Eclectic gallery</h3>
+                        <button class="style-select-btn" id="btn-eclectic" onclick="selectStyle('eclectic', 'Eclectic gallery')">Select style</button>
+                    </div>
+                    <p>Sculptural shelving, gallery-style wall art, and playful found-object pieces. For students who treat their room like a curated, ever-growing collection.</p>
+                    <div class="style-tags">
+                        <span class="stag stag-amber">Statement pieces</span>
+                        <span class="stag stag-ink">Sculptural</span>
+                        <span class="stag stag-sage">Playful</span>
                     </div>
                 </div>
             </div>
@@ -764,12 +787,13 @@
     <script>
         let selectedStyle = null;
 
-        // Photo galleries — 3 images per style
+        // Photo galleries per style
         const galleries = {
-            minimal:   { title: 'Minimal calm',    images: ['/images/aesthetics/minimal-1.jpg',   '/images/aesthetics/minimal-2.jpg',   '/images/aesthetics/minimal-3.jpg'] },
-            nordic:    { title: 'Nordic light',     images: ['/images/aesthetics/nordic-1.jpg',    '/images/aesthetics/nordic-2.jpg',    '/images/aesthetics/nordic-3.jpg'] },
+            minimal:   { title: 'Minimal calm',    images: ['/images/aesthetics/minimal-1.jpg',   '/images/aesthetics/minimal-2.jpg',   '/images/aesthetics/minimal-3.jpg',   '/images/aesthetics/minimal-4.jpg', '/images/aesthetics/minimal-5.jpg', '/images/aesthetics/minimal-6.jpg'] },
+            nordic:    { title: 'Nordic light',     images: ['/images/aesthetics/nordic-1.jpg',    '/images/aesthetics/nordic-2.jpg',    '/images/aesthetics/nordic-3.jpg',    '/images/aesthetics/nordic-4.jpg',  '/images/aesthetics/nordic-5.jpg'] },
             tropical:  { title: 'Tropical greens',  images: ['/images/aesthetics/tropical-1.jpg',  '/images/aesthetics/tropical-2.jpg',  '/images/aesthetics/tropical-3.jpg'] },
-            urban:     { title: 'Urban edge',       images: ['/images/aesthetics/urban-1.jpg',     '/images/aesthetics/urban-2.jpg',     '/images/aesthetics/urban-3.jpg'] },
+            urban:     { title: 'Urban edge',       images: ['/images/aesthetics/urban-1.jpg',     '/images/aesthetics/urban-2.jpg',     '/images/aesthetics/urban-3.jpg',     '/images/aesthetics/urban-4.jpg',   '/images/aesthetics/urban-5.jpg',   '/images/aesthetics/urban-6.jpg', '/images/aesthetics/urban-7.jpg', '/images/aesthetics/urban-8.jpg'] },
+            eclectic:  { title: 'Eclectic gallery', images: ['/images/aesthetics/eclectic-1.jpg',  '/images/aesthetics/eclectic-2.jpg',  '/images/aesthetics/eclectic-3.jpg',  '/images/aesthetics/eclectic-4.jpg'] },
             wallpaper: { title: 'Wallpaper art',     images: ['/images/aesthetics/wallpaper-1.jpg', '/images/aesthetics/wallpaper-2.jpg', '/images/aesthetics/wallpaper-3.jpg'] }
         };
 

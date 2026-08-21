@@ -649,6 +649,14 @@
     <script>
         let orderData = null;
 
+        const fmtTime = t => {
+            if (!t) return '';
+            const [h, m] = t.split(':').map(Number);
+            const period = h >= 12 ? 'PM' : 'AM';
+            const h12 = (h % 12) || 12;
+            return `${h12}:${String(m).padStart(2, '0')} ${period}`;
+        };
+
         window.addEventListener('DOMContentLoaded', () => {
             const raw = sessionStorage.getItem('nestOrder');
             if (!raw) { showEmpty(); return; }
@@ -677,8 +685,9 @@
 
                 const fmtDate = d => d ? new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '—';
 
+                const pickupTimeLabel = orderData.pickupTimeDisplay || fmtTime(orderData.pickupTime);
                 document.getElementById('coPickup').textContent =
-                    fmtDate(orderData.pickup) + (orderData.pickupTime ? ' at ' + orderData.pickupTime : '');
+                    fmtDate(orderData.pickup) + (pickupTimeLabel ? ', ' + pickupTimeLabel : '');
                 document.getElementById('coReturn').textContent = orderData.returnDate || '—';
                 document.getElementById('coPrevHostel').textContent = orderData.previousHostel || '—';
                 document.getElementById('coNewHostel').textContent = orderData.newHostel || '—';
@@ -717,7 +726,7 @@
                     custom_fields: [
                         { display_name: 'Order type',      variable_name: 'order_type',      value: 'Logistics storage' },
                         { display_name: 'Pickup date',      variable_name: 'pickup_date',      value: orderData.pickup },
-                        { display_name: 'Pickup time',      variable_name: 'pickup_time',      value: orderData.pickupTime },
+                        { display_name: 'Pickup time',      variable_name: 'pickup_time',      value: orderData.pickupTimeDisplay || fmtTime(orderData.pickupTime) },
                         { display_name: 'Current hostel',   variable_name: 'previous_hostel',  value: orderData.previousHostel },
                         { display_name: 'Return to hostel', variable_name: 'new_hostel',       value: orderData.newHostel },
                         { display_name: 'Return date',      variable_name: 'return_date',      value: orderData.returnDate }
