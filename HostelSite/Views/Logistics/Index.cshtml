@@ -66,7 +66,7 @@
     .log-header h1 {
         font-family: var(--font-d);
         font-size: 40px;
-        font-weight: 600;
+        font-weight: 900;
         color: #fff;
         line-height: 1.15;
         margin-bottom: 10px;
@@ -719,7 +719,7 @@
         function goToCheckout() {
             const pickup     = document.getElementById('pickup-date').value;
             const time        = '@ViewBag.FixedPickupTime';        // window start, stored as the order's TimeOnly value — not user-selectable
-            const timeDisplay = '@ViewBag.FixedPickupTimeDisplay'; // e.g. "5:00 PM – 6:00 PM" — for display only
+            const timeDisplay = @Html.Raw(System.Text.Json.JsonSerializer.Serialize((string)ViewBag.FixedPickupTimeDisplay)); // e.g. "5:00 PM – 6:00 PM" — for display only
             const prevHostel = document.getElementById('previous-hostel').value.trim();
             const newHostel  = document.getElementById('new-hostel').value.trim();
 

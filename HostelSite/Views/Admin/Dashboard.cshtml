@@ -134,7 +134,7 @@
             .admin-topbar h1 {
                 font-family: var(--font-d);
                 font-size: 28px;
-                font-weight: 600;
+                font-weight: 900;
                 color: var(--ink);
             }
 
@@ -550,7 +550,7 @@
                                         </td>
                                         <td>@order.OrderItems.Count item type(s)</td>
                                         <td>@(order.PickupDate?.ToString("dd MMM yyyy") ?? "—")</td>
-                                        <td>@(order.PickupTime.HasValue ? (string)ViewBag.FixedPickupTimeDisplay : "—")</td>
+                                        <td>@(order.PickupTime?.ToString("h:mm tt") ?? "—")</td>
                                         <td>
                                             <div class="hostel-flow">
                                                 <span>@(order.PreviousHostel ?? "—")</span>
