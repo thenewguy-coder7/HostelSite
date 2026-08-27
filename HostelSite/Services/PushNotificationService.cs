@@ -22,9 +22,9 @@ public class PushNotificationService
 
     public async Task NotifyAllAdminsAsync(string title, string body, string? url = null)
     {
-        var subject    = _config["Vapid:Subject"];
-        var publicKey  = _config["Vapid:PublicKey"];
-        var privateKey = _config["Vapid:PrivateKey"];
+        var subject    = _config["Vapid:Subject"]?.Trim();
+        var publicKey  = _config["Vapid:PublicKey"]?.Trim();
+        var privateKey = _config["Vapid:PrivateKey"]?.Trim();
 
         if (string.IsNullOrEmpty(publicKey) || string.IsNullOrEmpty(privateKey) || string.IsNullOrEmpty(subject))
         {

@@ -92,7 +92,7 @@ namespace HostelSite.Controllers
             PurgeOldRecords();
 
             ViewBag.FixedPickupTimeDisplay = _config["LogisticsSettings:FixedPickupTimeDisplay"];
-            ViewBag.VapidPublicKey = _config["Vapid:PublicKey"];
+            ViewBag.VapidPublicKey = _config["Vapid:PublicKey"]?.Trim();
 
             var currentAdminIdForPush = int.Parse(result.Principal!.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             ViewBag.PushEnabled = _db.AdminPushSubscriptions.Any(s => s.AdminId == currentAdminIdForPush);

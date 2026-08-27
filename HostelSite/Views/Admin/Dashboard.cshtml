@@ -811,10 +811,16 @@
     <script>
         const VAPID_PUBLIC_KEY = @Html.Raw(System.Text.Json.JsonSerializer.Serialize((string)(ViewBag.VapidPublicKey ?? "")));
         const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
+        console.log('VAPID public key from server:', JSON.stringify(VAPID_PUBLIC_KEY), '(length ' + VAPID_PUBLIC_KEY.length + ')');
 
         function urlBase64ToUint8Array(base64String) {
-            const padding = '='.repeat((4 - base64String.length % 4) % 4);
-            const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+            // Defensively strip anything that isn't a valid base64url character —
+            // a stray trailing newline/space in the server-side VAPID key
+            // (e.g. from copy-pasting into an env var) is enough to make
+            // atob() throw "not correctly encoded".
+            const cleaned = base64String.trim().replace(/[^A-Za-z0-9\-_]/g, '');
+            const padding = '='.repeat((4 - cleaned.length % 4) % 4);
+            const base64 = (cleaned + padding).replace(/-/g, '+').replace(/_/g, '/');
             const rawData = window.atob(base64);
             return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
         }
