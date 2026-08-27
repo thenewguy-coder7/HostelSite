@@ -1,5 +1,22 @@
-// Prosbee admin push notifications service worker.
-// Scope: site root, but only the Admin Dashboard ever subscribes to it.
+// Prosbee service worker.
+// Scope: site root. Registered on every page (see _Layout.cshtml) so the
+// site can be installed to a phone's home screen; only the Admin Dashboard
+// actually subscribes it to push notifications.
+
+self.addEventListener('install', function () {
+    self.skipWaiting();
+});
+
+self.addEventListener('activate', function (event) {
+    event.waitUntil(self.clients.claim());
+});
+
+// A fetch handler — even one that just passes every request straight through
+// to the network with no offline caching — is part of what Chrome/Android
+// checks before it will treat the site as installable.
+self.addEventListener('fetch', function (event) {
+    event.respondWith(fetch(event.request));
+});
 
 self.addEventListener('push', function (event) {
     let data = { title: 'Prosbee', body: 'You have a new update.', url: '/Admin/Dashboard' };

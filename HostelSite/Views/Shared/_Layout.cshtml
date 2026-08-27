@@ -9,6 +9,15 @@
     <link rel="icon" type="image/png" href="~/images/prosbee-icon.png" />
     <link rel="shortcut icon" type="image/png" href="~/images/prosbee-icon.png" />
 
+    <!-- Installable web app (Add to Home Screen) -->
+    <link rel="manifest" href="~/manifest.json" />
+    <meta name="theme-color" content="#0F1A2E" />
+    <link rel="apple-touch-icon" href="~/images/pwa/apple-touch-icon.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Prosbee" />
+
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;900&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
 
@@ -758,6 +767,16 @@
 
         document.querySelectorAll('.sec, .hiw-card, .aes-card, .log-item-card, .proof-card, .item-card')
             .forEach(el => { el.classList.add('reveal'); revealObserver.observe(el); });
+
+        // Register the service worker so the browser will offer "Add to
+        // Home Screen" / "Install app". This just registers it — it does
+        // NOT subscribe to push notifications (that's a separate opt-in,
+        // only offered to admins on the Admin Dashboard).
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => { });
+            });
+        }
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
