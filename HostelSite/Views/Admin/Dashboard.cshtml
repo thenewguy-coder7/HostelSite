@@ -891,7 +891,9 @@
                 label.textContent = 'Notifications on';
             } catch (e) {
                 console.error('Push subscription failed', e);
-                alert('Could not enable notifications: ' + e.message);
+                alert('Could not enable notifications: ' + e.message +
+                    '\n\nDebug info — VAPID key length: ' + VAPID_PUBLIC_KEY.length +
+                    '\nVAPID key value: ' + VAPID_PUBLIC_KEY);
             }
         });
 
