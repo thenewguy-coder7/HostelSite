@@ -21,6 +21,10 @@ namespace HostelSite.Controllers
         [HttpGet]
         public IActionResult Index()
         {
+            if (User.Identity?.IsAuthenticated != true)
+                return RedirectToAction("Login", "Account",
+                    new { returnUrl = Url.Action("Index", "Logistics") });
+
             ViewData["PaystackKey"] = _config["Paystack:PublicKey"];
             ViewBag.FixedReturnDate = _config["LogisticsSettings:FixedReturnDateDisplay"];
             ViewBag.FixedPickupTime = _config["LogisticsSettings:FixedPickupTime"];

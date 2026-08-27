@@ -18,6 +18,10 @@ namespace HostelSite.Controllers
         [HttpGet]
         public IActionResult Index()
         {
+            if (User.Identity?.IsAuthenticated != true)
+                return RedirectToAction("Login", "Account",
+                    new { returnUrl = Url.Action("Index", "Aesthetics") });
+
             return View();
         }
 
