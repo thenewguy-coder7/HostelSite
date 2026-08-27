@@ -668,7 +668,7 @@
                                             </div>
                                         </td>
                                         <td>@(order.RoomNumber ?? "—")</td>
-                                        <td>@(order.Phone ?? "—")</td>
+                                        <td>@(order.Phone ?? order.Student?.Phone ?? "—")</td>
                                         <td>@(order.ReturnDate?.ToString("dd MMM yyyy") ?? "—")</td>
                                         <td><strong>GH₵ @order.TotalAmount.ToString("0.00")</strong></td>
                                         <td><span class="badge @badgeClass">@order.OrderStatus</span></td>
@@ -745,7 +745,7 @@
                                             <div class="td-ref">@req.Student?.Email</div>
                                         </td>
                                         <td>@(NoteParser.Get(req.Notes, "Room") ?? "—")</td>
-                                        <td>@(NoteParser.Get(req.Notes, "Phone") ?? "—")</td>
+                                        <td>@(NoteParser.Get(req.Notes, "Phone") ?? req.Student?.Phone ?? "—")</td>
                                         <td style="max-width:260px; font-size:12px; color:var(--muted);">@req.Notes</td>
                                         <td>@(req.ResolvedAt?.ToString("dd MMM yyyy") ?? "—")</td>
                                         <td><span class="badge @badgeClass">@req.Status</span></td>
