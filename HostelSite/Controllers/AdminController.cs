@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using HostelSite.Models.Data;
+using HostelSite.Services;
 
 namespace HostelSite.Controllers
 {
@@ -13,11 +14,13 @@ namespace HostelSite.Controllers
     {
         private readonly HostelDbContext _db;
         private readonly IConfiguration _config;
+        private readonly PushNotificationService _push;
 
-        public AdminController(HostelDbContext db, IConfiguration config)
+        public AdminController(HostelDbContext db, IConfiguration config, PushNotificationService push)
         {
             _db = db;
             _config = config;
+            _push = push;
         }
 
         // ── GET /Admin/Login ──
@@ -242,6 +245,21 @@ namespace HostelSite.Controllers
                 _db.AdminPushSubscriptions.Remove(existing);
                 await _db.SaveChangesAsync();
             }
+
+            return Ok();
+        }
+
+        // ── POST /Admin/SendTestPush ──
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendTestPush()
+        {
+            var result = await HttpContext.AuthenticateAsync("AdminCookie");
+            if (!result.Succeeded) return Unauthorized();
+
+            await _push.NotifyAllAdminsAsync(
+                "Test notification",
+                "If you can see this, push notifications are working on this device.");
 
             return Ok();
         }

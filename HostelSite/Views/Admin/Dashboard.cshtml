@@ -537,6 +537,13 @@
                         <i class="ti ti-bell" aria-hidden="true"></i>
                         <span id="pushToggleLabel">@(ViewBag.PushEnabled == true ? "Notifications on" : "Enable notifications")</span>
                     </button>
+                    @if (ViewBag.PushEnabled == true)
+                    {
+                        <button type="button" id="testPushBtn" style="display:inline-flex; align-items:center; gap:6px; border:1px solid #E3E5EA; border-radius:8px; padding:6px 12px; background:#fff; cursor:pointer; font-size:13px; color:inherit;">
+                            <i class="ti ti-send" aria-hidden="true"></i>
+                            <span>Send test notification</span>
+                        </button>
+                    }
                     <span>
                         <i class="ti ti-shield-check" style="color:#4A9572"></i>
                         Logged in as <strong>@User.Identity?.Name</strong>
@@ -892,6 +899,26 @@
             } catch (e) {
                 console.error('Push subscription failed', e);
                 alert('Could not enable notifications: ' + e.message);
+            }
+        });
+
+        document.getElementById('testPushBtn')?.addEventListener('click', async () => {
+            const btn = document.getElementById('testPushBtn');
+            btn.disabled = true;
+            try {
+                const res = await fetch('@Url.Action("SendTestPush", "Admin")', {
+                    method: 'POST',
+                    headers: { 'RequestVerificationToken': csrfToken }
+                });
+                if (res.ok) {
+                    alert('Test notification sent — it should arrive on this device within a few seconds.');
+                } else {
+                    alert('Could not send test notification (server returned ' + res.status + ').');
+                }
+            } catch (e) {
+                alert('Could not send test notification: ' + e.message);
+            } finally {
+                btn.disabled = false;
             }
         });
 
