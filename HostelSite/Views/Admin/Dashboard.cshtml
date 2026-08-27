@@ -129,6 +129,8 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
             margin-bottom: 2rem;
         }
 
@@ -425,6 +427,69 @@
         @@media (max-width: 1024px) {
             .stat-grid {
                 grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* ── MOBILE: the fixed 240px sidebar + overflow-x:hidden on
+           .admin-main was clipping the topbar's notification button off
+           the right edge of the screen on phones. Collapse the sidebar
+           into a horizontal strip above the content instead. ── */
+        @@media (max-width: 860px) {
+            .admin-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+                height: auto;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+                padding: 0.85rem 1.25rem;
+                gap: 8px;
+            }
+
+            .sidebar-brand {
+                font-size: 17px;
+                margin-bottom: 0;
+                margin-right: 6px;
+            }
+
+            .sidebar-sub {
+                display: none;
+            }
+
+            .sidebar-nav {
+                flex: none;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+
+            .sidebar-link {
+                width: auto;
+                padding: 7px 10px;
+                font-size: 12.5px;
+            }
+
+            .sidebar-logout {
+                margin-top: 0;
+                padding-top: 0;
+                border-top: none;
+                margin-left: auto;
+            }
+
+            .admin-main {
+                padding: 1.5rem 1.25rem;
+                overflow-x: visible;
+            }
+
+            .admin-topbar h1 {
+                font-size: 22px;
+            }
+
+            .stat-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
