@@ -430,57 +430,80 @@
             }
         }
 
-        /* ── MOBILE: the fixed 240px sidebar + overflow-x:hidden on
-           .admin-main was clipping the topbar's notification button off
-           the right edge of the screen on phones. Collapse the sidebar
-           into a horizontal strip above the content instead. ── */
+        /* ── Sidebar toggle button — hidden on desktop, shown as a fixed
+           floating button on mobile (see media query below). ── */
+        .sidebar-toggle-btn {
+            display: none;
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            z-index: 1100;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            background: #fff;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--ink);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+
+        .sidebar-overlay {
+            display: none;
+        }
+
+        /* ── MOBILE: keep the sidebar as a real vertical side panel, but
+           off-canvas by default — it slides in over the content when the
+           toggle button is tapped, instead of squeezing into a horizontal
+           strip above the page. ── */
         @@media (max-width: 860px) {
             .admin-layout {
                 grid-template-columns: 1fr;
             }
 
+            .sidebar-toggle-btn {
+                display: flex;
+            }
+
             .sidebar {
-                position: static;
-                height: auto;
-                flex-direction: row;
-                flex-wrap: wrap;
-                align-items: center;
-                padding: 0.85rem 1.25rem;
-                gap: 8px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                width: 240px;
+                max-width: 80vw;
+                transform: translateX(-100%);
+                transition: transform 0.25s ease;
+                z-index: 1050;
+                box-shadow: 4px 0 24px rgba(0,0,0,0.3);
             }
 
-            .sidebar-brand {
-                font-size: 17px;
-                margin-bottom: 0;
-                margin-right: 6px;
+                .sidebar.open {
+                    transform: translateX(0);
+                }
+
+            .sidebar-overlay {
+                display: block;
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.45);
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.25s ease;
+                z-index: 1040;
             }
 
-            .sidebar-sub {
-                display: none;
-            }
-
-            .sidebar-nav {
-                flex: none;
-                flex-direction: row;
-                flex-wrap: wrap;
-                gap: 4px;
-            }
-
-            .sidebar-link {
-                width: auto;
-                padding: 7px 10px;
-                font-size: 12.5px;
-            }
-
-            .sidebar-logout {
-                margin-top: 0;
-                padding-top: 0;
-                border-top: none;
-                margin-left: auto;
-            }
+                .sidebar-overlay.open {
+                    opacity: 1;
+                    pointer-events: auto;
+                }
 
             .admin-main {
                 padding: 1.5rem 1.25rem;
+                padding-top: 4.5rem;
                 overflow-x: visible;
             }
 
@@ -495,10 +518,15 @@
     </style>
 </head>
 <body>
+    <button type="button" id="sidebarToggleBtn" class="sidebar-toggle-btn" aria-label="Toggle menu">
+        <i class="ti ti-menu-2" aria-hidden="true"></i>
+    </button>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <div class="admin-layout">
 
         <!-- SIDEBAR -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="adminSidebar">
             <div class="sidebar-brand">PROSBEE<em>.</em></div>
             <div class="sidebar-sub">Admin panel</div>
 
@@ -818,7 +846,28 @@
     <script>
         const VAPID_PUBLIC_KEY = @Html.Raw(System.Text.Json.JsonSerializer.Serialize((string)(ViewBag.VapidPublicKey ?? "")));
         const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
-        console.log('VAPID public key from server:', JSON.stringify(VAPID_PUBLIC_KEY), '(length ' + VAPID_PUBLIC_KEY.length + ')');
+
+        // Mobile sidebar drawer
+        (function () {
+            const toggleBtn = document.getElementById('sidebarToggleBtn');
+            const sidebar = document.getElementById('adminSidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            function closeSidebar() {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('open');
+            }
+
+            toggleBtn?.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('open');
+            });
+
+            overlay?.addEventListener('click', closeSidebar);
+            sidebar?.querySelectorAll('.sidebar-link').forEach(link => {
+                link.addEventListener('click', closeSidebar);
+            });
+        })();
 
         function urlBase64ToUint8Array(base64String) {
             // Defensively strip anything that isn't a valid base64url character —
