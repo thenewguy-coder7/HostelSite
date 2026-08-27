@@ -3,6 +3,13 @@ using Microsoft.EntityFrameworkCore;
 using HostelSite.Models.Data;
 using HostelSite.Services;
 
+// Render's containers hit a low per-host inotify-instance limit, and by default
+// ASP.NET Core opens a FileSystemWatcher on appsettings*.json to support hot
+// config reload. When the host runs out of inotify instances that watcher setup
+// throws and crashes the app before Main() even reaches this line's caller —
+// we don't need hot-reload in production, so turn it off before the host is built.
+Environment.SetEnvironmentVariable("DOTNET_hostBuilder:reloadConfigOnChange", "false");
+
 var builder = WebApplication.CreateBuilder(args);
 
 // ── MVC ──
