@@ -30,6 +30,12 @@ public partial class LogisticsOrder
     public TimeOnly? PickupTime { get; set; }
     public string? PreviousHostel { get; set; }
     public string? NewHostel { get; set; }
+    public string? RoomNumber { get; set; }
+    public string? Phone { get; set; }
+
+    // Set once the "pickup in 2 days" reminder push has gone out, so the
+    // reminder job never notifies the admin twice for the same order.
+    public DateTime? PickupReminderSentAt { get; set; }
 
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 

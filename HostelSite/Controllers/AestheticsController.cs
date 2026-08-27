@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using HostelSite.Models.Data;
+using HostelSite.Services;
 using HostelSite.ViewModels;
 
 namespace HostelSite.Controllers
@@ -8,10 +9,12 @@ namespace HostelSite.Controllers
     public class AestheticsController : Controller
     {
         private readonly HostelDbContext _db;
+        private readonly PushNotificationService _push;
 
-        public AestheticsController(HostelDbContext db)
+        public AestheticsController(HostelDbContext db, PushNotificationService push)
         {
             _db = db;
+            _push = push;
         }
 
         // GET /Aesthetics
@@ -56,13 +59,18 @@ namespace HostelSite.Controllers
                 RoomId      = null,           // placeholder — no room selection in this flow
                 Status      = "Pending",
                 Notes       = string.IsNullOrWhiteSpace(model.Notes)
-                                ? $"Style: {model.StyleName} | Hostel: {model.Hostel} | Room: {model.RoomNumber} | Date: {model.PreferredDate:dd MMM yyyy}"
-                                : $"Style: {model.StyleName} | Hostel: {model.Hostel} | Room: {model.RoomNumber} | Date: {model.PreferredDate:dd MMM yyyy} | Notes: {model.Notes}",
+                                ? $"Style: {model.StyleName} | Hostel: {model.Hostel} | Room: {model.RoomNumber} | Phone: {model.Phone} | Date: {model.PreferredDate:dd MMM yyyy}"
+                                : $"Style: {model.StyleName} | Hostel: {model.Hostel} | Room: {model.RoomNumber} | Phone: {model.Phone} | Date: {model.PreferredDate:dd MMM yyyy} | Notes: {model.Notes}",
                 RequestedAt = DateTime.UtcNow
             };
 
             _db.AestheticRequests.Add(request);
             await _db.SaveChangesAsync();
+
+            await _push.NotifyAllAdminsAsync(
+                "New aesthetic request",
+                $"{model.FirstName} {model.LastName} requested \"{model.StyleName}\" — {model.Hostel}, Room {model.RoomNumber}.",
+                "/Admin/Dashboard");
 
             TempData["Success"] = "Your aesthetic request has been submitted! We'll be in touch shortly.";
             return RedirectToAction("MyRequests");
@@ -89,6 +97,7 @@ namespace HostelSite.Controllers
                     StyleName   = ParseNote(r.Notes, "Style") ?? r.Aesthetic?.ThemeName ?? "Unknown",
                     Hostel      = ParseNote(r.Notes, "Hostel") ?? "—",
                     RoomNumber  = ParseNote(r.Notes, "Room") ?? "—",
+                    Phone       = ParseNote(r.Notes, "Phone") ?? "—",
                     Status      = r.Status,
                     SubmittedAt = r.RequestedAt,
                     PreferredDate = TryParseDate(ParseNote(r.Notes, "Date")),

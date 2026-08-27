@@ -92,6 +92,10 @@ namespace HostelSite.Controllers
             PurgeOldRecords();
 
             ViewBag.FixedPickupTimeDisplay = _config["LogisticsSettings:FixedPickupTimeDisplay"];
+            ViewBag.VapidPublicKey = _config["Vapid:PublicKey"];
+
+            var currentAdminIdForPush = int.Parse(result.Principal!.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            ViewBag.PushEnabled = _db.AdminPushSubscriptions.Any(s => s.AdminId == currentAdminIdForPush);
 
             // Stats
             ViewBag.TotalOrders = _db.LogisticsOrders.Count(o => !o.IsDeleted);
@@ -190,6 +194,56 @@ namespace HostelSite.Controllers
 
             TempData["Success"] = $"Request #{requestId} updated to {status}.";
             return RedirectToAction("Dashboard");
+        }
+
+        // ── POST /Admin/SubscribePush ──
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubscribePush([FromBody] PushSubscriptionRequest sub)
+        {
+            var result = await HttpContext.AuthenticateAsync("AdminCookie");
+            if (!result.Succeeded) return Unauthorized();
+
+            if (sub == null || string.IsNullOrEmpty(sub.Endpoint) || sub.Keys == null)
+                return BadRequest();
+
+            var adminId = int.Parse(result.Principal!.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            var existing = _db.AdminPushSubscriptions.FirstOrDefault(s => s.Endpoint == sub.Endpoint);
+            if (existing == null)
+            {
+                _db.AdminPushSubscriptions.Add(new AdminPushSubscription
+                {
+                    AdminId = adminId,
+                    Endpoint = sub.Endpoint,
+                    P256dh = sub.Keys.P256dh,
+                    Auth = sub.Keys.Auth,
+                    CreatedAt = DateTime.UtcNow
+                });
+                await _db.SaveChangesAsync();
+            }
+
+            return Ok();
+        }
+
+        // ── POST /Admin/UnsubscribePush ──
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UnsubscribePush([FromBody] UnsubscribeRequest req)
+        {
+            var result = await HttpContext.AuthenticateAsync("AdminCookie");
+            if (!result.Succeeded) return Unauthorized();
+
+            if (req == null || string.IsNullOrEmpty(req.Endpoint)) return BadRequest();
+
+            var existing = _db.AdminPushSubscriptions.FirstOrDefault(s => s.Endpoint == req.Endpoint);
+            if (existing != null)
+            {
+                _db.AdminPushSubscriptions.Remove(existing);
+                await _db.SaveChangesAsync();
+            }
+
+            return Ok();
         }
 
         // ── Helpers ──
@@ -319,5 +373,24 @@ namespace HostelSite.Controllers
         }
 
 
+    }
+
+    // ── Push subscription payload shapes (outside the controller, inside the namespace) ──
+
+    public class PushSubscriptionRequest
+    {
+        public string Endpoint { get; set; } = "";
+        public PushSubscriptionKeys? Keys { get; set; }
+    }
+
+    public class PushSubscriptionKeys
+    {
+        public string P256dh { get; set; } = "";
+        public string Auth { get; set; } = "";
+    }
+
+    public class UnsubscribeRequest
+    {
+        public string Endpoint { get; set; } = "";
     }
 }

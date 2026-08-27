@@ -79,6 +79,94 @@
         line-height: 1.7;
     }
 
+    /* ── HOW YOUR ORDER WORKS (shown before the pickup form) ── */
+    .howitworks-panel {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 2rem 3rem 0;
+    }
+
+    .order-panel {
+        background: var(--white);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    .order-panel-head {
+        background: var(--forest);
+        padding: 1.25rem 1.5rem;
+    }
+
+        .order-panel-head h3 {
+            font-family: var(--font-d);
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 3px;
+        }
+
+        .order-panel-head p {
+            font-size: 12px;
+            color: var(--sage-muted);
+        }
+
+    .order-panel-body {
+        padding: 1.5rem;
+    }
+
+    .order-steps {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+
+    .order-step {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        flex: 1 1 220px;
+        min-width: 200px;
+    }
+
+    .ostep-num {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: var(--sage-light);
+        color: var(--forest-mid);
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+
+    .ostep-text strong {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ink);
+        margin-bottom: 2px;
+    }
+
+    .ostep-text span {
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.5;
+    }
+
+    @@media (max-width: 700px) {
+        .howitworks-panel {
+            padding: 1.5rem 1.25rem 0;
+        }
+
+        .order-steps {
+            flex-direction: column;
+        }
+    }
+
     .pickup-bar {
         background: var(--amber-light);
         border-bottom: 1px solid #F0D9BE;
@@ -578,6 +666,48 @@
         </div>
     </div>
 
+    <!-- HOW YOUR ORDER WORKS (shown first, before the pickup form) -->
+    <div class="howitworks-panel">
+        <div class="order-panel">
+            <div class="order-panel-head">
+                <h3>How your order works</h3>
+                <p>Simple 4-step process, door to door</p>
+            </div>
+            <div class="order-panel-body">
+                <div class="order-steps">
+                    <div class="order-step">
+                        <div class="ostep-num">1</div>
+                        <div class="ostep-text">
+                            <strong>Pick your items</strong>
+                            <span>Browse the full item catalog and select what you want stored, with quantities.</span>
+                        </div>
+                    </div>
+                    <div class="order-step">
+                        <div class="ostep-num">2</div>
+                        <div class="ostep-text">
+                            <strong>Choose pickup date</strong>
+                            <span>Select a date before your vacation starts. We'll be at your door on time.</span>
+                        </div>
+                    </div>
+                    <div class="order-step">
+                        <div class="ostep-num">3</div>
+                        <div class="ostep-text">
+                            <strong>Pay via Paystack</strong>
+                            <span>Card, mobile money, or bank transfer. Your items are insured from the moment we collect.</span>
+                        </div>
+                    </div>
+                    <div class="order-step">
+                        <div class="ostep-num">4</div>
+                        <div class="ostep-text">
+                            <strong>We return everything</strong>
+                            <span>Set your return date and your belongings will be waiting when you get back.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- PICKUP DATE BAR -->
     <div class="pickup-bar">
         <div class="pickup-bar-inner">
@@ -601,8 +731,16 @@
                     <input type="text" id="previous-hostel" placeholder="e.g. Fortune Royal" />
                 </div>
                 <div class="pickup-field">
+                    <label for="room-number">Room number</label>
+                    <input type="text" id="room-number" placeholder="e.g. A204" />
+                </div>
+                <div class="pickup-field">
                     <label for="new-hostel">Return to hostel</label>
                     <input type="text" id="new-hostel" placeholder="e.g. Evandy hostel" />
+                </div>
+                <div class="pickup-field">
+                    <label for="phone-number">Phone number</label>
+                    <input type="tel" id="phone-number" placeholder="e.g. 024 123 4567" />
                 </div>
             </div>
         </div>
@@ -721,7 +859,9 @@
             const time        = '@ViewBag.FixedPickupTime';        // window start, stored as the order's TimeOnly value — not user-selectable
             const timeDisplay = @Html.Raw(System.Text.Json.JsonSerializer.Serialize((string)ViewBag.FixedPickupTimeDisplay)); // e.g. "5:00 PM – 6:00 PM" — for display only
             const prevHostel = document.getElementById('previous-hostel').value.trim();
+            const roomNumber = document.getElementById('room-number').value.trim();
             const newHostel  = document.getElementById('new-hostel').value.trim();
+            const phone      = document.getElementById('phone-number').value.trim();
 
             if (Object.keys(order).length === 0) {
                 alert('Please add at least one item to your order.');
@@ -729,7 +869,9 @@
             }
             if (!pickup) { alert('Please select a pickup date.'); return; }
             if (!prevHostel) { alert('Please enter your current hostel.'); return; }
+            if (!roomNumber) { alert('Please enter your room number at your current hostel.'); return; }
             if (!newHostel) { alert('Please enter the hostel to return items to.'); return; }
+            if (!phone) { alert('Please enter a phone number so we can contact you.'); return; }
 
             const items = Object.keys(order).map(id => ({
                 itemId:   parseInt(id),
@@ -748,7 +890,9 @@
                 pickupTime:        time,
                 pickupTimeDisplay: timeDisplay,
                 previousHostel:    prevHostel,
+                roomNumber:        roomNumber,
                 newHostel:         newHostel,
+                phone:             phone,
                 returnDate:        '@ViewBag.FixedReturnDate'
             }));
 
@@ -834,6 +978,59 @@
             const fmt = d => d.toISOString().split('T')[0];
             const pickupInput = document.getElementById('pickup-date');
             if (pickupInput) pickupInput.min = fmt(tomorrow);
+
+            restoreSavedOrder();
         });
+
+        // Restores a previously started order — e.g. clicking "Edit" from the
+        // Checkout page brings the student back here, and this repopulates the
+        // items, quantities, pickup date, and hostel fields instead of leaving
+        // everything cleared.
+        function restoreSavedOrder() {
+            const saved = sessionStorage.getItem('nestOrder');
+            if (!saved) return;
+
+            let data;
+            try {
+                data = JSON.parse(saved);
+            } catch (e) {
+                return;
+            }
+
+            // Full checkout-shape: { items: [...], pickup, previousHostel, newHostel, ... }
+            if (data && Array.isArray(data.items)) {
+                data.items.forEach(it => {
+                    order[it.itemId] = { name: it.name, price: it.price, qty: it.quantity };
+                });
+
+                if (data.pickup && pickupInput) pickupInput.value = data.pickup;
+
+                const prevHostelInput = document.getElementById('previous-hostel');
+                const newHostelInput  = document.getElementById('new-hostel');
+                const roomNumberInput = document.getElementById('room-number');
+                const phoneInput      = document.getElementById('phone-number');
+                if (data.previousHostel && prevHostelInput) prevHostelInput.value = data.previousHostel;
+                if (data.newHostel && newHostelInput) newHostelInput.value = data.newHostel;
+                if (data.roomNumber && roomNumberInput) roomNumberInput.value = data.roomNumber;
+                if (data.phone && phoneInput) phoneInput.value = data.phone;
+            }
+            // Raw cart-shape: { "12": { name, price, qty }, ... }
+            else if (data && typeof data === 'object') {
+                Object.keys(data).forEach(id => {
+                    if (data[id] && typeof data[id].qty === 'number' && data[id].qty > 0) {
+                        order[id] = data[id];
+                    }
+                });
+            }
+
+            Object.keys(order).forEach(id => {
+                const card  = document.querySelector(`.item-card[data-id="${id}"]`);
+                const qtyEl = document.getElementById('qty-' + id);
+                if (qtyEl) qtyEl.textContent = order[id].qty;
+                if (card)  card.classList.toggle('in-order', order[id].qty > 0);
+            });
+
+            renderOrder();
+        }
     </script>
 }

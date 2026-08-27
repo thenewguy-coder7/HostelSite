@@ -1,4 +1,5 @@
 using HostelSite.Models.Data;
+using HostelSite.Services;
 using HostelSite.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,12 +15,14 @@ namespace HostelSite.Controllers
         private readonly HostelDbContext _db;
         private readonly IConfiguration _config;
         private readonly HttpClient _http;
+        private readonly PushNotificationService _push;
 
-        public PaymentsController(HostelDbContext db, IConfiguration config, IHttpClientFactory factory)
+        public PaymentsController(HostelDbContext db, IConfiguration config, IHttpClientFactory factory, PushNotificationService push)
         {
             _db = db;
             _config = config;
             _http = factory.CreateClient("Paystack");
+            _push = push;
         }
 
         // GET /Payments/Success
@@ -97,6 +100,8 @@ namespace HostelSite.Controllers
                             PickupTime = !string.IsNullOrEmpty(orderItems.PickupTime) ? TimeOnly.Parse(orderItems.PickupTime) : null,
                             PreviousHostel = orderItems.PreviousHostel,
                             NewHostel = orderItems.NewHostel,
+                            RoomNumber = orderItems.RoomNumber,
+                            Phone = orderItems.Phone,
                             ReturnDate = !string.IsNullOrEmpty(orderItems.ReturnDate) ? DateOnly.Parse(orderItems.ReturnDate, System.Globalization.CultureInfo.GetCultureInfo("en-GB")) : null,
                             OrderedAt = DateTime.UtcNow,
                             UpdatedAt = DateTime.UtcNow
@@ -129,6 +134,14 @@ namespace HostelSite.Controllers
 
                         await _db.SaveChangesAsync();
                         await tx.CommitAsync();
+
+                        var student = await _db.Students.FindAsync(studentId);
+                        var studentName = student != null ? $"{student.FirstName} {student.LastName}" : "A student";
+                        var pickupText = order.PickupDate.HasValue ? order.PickupDate.Value.ToString("dd MMM yyyy") : "an unscheduled date";
+                        await _push.NotifyAllAdminsAsync(
+                            "New storage booking",
+                            $"{studentName} booked storage (Order #{order.OrderId}) — pickup {pickupText}.",
+                            "/Admin/Dashboard");
 
                         return Json(new PaystackVerifyResponse { Success = true, OrderId = order.OrderId });
                     }
@@ -218,6 +231,8 @@ namespace HostelSite.Controllers
         public string? PickupTime { get; set; }
         public string? PreviousHostel { get; set; }
         public string? NewHostel { get; set; }
+        public string? RoomNumber { get; set; }
+        public string? Phone { get; set; }
         public string? ReturnDate { get; set; }
     }
 

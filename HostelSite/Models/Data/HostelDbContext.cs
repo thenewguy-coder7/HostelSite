@@ -17,6 +17,8 @@ public partial class HostelDbContext : DbContext
 
     public virtual DbSet<Admin> Admins { get; set; }
 
+    public virtual DbSet<AdminPushSubscription> AdminPushSubscriptions { get; set; }
+
     public virtual DbSet<AestheticRequest> AestheticRequests { get; set; }
 
     public virtual DbSet<LogisticsItem> LogisticsItems { get; set; }
@@ -54,6 +56,28 @@ public partial class HostelDbContext : DbContext
             entity.Property(e => e.PasswordHash)
                 .HasMaxLength(255)
                 .HasColumnName("password_hash");
+        });
+
+        modelBuilder.Entity<AdminPushSubscription>(entity =>
+        {
+            entity.HasKey(e => e.SubscriptionId);
+
+            entity.ToTable("admin_push_subscriptions");
+
+            entity.HasIndex(e => e.Endpoint).IsUnique();
+
+            entity.Property(e => e.SubscriptionId).HasColumnName("subscription_id");
+            entity.Property(e => e.AdminId).HasColumnName("admin_id");
+            entity.Property(e => e.Endpoint).HasColumnName("endpoint");
+            entity.Property(e => e.P256dh).HasColumnName("p256dh");
+            entity.Property(e => e.Auth).HasColumnName("auth");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("created_at");
+
+            entity.HasOne(d => d.Admin).WithMany(p => p.PushSubscriptions)
+                .HasForeignKey(d => d.AdminId)
+                .HasConstraintName("admin_push_subscriptions_admin_id_fkey");
         });
 
         modelBuilder.Entity<AestheticRequest>(entity =>
@@ -155,6 +179,9 @@ public partial class HostelDbContext : DbContext
             entity.Property(e => e.PickupTime).HasColumnName("pickup_time");
             entity.Property(e => e.PreviousHostel).HasMaxLength(150).HasColumnName("previous_hostel");
             entity.Property(e => e.NewHostel).HasMaxLength(150).HasColumnName("new_hostel");
+            entity.Property(e => e.PickupReminderSentAt).HasColumnName("pickup_reminder_sent_at");
+            entity.Property(e => e.RoomNumber).HasMaxLength(50).HasColumnName("room_number");
+            entity.Property(e => e.Phone).HasMaxLength(20).HasColumnName("phone");
         });
 
         modelBuilder.Entity<OrderItem>(entity =>

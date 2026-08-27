@@ -582,8 +582,16 @@
                             <div class="co-date-value" id="coPrevHostel">—</div>
                         </div>
                         <div class="co-date-box">
+                            <div class="co-date-label">Room number</div>
+                            <div class="co-date-value" id="coRoomNumber">—</div>
+                        </div>
+                        <div class="co-date-box">
                             <div class="co-date-label">Return to hostel</div>
                             <div class="co-date-value" id="coNewHostel">—</div>
+                        </div>
+                        <div class="co-date-box">
+                            <div class="co-date-label">Phone number</div>
+                            <div class="co-date-value" id="coPhone">—</div>
                         </div>
                     </div>
                 </div>
@@ -691,6 +699,8 @@
                 document.getElementById('coReturn').textContent = orderData.returnDate || '—';
                 document.getElementById('coPrevHostel').textContent = orderData.previousHostel || '—';
                 document.getElementById('coNewHostel').textContent = orderData.newHostel || '—';
+                document.getElementById('coRoomNumber').textContent = orderData.roomNumber || '—';
+                document.getElementById('coPhone').textContent = orderData.phone || '—';
 
                 const total = orderData.total || items.reduce((s, i) => s + parseFloat(i.price) * i.quantity, 0);
                 document.getElementById('sumSubtotal').textContent = 'GH₵ ' + parseFloat(total).toFixed(2);
@@ -728,7 +738,9 @@
                         { display_name: 'Pickup date',      variable_name: 'pickup_date',      value: orderData.pickup },
                         { display_name: 'Pickup time',      variable_name: 'pickup_time',      value: orderData.pickupTimeDisplay || fmtTime(orderData.pickupTime) },
                         { display_name: 'Current hostel',   variable_name: 'previous_hostel',  value: orderData.previousHostel },
+                        { display_name: 'Room number',      variable_name: 'room_number',      value: orderData.roomNumber },
                         { display_name: 'Return to hostel', variable_name: 'new_hostel',       value: orderData.newHostel },
+                        { display_name: 'Phone number',     variable_name: 'phone',            value: orderData.phone },
                         { display_name: 'Return date',      variable_name: 'return_date',      value: orderData.returnDate }
                     ]
                 },

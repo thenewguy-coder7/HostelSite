@@ -18,6 +18,9 @@ namespace HostelSite.ViewModels
         [EmailAddress]
         public string Email { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "Phone number is required")]
+        public string Phone { get; set; } = string.Empty;
+
         [Required(ErrorMessage = "Hostel name is required")]
         public string Hostel { get; set; } = string.Empty;
 
@@ -38,6 +41,7 @@ namespace HostelSite.ViewModels
         public string StyleName { get; set; } = string.Empty;
         public string Hostel { get; set; } = string.Empty;
         public string RoomNumber { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
         public DateTime SubmittedAt { get; set; }
         public DateTime? PreferredDate { get; set; }

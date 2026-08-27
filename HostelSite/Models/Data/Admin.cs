@@ -14,4 +14,6 @@ public partial class Admin
     public string PasswordHash { get; set; } = null!;
 
     public DateTime? CreatedAt { get; set; }
+
+    public virtual ICollection<AdminPushSubscription> PushSubscriptions { get; set; } = new List<AdminPushSubscription>();
 }

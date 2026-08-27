@@ -1,3 +1,4 @@
+@using HostelSite.Services
 @{
     ViewData["Title"] = "Admin Dashboard";
     Layout = null;
@@ -239,7 +240,7 @@
         .admin-table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 900px;
+            min-width: 1100px;
         }
 
             .admin-table th {
@@ -466,9 +467,15 @@
 
             <div class="admin-topbar">
                 <h1>Dashboard</h1>
-                <div class="admin-user">
-                    <i class="ti ti-shield-check" style="color:#4A9572"></i>
-                    Logged in as <strong>@User.Identity?.Name</strong>
+                <div class="admin-user" style="display:flex; align-items:center; gap:14px;">
+                    <button type="button" id="pushToggleBtn" style="display:inline-flex; align-items:center; gap:6px; border:1px solid #E3E5EA; border-radius:8px; padding:6px 12px; background:#fff; cursor:pointer; font-size:13px; color:inherit;">
+                        <i class="ti ti-bell" aria-hidden="true"></i>
+                        <span id="pushToggleLabel">@(ViewBag.PushEnabled == true ? "Notifications on" : "Enable notifications")</span>
+                    </button>
+                    <span>
+                        <i class="ti ti-shield-check" style="color:#4A9572"></i>
+                        Logged in as <strong>@User.Identity?.Name</strong>
+                    </span>
                 </div>
             </div>
 
@@ -522,6 +529,8 @@
                                     <th>Pickup date</th>
                                     <th>Pickup time</th>
                                     <th>Hostel</th>
+                                    <th>Room</th>
+                                    <th>Phone</th>
                                     <th>Return</th>
                                     <th>Total</th>
                                     <th>Status</th>
@@ -558,6 +567,8 @@
                                                 <span>@(order.NewHostel ?? "—")</span>
                                             </div>
                                         </td>
+                                        <td>@(order.RoomNumber ?? "—")</td>
+                                        <td>@(order.Phone ?? "—")</td>
                                         <td>@(order.ReturnDate?.ToString("dd MMM yyyy") ?? "—")</td>
                                         <td><strong>GH₵ @order.TotalAmount.ToString("0.00")</strong></td>
                                         <td><span class="badge @badgeClass">@order.OrderStatus</span></td>
@@ -604,6 +615,8 @@
                                 <tr>
                                     <th>Request</th>
                                     <th>Student</th>
+                                    <th>Room</th>
+                                    <th>Phone</th>
                                     <th>Style / details</th>
                                     <th>Preferred date</th>
                                     <th>Status</th>
@@ -631,6 +644,8 @@
                                             <div class="td-name">@req.Student?.FirstName @req.Student?.LastName</div>
                                             <div class="td-ref">@req.Student?.Email</div>
                                         </td>
+                                        <td>@(NoteParser.Get(req.Notes, "Room") ?? "—")</td>
+                                        <td>@(NoteParser.Get(req.Notes, "Phone") ?? "—")</td>
                                         <td style="max-width:260px; font-size:12px; color:var(--muted);">@req.Notes</td>
                                         <td>@(req.ResolvedAt?.ToString("dd MMM yyyy") ?? "—")</td>
                                         <td><span class="badge @badgeClass">@req.Status</span></td>
@@ -727,5 +742,89 @@
 
         </main>
     </div>
+
+    <script>
+        const VAPID_PUBLIC_KEY = '@Html.Raw(System.Text.Json.JsonSerializer.Serialize((string)(ViewBag.VapidPublicKey ?? "")))';
+        const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
+
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+        }
+
+        async function updatePushButton() {
+            const label = document.getElementById('pushToggleLabel');
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                label.textContent = 'Notifications not supported';
+                document.getElementById('pushToggleBtn').disabled = true;
+                return;
+            }
+            try {
+                const reg = await navigator.serviceWorker.getRegistration('/sw.js');
+                const sub = reg ? await reg.pushManager.getSubscription() : null;
+                label.textContent = sub ? 'Notifications on' : 'Enable notifications';
+            } catch (e) {
+                label.textContent = 'Enable notifications';
+            }
+        }
+
+        document.getElementById('pushToggleBtn')?.addEventListener('click', async () => {
+            const label = document.getElementById('pushToggleLabel');
+
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                alert('Push notifications are not supported in this browser.');
+                return;
+            }
+            if (!VAPID_PUBLIC_KEY) {
+                alert('Push notifications are not configured on the server yet.');
+                return;
+            }
+
+            try {
+                const reg = await navigator.serviceWorker.register('/sw.js');
+                await navigator.serviceWorker.ready;
+                let sub = await reg.pushManager.getSubscription();
+
+                if (sub) {
+                    // Already subscribed — turn it off
+                    await fetch('@Url.Action("UnsubscribePush", "Admin")', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': csrfToken },
+                        body: JSON.stringify({ endpoint: sub.endpoint })
+                    });
+                    await sub.unsubscribe();
+                    label.textContent = 'Enable notifications';
+                    return;
+                }
+
+                const permission = await Notification.requestPermission();
+                if (permission !== 'granted') {
+                    alert('Notifications were not allowed. You can enable them again from your browser settings.');
+                    return;
+                }
+
+                sub = await reg.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+                });
+
+                const subJson = sub.toJSON();
+                await fetch('@Url.Action("SubscribePush", "Admin")', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': csrfToken },
+                    body: JSON.stringify({ endpoint: subJson.endpoint, keys: subJson.keys })
+                });
+
+                label.textContent = 'Notifications on';
+            } catch (e) {
+                console.error('Push subscription failed', e);
+                alert('Could not enable notifications: ' + e.message);
+            }
+        });
+
+        updatePushButton();
+    </script>
 </body>
 </html>

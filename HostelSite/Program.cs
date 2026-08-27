@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using HostelSite.Models.Data;
+using HostelSite.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +52,9 @@ builder.Services.AddHttpClient("Paystack", client =>
     client.BaseAddress = new Uri("https://api.paystack.co/");
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
+
+// ── PUSH NOTIFICATIONS (admin alerts for bookings, requests, pickup reminders) ──
+builder.Services.AddScoped<PushNotificationService>();
 
 // ── BUILD ──
 var app = builder.Build();
