@@ -657,7 +657,14 @@
                                             <div class="td-name">@order.Student?.FirstName @order.Student?.LastName</div>
                                             <div class="td-ref">@order.Student?.Email</div>
                                         </td>
-                                        <td>@order.OrderItems.Count item type(s)</td>
+                                        <td style="vertical-align:top;">
+                                            <div style="display:flex; flex-direction:column; gap:3px; min-width:150px;">
+                                                @foreach (var oi in order.OrderItems)
+                                                {
+                                                    <span>@oi.Item.ItemName@(oi.Quantity > 1 ? $" × {oi.Quantity}" : "")</span>
+                                                }
+                                            </div>
+                                        </td>
                                         <td>@(order.PickupDate?.ToString("dd MMM yyyy") ?? "—")</td>
                                         <td>@(order.PickupTime?.ToString("h:mm tt") ?? "—")</td>
                                         <td>
