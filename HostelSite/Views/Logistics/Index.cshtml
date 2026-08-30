@@ -261,6 +261,47 @@
             color: var(--amber);
         }
 
+    /* Explicit, tappable pickup-date list — replaces the native
+       <input type="date"> picker, whose calendar/wheel UI can render
+       confusingly (or appear to offer only one date) on some phone
+       browsers. */
+    .pickup-date-chips {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        max-width: 280px;
+        padding-bottom: 2px;
+    }
+
+    .date-chip {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1px;
+        font-family: var(--font-b);
+        background: var(--white);
+        border: 1px solid #F0D9BE;
+        border-radius: 7px;
+        padding: 6px 10px;
+        cursor: pointer;
+        font-size: 11px;
+        color: var(--ink);
+        line-height: 1.2;
+        white-space: nowrap;
+    }
+
+        .date-chip .dc-day {
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .date-chip.selected {
+            background: var(--amber);
+            border-color: var(--amber);
+            color: #fff;
+        }
+
     .fixed-tag {
         font-size: 10px;
         font-weight: 700;
@@ -717,8 +758,9 @@
             </div>
             <div class="pickup-fields">
                 <div class="pickup-field">
-                    <label for="pickup-date">Pickup date</label>
-                    <input type="date" id="pickup-date" />
+                    <label id="pickup-date-label">Pickup date</label>
+                    <div class="pickup-date-chips" id="pickup-date-chips" role="listbox" aria-labelledby="pickup-date-label"></div>
+                    <input type="hidden" id="pickup-date" />
                 </div>
                 <div class="pickup-field">
                     <label for="pickup-time">Pickup time</label>
@@ -973,14 +1015,54 @@
         });
 
         document.addEventListener('DOMContentLoaded', function () {
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            const fmt = d => d.toISOString().split('T')[0];
-            const pickupInput = document.getElementById('pickup-date');
-            if (pickupInput) pickupInput.min = fmt(tomorrow);
-
+            renderPickupDateChips();
             restoreSavedOrder();
         });
+
+        // Renders the next 21 days (tomorrow onward) as tappable chips and
+        // wires each one to set the hidden #pickup-date input that
+        // goToCheckout() and restoreSavedOrder() already read from.
+        function renderPickupDateChips(selectedIso) {
+            const container   = document.getElementById('pickup-date-chips');
+            const pickupInput = document.getElementById('pickup-date');
+            if (!container || !pickupInput) return;
+
+            container.innerHTML = '';
+            const dayNames   = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+            for (let i = 1; i <= 21; i++) {
+                const d = new Date();
+                d.setHours(0, 0, 0, 0);
+                d.setDate(d.getDate() + i);
+                const iso = d.toISOString().split('T')[0];
+
+                const chip = document.createElement('button');
+                chip.type = 'button';
+                chip.className = 'date-chip';
+                chip.setAttribute('role', 'option');
+                chip.dataset.date = iso;
+                chip.innerHTML =
+                    '<span class="dc-dow">' + dayNames[d.getDay()] + '</span>' +
+                    '<span class="dc-day">' + d.getDate() + '</span>' +
+                    '<span class="dc-dow">' + monthNames[d.getMonth()] + '</span>';
+
+                if (iso === selectedIso) chip.classList.add('selected');
+
+                chip.addEventListener('click', () => {
+                    container.querySelectorAll('.date-chip').forEach(c => c.classList.remove('selected'));
+                    chip.classList.add('selected');
+                    pickupInput.value = iso;
+                });
+
+                container.appendChild(chip);
+            }
+
+            if (selectedIso) {
+                const match = container.querySelector(`.date-chip[data-date="${selectedIso}"]`);
+                if (match) match.scrollIntoView({ inline: 'center', block: 'nearest' });
+            }
+        }
 
         // Restores a previously started order — e.g. clicking "Edit" from the
         // Checkout page brings the student back here, and this repopulates the
@@ -1003,7 +1085,17 @@
                     order[it.itemId] = { name: it.name, price: it.price, qty: it.quantity };
                 });
 
-                if (data.pickup && pickupInput) pickupInput.value = data.pickup;
+                // NOTE: `pickupInput` here used to reference a `const` that only
+                // existed inside the DOMContentLoaded callback's own scope, not
+                // this function — referencing it threw a ReferenceError any time
+                // a saved order had a pickup date (e.g. clicking "Edit" from
+                // Checkout), which aborted the rest of this restore (hostel,
+                // room, phone, cart quantities never got repopulated either).
+                if (data.pickup) {
+                    const pickupInput = document.getElementById('pickup-date');
+                    if (pickupInput) pickupInput.value = data.pickup;
+                    renderPickupDateChips(data.pickup);
+                }
 
                 const prevHostelInput = document.getElementById('previous-hostel');
                 const newHostelInput  = document.getElementById('new-hostel');
