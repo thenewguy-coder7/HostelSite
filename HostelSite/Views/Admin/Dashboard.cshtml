@@ -346,6 +346,409 @@
             color: #1A5C34;
         }
 
+        /* ── Mobile-first pickup view (Logistics orders) ── */
+        .pickup-stats {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .pickup-stat-chip {
+            flex: 1;
+            min-width: 90px;
+            background: var(--sand);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+            .pickup-stat-chip .psc-value {
+                font-family: var(--font-d);
+                font-size: 22px;
+                font-weight: 700;
+                color: var(--ink);
+            }
+
+            .pickup-stat-chip .psc-label {
+                font-size: 11px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.6px;
+                color: var(--muted);
+            }
+
+            .pickup-stat-chip.pending .psc-value {
+                color: #946800;
+            }
+
+            .pickup-stat-chip.picked .psc-value {
+                color: #2B5CC8;
+            }
+
+        .pickup-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .pickup-search {
+            flex: 1;
+            min-width: 180px;
+            font-family: var(--font-b);
+            font-size: 13px;
+            padding: 9px 14px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            outline: none;
+        }
+
+            .pickup-search:focus {
+                border-color: var(--sage);
+            }
+
+        .pickup-filter-tabs {
+            display: flex;
+            background: var(--sand);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 3px;
+            gap: 2px;
+        }
+
+        .pft {
+            border: none;
+            background: transparent;
+            font-family: var(--font-b);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+            padding: 7px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+            .pft.active {
+                background: var(--white);
+                color: var(--ink);
+                box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            }
+
+        .hall-groups {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .hall-group {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .hall-group-head {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: none;
+            background: var(--sand);
+            padding: 14px 16px;
+            cursor: pointer;
+            font-family: var(--font-b);
+            text-align: left;
+        }
+
+        .hall-group:nth-of-type(5n+1) .hall-group-head { background: #EAF2FB; }
+        .hall-group:nth-of-type(5n+2) .hall-group-head { background: #F5EEFB; }
+        .hall-group:nth-of-type(5n+3) .hall-group-head { background: #EAF7EF; }
+        .hall-group:nth-of-type(5n+4) .hall-group-head { background: #FBF6E3; }
+        .hall-group:nth-of-type(5n+5) .hall-group-head { background: #FCEBEE; }
+
+        .hall-group-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+            .hall-group-title i {
+                font-size: 18px;
+                color: var(--forest-mid);
+            }
+
+        .hall-group-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hall-group-count {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+        }
+
+        .hall-chevron {
+            transition: transform 0.2s ease;
+            font-size: 16px;
+            color: var(--muted);
+        }
+
+        .hall-group.expanded .hall-chevron {
+            transform: rotate(180deg);
+        }
+
+        .hall-group-body {
+            display: none;
+            padding: 6px 10px 10px;
+        }
+
+        .hall-group.expanded .hall-group-body {
+            display: block;
+        }
+
+        .pickup-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--line);
+            cursor: pointer;
+            background: var(--white);
+            border-radius: 8px;
+            transition: background 0.15s ease;
+        }
+
+            .pickup-card:last-child {
+                border-bottom: none;
+            }
+
+            .pickup-card:hover {
+                background: var(--sand);
+            }
+
+        .pc-check {
+            flex: 0 0 auto;
+            font-size: 20px;
+            color: var(--line);
+        }
+
+            .pc-check .ti-circle-check-filled {
+                color: var(--sage);
+            }
+
+        .pc-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .pc-ref {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .pc-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ink);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .pc-room {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .pc-status-badge {
+            flex: 0 0 auto;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 4px 9px;
+            border-radius: 99px;
+        }
+
+            .pc-status-badge.pending {
+                background: #FFF8E6;
+                color: #946800;
+            }
+
+            .pc-status-badge.picked {
+                background: #EEF4FF;
+                color: #2B5CC8;
+            }
+
+        /* Pickup detail modal */
+        .pickup-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(17, 19, 24, 0.5);
+            z-index: 2000;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+            .pickup-modal-overlay.open {
+                display: flex;
+            }
+
+        .pickup-modal {
+            background: var(--white);
+            width: 100%;
+            max-width: 480px;
+            max-height: 88vh;
+            overflow-y: auto;
+            border-radius: 18px 18px 0 0;
+            padding: 1.5rem 1.5rem 2rem;
+            position: relative;
+        }
+
+        @@media (min-width: 620px) {
+            .pickup-modal-overlay {
+                align-items: center;
+            }
+
+            .pickup-modal {
+                border-radius: 16px;
+                max-height: 80vh;
+            }
+        }
+
+        .pickup-modal-close {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            border: none;
+            background: var(--sand);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--ink);
+            font-size: 15px;
+        }
+
+        .pm-ref {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 4px;
+        }
+
+        .pm-name {
+            font-family: var(--font-d);
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 14px;
+        }
+
+        .pm-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13.5px;
+            color: var(--ink2);
+            padding: 8px 0;
+            border-bottom: 1px solid var(--line);
+        }
+
+            .pm-row i {
+                font-size: 16px;
+                color: var(--sage);
+                flex: 0 0 auto;
+            }
+
+        .pm-paid-badge {
+            margin-left: auto;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #E8F5EE;
+            color: #1A5C34;
+            padding: 3px 9px;
+            border-radius: 99px;
+        }
+
+        .pm-items-title, .pm-status-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--muted);
+            margin: 16px 0 8px;
+        }
+
+        .pm-items {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+            .pm-items li {
+                font-size: 13.5px;
+                color: var(--ink);
+                background: var(--sand);
+                border-radius: 7px;
+                padding: 8px 12px;
+            }
+
+        .pm-status-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .pm-status-btn {
+            flex: 1;
+            min-width: 100px;
+            font-family: var(--font-b);
+            font-size: 12.5px;
+            font-weight: 600;
+            padding: 10px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            background: var(--white);
+            color: var(--ink2);
+            cursor: pointer;
+        }
+
+            .pm-status-btn.active {
+                border-color: var(--sage);
+                background: var(--sage-light);
+                color: #1C5C40;
+            }
+
+            .pm-status-btn.complete {
+                border-color: var(--amber);
+                color: #7A4B10;
+            }
+
+            .pm-status-btn.complete:hover {
+                background: var(--amber-light);
+            }
+
         .status-form {
             display: flex;
             align-items: center;
@@ -611,92 +1014,113 @@
             </div>
 
             <!-- LOGISTICS ORDERS -->
+            @{
+                var pickupOrders = ((IEnumerable<dynamic>)ViewBag.Orders).ToList();
+                var pickupHallGroups = pickupOrders
+                    .GroupBy(o => string.IsNullOrWhiteSpace((string)o.PreviousHostel) ? "Hostel not specified" : (string)o.PreviousHostel)
+                    .OrderByDescending(g => g.Count());
+                int pickupPendingCount = pickupOrders.Count(o => (string)o.OrderStatus == "Confirmed");
+                int pickupPickedCount = pickupOrders.Count(o => (string)o.OrderStatus == "Collected" || (string)o.OrderStatus == "Stored");
+
+                // Flattened per-order data for the detail modal — items only
+                // exist post-payment (orders are created in PaymentsController
+                // only after Paystack verification succeeds), so every order
+                // here is always "Paid".
+                var pickupOrderData = pickupOrders.Select(o => new
+                {
+                    orderId = (int)o.OrderId,
+                    studentName = $"{o.Student?.FirstName} {o.Student?.LastName}".Trim(),
+                    email = (string)(o.Student?.Email ?? ""),
+                    phone = (string)(o.Phone ?? o.Student?.Phone ?? ""),
+                    room = (string)(o.RoomNumber ?? ""),
+                    hostel = (string)(o.PreviousHostel ?? ""),
+                    returnHostel = (string)(o.NewHostel ?? ""),
+                    pickupDate = o.PickupDate != null ? ((DateOnly)o.PickupDate).ToString("dd MMM yyyy") : "—",
+                    pickupTime = o.PickupTime != null ? ((TimeOnly)o.PickupTime).ToString("h:mm tt") : "—",
+                    status = (string)o.OrderStatus,
+                    total = ((decimal)o.TotalAmount).ToString("0.00"),
+                    items = ((IEnumerable<dynamic>)o.OrderItems).Select(oi => new
+                    {
+                        name = (string)oi.Item.ItemName,
+                        qty = (int)oi.Quantity
+                    }).ToList()
+                }).ToList();
+            }
             <div class="admin-section" id="orders">
                 <div class="section-head">
                     <h2><i class="ti ti-package"></i> Logistics orders</h2>
-                    <span class="section-count">@(((IEnumerable<dynamic>)ViewBag.Orders).Count()) active</span>
+                    <span class="section-count">@pickupOrders.Count active</span>
                 </div>
 
-                @if (((IEnumerable<dynamic>)ViewBag.Orders).Any())
+                @if (pickupOrders.Any())
                 {
-                    <div class="table-scroll">
-                        <table class="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>Order</th>
-                                    <th>Student</th>
-                                    <th>Items</th>
-                                    <th>Pickup date</th>
-                                    <th>Pickup time</th>
-                                    <th>Hostel</th>
-                                    <th>Room</th>
-                                    <th>Phone</th>
-                                    <th>Return</th>
-                                    <th>Total</th>
-                                    <th>Status</th>
-                                    <th>Update</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var order in ViewBag.Orders)
-                                {
-                                    var badgeClass = order.OrderStatus switch
-                                    {
-                                        "Confirmed" => "badge-confirmed",
-                                        "Collected" => "badge-collected",
-                                        "Stored" => "badge-stored",
-                                        _ => "badge-pending"
-                                    };
-
-                                    <tr>
-                                        <td>
-                                            <div class="td-name">#@order.OrderId</div>
-                                            <div class="td-ref">@order.OrderedAt.ToString("dd MMM yyyy")</div>
-                                        </td>
-                                        <td>
-                                            <div class="td-name">@order.Student?.FirstName @order.Student?.LastName</div>
-                                            <div class="td-ref">@order.Student?.Email</div>
-                                        </td>
-                                        <td style="vertical-align:top;">
-                                            <div style="display:flex; flex-direction:column; gap:3px; min-width:150px;">
-                                                @foreach (var oi in order.OrderItems)
-                                                {
-                                                    <span>@oi.Item.ItemName@(oi.Quantity > 1 ? $" × {oi.Quantity}" : "")</span>
-                                                }
-                                            </div>
-                                        </td>
-                                        <td>@(order.PickupDate?.ToString("dd MMM yyyy") ?? "—")</td>
-                                        <td>@(order.PickupTime?.ToString("h:mm tt") ?? "—")</td>
-                                        <td>
-                                            <div class="hostel-flow">
-                                                <span>@(order.PreviousHostel ?? "—")</span>
-                                                <i class="ti ti-arrow-right"></i>
-                                                <span>@(order.NewHostel ?? "—")</span>
-                                            </div>
-                                        </td>
-                                        <td>@(order.RoomNumber ?? "—")</td>
-                                        <td>@(order.Phone ?? order.Student?.Phone ?? "—")</td>
-                                        <td>@(order.ReturnDate?.ToString("dd MMM yyyy") ?? "—")</td>
-                                        <td><strong>GH₵ @order.TotalAmount.ToString("0.00")</strong></td>
-                                        <td><span class="badge @badgeClass">@order.OrderStatus</span></td>
-                                        <td>
-                                            <form class="status-form" asp-controller="Admin" asp-action="UpdateOrderStatus" method="post">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="orderId" value="@order.OrderId" />
-                                                <select name="status" class="status-select">
-                                                    <option value="Confirmed" selected="@(order.OrderStatus == "Confirmed")">Confirmed</option>
-                                                    <option value="Collected" selected="@(order.OrderStatus == "Collected")">Collected</option>
-                                                    <option value="Stored" selected="@(order.OrderStatus == "Stored")">In storage</option>
-                                                    <option value="Completed">Completed ✓</option>
-                                                </select>
-                                                <button type="submit" class="btn-update">Update</button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                    <div class="pickup-stats">
+                        <div class="pickup-stat-chip pending">
+                            <span class="psc-value">@pickupPendingCount</span>
+                            <span class="psc-label">Pending</span>
+                        </div>
+                        <div class="pickup-stat-chip picked">
+                            <span class="psc-value">@pickupPickedCount</span>
+                            <span class="psc-label">Picked up</span>
+                        </div>
+                        <div class="pickup-stat-chip">
+                            <span class="psc-value">@pickupOrders.Count</span>
+                            <span class="psc-label">Total</span>
+                        </div>
                     </div>
+
+                    <div class="pickup-controls">
+                        <input type="text" id="pickupSearch" class="pickup-search" placeholder="Search name, room, order #…" />
+                        <div class="pickup-filter-tabs" id="pickupFilterTabs">
+                            <button type="button" class="pft active" data-filter="all">All</button>
+                            <button type="button" class="pft" data-filter="pending">Pending</button>
+                            <button type="button" class="pft" data-filter="picked">Picked up</button>
+                        </div>
+                    </div>
+
+                    <div class="hall-groups" id="hallGroups">
+                        @foreach (var grp in pickupHallGroups)
+                        {
+                            <div class="hall-group">
+                                <button type="button" class="hall-group-head">
+                                    <span class="hall-group-title">
+                                        <i class="ti ti-building"></i>
+                                        <span>@grp.Key</span>
+                                    </span>
+                                    <span class="hall-group-meta">
+                                        <span class="hall-group-count">@grp.Count() client@(grp.Count() != 1 ? "s" : "")</span>
+                                        <i class="ti ti-chevron-down hall-chevron"></i>
+                                    </span>
+                                </button>
+                                <div class="hall-group-body">
+                                    @foreach (var order in grp)
+                                    {
+                                        var isPending = (string)order.OrderStatus == "Confirmed";
+                                        var pickedLabel = isPending ? "pending" : "picked";
+                                        var searchBlob = $"{order.Student?.FirstName} {order.Student?.LastName} {order.RoomNumber} {order.OrderId}".ToLower();
+                                        <div class="pickup-card" data-status="@pickedLabel" data-search="@searchBlob" data-order-id="@order.OrderId">
+                                            <div class="pc-check">
+                                                <i class="ti @(isPending ? "ti-circle" : "ti-circle-check-filled")"></i>
+                                            </div>
+                                            <div class="pc-info">
+                                                <div class="pc-ref">PROSBEE-@order.OrderId</div>
+                                                <div class="pc-name">@order.Student?.FirstName @order.Student?.LastName</div>
+                                                <div class="pc-room">Room @(order.RoomNumber ?? "—")</div>
+                                            </div>
+                                            <div class="pc-status-badge @pickedLabel">@(isPending ? "Pending" : (string)order.OrderStatus)</div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div id="hallGroupsEmpty" class="table-empty" hidden>
+                        <i class="ti ti-search-off"></i>
+                        No bookings match this search/filter
+                    </div>
+
+                    <script id="pickupOrdersData" type="application/json">@Html.Raw(System.Text.Json.JsonSerializer.Serialize(pickupOrderData))</script>
                 }
                 else
                 {
@@ -705,6 +1129,16 @@
                         No active logistics orders
                     </div>
                 }
+            </div>
+
+            <!-- PICKUP DETAIL MODAL -->
+            <div class="pickup-modal-overlay" id="pickupModalOverlay">
+                <div class="pickup-modal">
+                    <button type="button" class="pickup-modal-close" id="pickupModalClose" aria-label="Close">
+                        <i class="ti ti-x"></i>
+                    </button>
+                    <div id="pickupModalBody"></div>
+                </div>
             </div>
 
             <!-- AESTHETIC REQUESTS -->
@@ -979,6 +1413,118 @@
         });
 
         updatePushButton();
+
+        // ── Pickup view (hall-grouped logistics orders) ──
+        (function () {
+            const dataEl = document.getElementById('pickupOrdersData');
+            if (!dataEl) return; // no active orders — nothing to wire up
+
+            const PICKUP_ORDERS = {};
+            JSON.parse(dataEl.textContent || '[]').forEach(o => { PICKUP_ORDERS[o.orderId] = o; });
+
+            const UPDATE_STATUS_URL = '@Url.Action("UpdateOrderStatus", "Admin")';
+
+            let activeFilter = 'all';
+            let searchTerm = '';
+
+            function applyPickupFilters() {
+                document.querySelectorAll('.hall-group').forEach(group => {
+                    let visibleInGroup = 0;
+                    group.querySelectorAll('.pickup-card').forEach(card => {
+                        const matchesFilter = activeFilter === 'all' || card.dataset.status === activeFilter;
+                        const matchesSearch = !searchTerm || card.dataset.search.includes(searchTerm);
+                        const show = matchesFilter && matchesSearch;
+                        card.style.display = show ? '' : 'none';
+                        if (show) visibleInGroup++;
+                    });
+                    group.style.display = visibleInGroup > 0 ? '' : 'none';
+                    // Auto-expand a group while actively searching/filtering so
+                    // matches aren't hidden behind a collapsed header.
+                    if (visibleInGroup > 0 && (searchTerm || activeFilter !== 'all')) {
+                        group.classList.add('expanded');
+                    }
+                });
+
+                const anyVisible = Array.from(document.querySelectorAll('.hall-group'))
+                    .some(g => g.style.display !== 'none');
+                const emptyState = document.getElementById('hallGroupsEmpty');
+                if (emptyState) emptyState.hidden = anyVisible;
+            }
+
+            document.getElementById('pickupSearch')?.addEventListener('input', function () {
+                searchTerm = this.value.trim().toLowerCase();
+                applyPickupFilters();
+            });
+
+            document.getElementById('pickupFilterTabs')?.addEventListener('click', function (e) {
+                const btn = e.target.closest('.pft');
+                if (!btn) return;
+                this.querySelectorAll('.pft').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                activeFilter = btn.dataset.filter;
+                applyPickupFilters();
+            });
+
+            document.querySelectorAll('.hall-group-head').forEach(head => {
+                head.addEventListener('click', () => {
+                    head.closest('.hall-group').classList.toggle('expanded');
+                });
+            });
+
+            function statusLabel(status) {
+                if (status === 'Confirmed') return 'Pending';
+                if (status === 'Collected') return 'Collected';
+                if (status === 'Stored') return 'In storage';
+                return status;
+            }
+
+            function openPickupModal(orderId) {
+                const o = PICKUP_ORDERS[orderId];
+                if (!o) return;
+
+                const itemsHtml = o.items.length
+                    ? o.items.map(it => `<li>${it.name}${it.qty > 1 ? ' × ' + it.qty : ''}</li>`).join('')
+                    : '<li>No items on record</li>';
+
+                document.getElementById('pickupModalBody').innerHTML = `
+                    <div class="pm-ref">PROSBEE-${o.orderId}</div>
+                    <div class="pm-name">${o.studentName}</div>
+                    <div class="pm-row"><i class="ti ti-mail"></i> ${o.email || '—'}</div>
+                    <div class="pm-row"><i class="ti ti-phone"></i> ${o.phone || '—'}</div>
+                    <div class="pm-row"><i class="ti ti-door"></i> Room ${o.room || '—'} · ${o.hostel || '—'}</div>
+                    <div class="pm-row"><i class="ti ti-arrow-right"></i> Return to ${o.returnHostel || '—'}</div>
+                    <div class="pm-row"><i class="ti ti-calendar"></i> ${o.pickupDate} · ${o.pickupTime}</div>
+                    <div class="pm-row"><i class="ti ti-cash"></i> GH₵ ${o.total}<span class="pm-paid-badge">Paid</span></div>
+                    <div class="pm-items-title">Items to collect</div>
+                    <ul class="pm-items">${itemsHtml}</ul>
+                    <div class="pm-status-title">Update status — currently: ${statusLabel(o.status)}</div>
+                    <form class="pm-status-form" method="post" action="${UPDATE_STATUS_URL}">
+                        <input type="hidden" name="__RequestVerificationToken" value="${csrfToken}" />
+                        <input type="hidden" name="orderId" value="${o.orderId}" />
+                        <div class="pm-status-buttons">
+                            <button type="submit" name="status" value="Confirmed" class="pm-status-btn ${o.status === 'Confirmed' ? 'active' : ''}">Pending</button>
+                            <button type="submit" name="status" value="Collected" class="pm-status-btn ${o.status === 'Collected' ? 'active' : ''}">Picked up</button>
+                            <button type="submit" name="status" value="Stored" class="pm-status-btn ${o.status === 'Stored' ? 'active' : ''}">In storage</button>
+                            <button type="submit" name="status" value="Completed" class="pm-status-btn complete">Completed ✓</button>
+                        </div>
+                    </form>`;
+
+                document.getElementById('pickupModalOverlay').classList.add('open');
+            }
+
+            document.querySelectorAll('.pickup-card').forEach(card => {
+                card.addEventListener('click', () => openPickupModal(card.dataset.orderId));
+            });
+
+            function closePickupModal() {
+                document.getElementById('pickupModalOverlay').classList.remove('open');
+            }
+
+            document.getElementById('pickupModalClose')?.addEventListener('click', closePickupModal);
+            document.getElementById('pickupModalOverlay')?.addEventListener('click', function (e) {
+                if (e.target === this) closePickupModal();
+            });
+        })();
     </script>
 </body>
 </html>
