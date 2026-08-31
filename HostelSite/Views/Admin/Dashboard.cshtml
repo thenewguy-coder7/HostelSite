@@ -1017,7 +1017,7 @@
             @{
                 var pickupOrders = ((IEnumerable<dynamic>)ViewBag.Orders).ToList();
                 var pickupHallGroups = pickupOrders
-                    .GroupBy(o => string.IsNullOrWhiteSpace((string)o.PreviousHostel) ? "Hostel not specified" : (string)o.PreviousHostel)
+                    .GroupBy(o => HostelNameNormalizer.Canonicalize((string)o.PreviousHostel))
                     .OrderByDescending(g => g.Count());
                 int pickupPendingCount = pickupOrders.Count(o => (string)o.OrderStatus == "Confirmed");
                 int pickupPickedCount = pickupOrders.Count(o => (string)o.OrderStatus == "Collected" || (string)o.OrderStatus == "Stored");
@@ -1033,7 +1033,7 @@
                     email = (string)(o.Student?.Email ?? ""),
                     phone = (string)(o.Phone ?? o.Student?.Phone ?? ""),
                     room = (string)(o.RoomNumber ?? ""),
-                    hostel = (string)(o.PreviousHostel ?? ""),
+                    hostel = HostelNameNormalizer.Canonicalize((string)(o.PreviousHostel ?? "")),
                     returnHostel = (string)(o.NewHostel ?? ""),
                     pickupDate = o.PickupDate != null ? ((DateOnly)o.PickupDate).ToString("dd MMM yyyy") : "—",
                     pickupTime = o.PickupTime != null ? ((TimeOnly)o.PickupTime).ToString("h:mm tt") : "—",
