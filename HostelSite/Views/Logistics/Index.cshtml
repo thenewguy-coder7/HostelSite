@@ -212,12 +212,49 @@
     }
 
         .pickup-field label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
             font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: #A0701A;
         }
+
+        .field-hint-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: none;
+            padding: 0;
+            color: #A0701A;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+        }
+
+        .field-hint {
+            max-width: 240px;
+            font-size: 11px;
+            font-weight: 400;
+            text-transform: none;
+            letter-spacing: normal;
+            line-height: 1.4;
+            color: #7A5020;
+            background: #fff;
+            border: 1px solid #F0D9BE;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-top: 2px;
+        }
+
+            .field-hint strong {
+                display: block;
+                margin-bottom: 3px;
+                color: #5A3B10;
+            }
 
         .pickup-field input[type="date"], .pickup-field input[type="time"], .pickup-field input[type="text"] {
             font-family: var(--font-b);
@@ -777,8 +814,17 @@
                     <input type="text" id="room-number" placeholder="e.g. A204" />
                 </div>
                 <div class="pickup-field">
-                    <label for="new-hostel">Return to hostel</label>
+                    <label for="new-hostel">
+                        Return to hostel
+                        <button type="button" class="field-hint-toggle" id="newHostelHintToggle" aria-label="Help — what to enter if your place has no name" aria-expanded="false">
+                            <i class="ti ti-info-circle" aria-hidden="true"></i>
+                        </button>
+                    </label>
                     <input type="text" id="new-hostel" placeholder="e.g. Evandy hostel" />
+                    <div class="field-hint" id="newHostelHint" hidden>
+                        <strong>Moving to a homestel, or your place has no name?</strong>
+                        State the nearest hostel and the distance it is from your place — e.g. "5 min walk from Evandy hostel".
+                    </div>
                 </div>
                 <div class="pickup-field">
                     <label for="phone-number">Phone number</label>
@@ -1017,6 +1063,13 @@
         document.addEventListener('DOMContentLoaded', function () {
             renderPickupDateChips();
             restoreSavedOrder();
+        });
+
+        document.getElementById('newHostelHintToggle')?.addEventListener('click', function () {
+            const hint = document.getElementById('newHostelHint');
+            if (!hint) return;
+            hint.hidden = !hint.hidden;
+            this.setAttribute('aria-expanded', String(!hint.hidden));
         });
 
         // Renders the next 21 days (tomorrow onward) as tappable chips and
