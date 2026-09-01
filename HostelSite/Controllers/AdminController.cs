@@ -155,9 +155,12 @@ namespace HostelSite.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateOrderStatus(int orderId, string status)
         {
+            // Both Admins and Staff can now work the logistics pickup queue —
+            // this action never touches or reveals money, so either role may
+            // call it. Money stays gated on the Dashboard/UpdateOrderStatus's
+            // caller side (Staff's own view never receives amount fields).
             var result = await HttpContext.AuthenticateAsync("AdminCookie");
             if (!result.Succeeded) return RedirectToAction("Login");
-            if (!IsAdmin(result)) return Forbid("AdminCookie");
 
             var order = _db.LogisticsOrders.Find(orderId);
             if (order == null) return NotFound();
@@ -177,7 +180,7 @@ namespace HostelSite.Controllers
             await _db.SaveChangesAsync();
 
             TempData["Success"] = $"Order #{orderId} updated to {status}.";
-            return RedirectToAction("Dashboard");
+            return RedirectToRoleHome(result);
         }
 
         // ── POST /Admin/UpdateRequestStatus ──

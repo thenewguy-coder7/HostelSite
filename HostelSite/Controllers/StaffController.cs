@@ -45,6 +45,24 @@ namespace HostelSite.Controllers
                 .OrderByDescending(r => r.DeletedAt)
                 .ToList();
 
+            // Active logistics orders — same hall-grouped pickup queue as the
+            // Admin dashboard, minus every money field (see Dashboard.cshtml,
+            // which never projects an amount into the data sent to the page).
+            ViewBag.Orders = _db.LogisticsOrders
+                .Where(o => !o.IsDeleted)
+                .Include(o => o.Student)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Item)
+                .OrderByDescending(o => o.OrderedAt)
+                .ToList();
+
+            ViewBag.RecentlyCompletedOrders = _db.LogisticsOrders
+                .Where(o => o.IsDeleted && o.DeletedAt.HasValue
+                         && o.DeletedAt.Value > DateTime.UtcNow.AddDays(-15))
+                .Include(o => o.Student)
+                .OrderByDescending(o => o.DeletedAt)
+                .ToList();
+
             return View();
         }
     }

@@ -23,6 +23,38 @@
     }).ToList();
 
     var completedRequests = ((IEnumerable<dynamic>)ViewBag.RecentlyCompleted).ToList();
+
+    // ── Logistics pickup queue — same hall-grouped view as Admin, minus every
+    // money field. No "total"/amount property is even projected below, so a
+    // dollar figure never reaches this page's HTML or JSON at all. The
+    // "Payment" row in the detail modal only ever shows a Paid/— badge.
+    var pickupOrders = ((IEnumerable<dynamic>)ViewBag.Orders).ToList();
+    var pickupHallGroups = pickupOrders
+        .GroupBy(o => HostelNameNormalizer.Canonicalize((string)o.PreviousHostel))
+        .OrderByDescending(g => g.Count());
+    int pickupPendingCount = pickupOrders.Count(o => (string)o.OrderStatus == "Confirmed");
+    int pickupPickedCount = pickupOrders.Count(o => (string)o.OrderStatus == "Collected" || (string)o.OrderStatus == "Stored");
+
+    var pickupOrderData = pickupOrders.Select(o => new
+    {
+        orderId = (int)o.OrderId,
+        studentName = $"{o.Student?.FirstName} {o.Student?.LastName}".Trim(),
+        email = (string)(o.Student?.Email ?? ""),
+        phone = (string)(o.Phone ?? o.Student?.Phone ?? "—"),
+        room = (string)(o.RoomNumber ?? "—"),
+        hostel = HostelNameNormalizer.Canonicalize((string)(o.PreviousHostel ?? "")),
+        returnHostel = (string)(o.NewHostel ?? "—"),
+        pickupDate = o.PickupDate != null ? ((DateOnly)o.PickupDate).ToString("dd MMM yyyy") : "—",
+        pickupTime = o.PickupTime != null ? ((TimeOnly)o.PickupTime).ToString("h:mm tt") : "—",
+        status = (string)o.OrderStatus,
+        items = ((IEnumerable<dynamic>)o.OrderItems).Select(oi => new
+        {
+            name = (string)oi.Item.ItemName,
+            qty = (int)oi.Quantity
+        }).ToList()
+    }).ToList();
+
+    var completedOrders = ((IEnumerable<dynamic>)ViewBag.RecentlyCompletedOrders).ToList();
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -99,6 +131,18 @@
         .sf-alert.success { background: #E8F5EE; border-left: 3px solid #2D9B5A; color: #1A5C34; }
         .sf-alert.error   { background: #FDECEA; border-left: 3px solid #D94040; color: #7A1E1E; }
 
+        /* ── Tab switcher ── */
+        .sf-tabs { display: flex; gap: 8px; margin-bottom: 1.25rem; }
+        .sf-tab {
+            flex: 1;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            padding: 10px; border-radius: 10px; border: 1.5px solid var(--line);
+            background: var(--white); color: var(--ink2); font-family: var(--font-b);
+            font-size: 13px; font-weight: 600; cursor: pointer;
+        }
+        .sf-tab i { font-size: 16px; }
+        .sf-tab.active { background: var(--forest); border-color: var(--forest); color: #fff; }
+
         /* ── Stat chips ── */
         .sf-stats { display: flex; gap: 10px; margin-bottom: 1rem; }
         .sf-stat-chip {
@@ -113,6 +157,7 @@
         .sf-stat-chip .lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
         .sf-stat-chip.pending .num { color: #946800; }
         .sf-stat-chip.progress .num { color: var(--forest-mid); }
+        .sf-stat-chip.picked .num { color: #2B5CC8; }
 
         /* ── Search + filters ── */
         .sf-controls { margin-bottom: 1rem; }
@@ -144,7 +189,7 @@
         }
         .sft.active { background: var(--forest); border-color: var(--forest); color: #fff; }
 
-        /* ── Request cards ── */
+        /* ── Request / order cards ── */
         .sf-list { display: flex; flex-direction: column; gap: 10px; margin-top: 1rem; }
 
         .sf-card {
@@ -180,6 +225,7 @@
         .sf-badge.reviewing  { background: #EEF4FF; color: #2B5CC8; }
         .sf-badge.approved   { background: var(--sage-light); color: #1C5C40; }
         .sf-badge.inprogress { background: var(--amber-light); color: #7A4B10; }
+        .sf-badge.picked     { background: #EEF4FF; color: #2B5CC8; }
         .sf-badge.completed  { background: #E8F5EE; color: #1A5C34; }
 
         .sf-empty {
@@ -192,6 +238,23 @@
             text-transform: uppercase; letter-spacing: 0.6px;
             margin: 1.75rem 0 0.75rem;
         }
+
+        /* ── Hall-grouped logistics list ── */
+        .hall-groups { display: flex; flex-direction: column; gap: 12px; margin-top: 1rem; }
+        .hall-group { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--white); }
+        .hall-group-head {
+            width: 100%; display: flex; align-items: center; justify-content: space-between;
+            border: none; background: var(--sand); padding: 12px 14px; cursor: pointer;
+            font-family: var(--font-b); text-align: left;
+        }
+        .hall-group-title { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: var(--ink); }
+        .hall-group-title i { font-size: 17px; color: var(--forest-mid); }
+        .hall-group-meta { display: flex; align-items: center; gap: 10px; }
+        .hall-group-count { font-size: 11.5px; font-weight: 600; color: var(--muted); }
+        .hall-chevron { transition: transform 0.2s ease; font-size: 15px; color: var(--muted); }
+        .hall-group.expanded .hall-chevron { transform: rotate(180deg); }
+        .hall-group-body { display: none; padding: 8px; }
+        .hall-group.expanded .hall-group-body { display: flex; flex-direction: column; gap: 8px; }
 
         /* ── Detail modal ── */
         .sf-modal-overlay {
@@ -237,6 +300,9 @@
         .sm-row-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
         .sm-row-value { font-size: 14px; color: var(--ink); margin-top: 1px; word-break: break-word; }
 
+        .sm-items { list-style: none; display: flex; flex-direction: column; gap: 6px; margin: 6px 0 4px; }
+        .sm-items li { font-size: 13.5px; color: var(--ink); background: var(--sand); border-radius: 7px; padding: 8px 12px; }
+
         .sm-status-title { font-size: 13px; font-weight: 600; color: var(--ink); margin: 1.25rem 0 0.6rem; }
         .sm-status-form { display: flex; gap: 8px; }
         .sm-status-form select {
@@ -255,7 +321,7 @@
     <div class="sf-topbar">
         <div>
             <div class="sf-brand">PROSBEE<em>.</em></div>
-            <div class="sf-brand-sub">Staff panel · Aesthetics</div>
+            <div class="sf-brand-sub">Staff panel</div>
         </div>
         <div class="sf-user">
             <span>@ViewBag.StaffName</span>
@@ -277,90 +343,195 @@
             <div class="sf-alert error"><i class="ti ti-circle-x"></i> @TempData["AdminError"]</div>
         }
 
-        <div class="sf-stats">
-            <div class="sf-stat-chip pending">
-                <div class="num">@staffPendingCount</div>
-                <div class="lbl">Pending</div>
-            </div>
-            <div class="sf-stat-chip progress">
-                <div class="num">@staffInProgressCount</div>
-                <div class="lbl">In progress</div>
-            </div>
-            <div class="sf-stat-chip">
-                <div class="num">@staffRequests.Count</div>
-                <div class="lbl">Total active</div>
-            </div>
+        <div class="sf-tabs" id="sfTabs">
+            <button type="button" class="sf-tab active" data-tab="aesthetics"><i class="ti ti-palette"></i> Aesthetics</button>
+            <button type="button" class="sf-tab" data-tab="logistics"><i class="ti ti-package"></i> Logistics</button>
         </div>
 
-        <div class="sf-controls">
-            <input type="text" id="sfSearch" class="sf-search" placeholder="Search name, room, hostel…" />
-            <div class="sf-filter-tabs" id="sfFilterTabs">
-                <button type="button" class="sft active" data-filter="all">All</button>
-                <button type="button" class="sft" data-filter="Pending">Pending</button>
-                <button type="button" class="sft" data-filter="Reviewing">Reviewing</button>
-                <button type="button" class="sft" data-filter="Approved">Approved</button>
-                <button type="button" class="sft" data-filter="In Progress">In progress</button>
-            </div>
-        </div>
+        <!-- ══════════ AESTHETICS TAB ══════════ -->
+        <section id="tabAesthetics" class="sf-tab-panel">
 
-        <div class="sf-list" id="sfList">
-            @foreach (var r in staffRequestData)
-            {
-                var badgeClass = r.status switch
-                {
-                    "Pending" => "pending",
-                    "Reviewing" => "reviewing",
-                    "Approved" => "approved",
-                    "In Progress" => "inprogress",
-                    _ => "pending"
-                };
-                var searchBlob = $"{r.studentName} {r.room} {r.hostel} {r.style}".ToLower();
-                <div class="sf-card" data-status="@r.status" data-search="@searchBlob" data-request-id="@r.id">
-                    <div class="sf-card-icon"><i class="ti ti-palette"></i></div>
-                    <div class="sf-card-info">
-                        <div class="sf-card-name">@r.studentName</div>
-                        <div class="sf-card-meta">@r.hostel · Room @r.room · @r.style</div>
-                    </div>
-                    <span class="sf-badge @badgeClass">@r.status</span>
+            <div class="sf-stats">
+                <div class="sf-stat-chip pending">
+                    <div class="num">@staffPendingCount</div>
+                    <div class="lbl">Pending</div>
                 </div>
-            }
-        </div>
-
-        <div id="sfEmpty" class="sf-empty" hidden>
-            <i class="ti ti-palette-off"></i>
-            No aesthetics bookings match this search.
-        </div>
-
-        @if (!staffRequestData.Any())
-        {
-            <div class="sf-empty">
-                <i class="ti ti-palette-off"></i>
-                No active aesthetics bookings right now.
+                <div class="sf-stat-chip progress">
+                    <div class="num">@staffInProgressCount</div>
+                    <div class="lbl">In progress</div>
+                </div>
+                <div class="sf-stat-chip">
+                    <div class="num">@staffRequests.Count</div>
+                    <div class="lbl">Total active</div>
+                </div>
             </div>
-        }
 
-        @if (completedRequests.Any())
-        {
-            <div class="sf-section-title">Recently completed</div>
-            <div class="sf-list">
-                @foreach (var r in completedRequests)
+            <div class="sf-controls">
+                <input type="text" id="sfSearch" class="sf-search" placeholder="Search name, room, hostel…" />
+                <div class="sf-filter-tabs" id="sfFilterTabs">
+                    <button type="button" class="sft active" data-filter="all">All</button>
+                    <button type="button" class="sft" data-filter="Pending">Pending</button>
+                    <button type="button" class="sft" data-filter="Reviewing">Reviewing</button>
+                    <button type="button" class="sft" data-filter="Approved">Approved</button>
+                    <button type="button" class="sft" data-filter="In Progress">In progress</button>
+                </div>
+            </div>
+
+            <div class="sf-list" id="sfList">
+                @foreach (var r in staffRequestData)
                 {
-                    <div class="sf-card" style="cursor:default;">
-                        <div class="sf-card-icon" style="background:#E8F5EE; color:#1A5C34;"><i class="ti ti-check"></i></div>
+                    var badgeClass = r.status switch
+                    {
+                        "Pending" => "pending",
+                        "Reviewing" => "reviewing",
+                        "Approved" => "approved",
+                        "In Progress" => "inprogress",
+                        _ => "pending"
+                    };
+                    var searchBlob = $"{r.studentName} {r.room} {r.hostel} {r.style}".ToLower();
+                    <div class="sf-card" data-status="@r.status" data-search="@searchBlob" data-request-id="@r.id">
+                        <div class="sf-card-icon"><i class="ti ti-palette"></i></div>
                         <div class="sf-card-info">
-                            <div class="sf-card-name">@r.Student?.FirstName @r.Student?.LastName</div>
-                            <div class="sf-card-meta">@(NoteParser.Get(r.Notes, "Hostel") ?? "—") · Room @(NoteParser.Get(r.Notes, "Room") ?? "—")</div>
+                            <div class="sf-card-name">@r.studentName</div>
+                            <div class="sf-card-meta">@r.hostel · Room @r.room · @r.style</div>
                         </div>
-                        <span class="sf-badge completed">Done</span>
+                        <span class="sf-badge @badgeClass">@r.status</span>
                     </div>
                 }
             </div>
-        }
 
-        <script id="staffRequestsData" type="application/json">@Html.Raw(System.Text.Json.JsonSerializer.Serialize(staffRequestData))</script>
+            <div id="sfEmpty" class="sf-empty" hidden>
+                <i class="ti ti-palette-off"></i>
+                No aesthetics bookings match this search.
+            </div>
+
+            @if (!staffRequestData.Any())
+            {
+                <div class="sf-empty">
+                    <i class="ti ti-palette-off"></i>
+                    No active aesthetics bookings right now.
+                </div>
+            }
+
+            @if (completedRequests.Any())
+            {
+                <div class="sf-section-title">Recently completed</div>
+                <div class="sf-list">
+                    @foreach (var r in completedRequests)
+                    {
+                        <div class="sf-card" style="cursor:default;">
+                            <div class="sf-card-icon" style="background:#E8F5EE; color:#1A5C34;"><i class="ti ti-check"></i></div>
+                            <div class="sf-card-info">
+                                <div class="sf-card-name">@r.Student?.FirstName @r.Student?.LastName</div>
+                                <div class="sf-card-meta">@(NoteParser.Get(r.Notes, "Hostel") ?? "—") · Room @(NoteParser.Get(r.Notes, "Room") ?? "—")</div>
+                            </div>
+                            <span class="sf-badge completed">Done</span>
+                        </div>
+                    }
+                </div>
+            }
+
+            <script id="staffRequestsData" type="application/json">@Html.Raw(System.Text.Json.JsonSerializer.Serialize(staffRequestData))</script>
+        </section>
+
+        <!-- ══════════ LOGISTICS TAB ══════════ -->
+        <section id="tabLogistics" class="sf-tab-panel" hidden>
+
+            <div class="sf-stats">
+                <div class="sf-stat-chip pending">
+                    <div class="num">@pickupPendingCount</div>
+                    <div class="lbl">Pending</div>
+                </div>
+                <div class="sf-stat-chip picked">
+                    <div class="num">@pickupPickedCount</div>
+                    <div class="lbl">Picked up</div>
+                </div>
+                <div class="sf-stat-chip">
+                    <div class="num">@pickupOrders.Count</div>
+                    <div class="lbl">Total active</div>
+                </div>
+            </div>
+
+            <div class="sf-controls">
+                <input type="text" id="logSearch" class="sf-search" placeholder="Search name, room, order #…" />
+                <div class="sf-filter-tabs" id="logFilterTabs">
+                    <button type="button" class="sft active" data-filter="all">All</button>
+                    <button type="button" class="sft" data-filter="pending">Pending</button>
+                    <button type="button" class="sft" data-filter="picked">Picked up</button>
+                </div>
+            </div>
+
+            @if (pickupOrders.Any())
+            {
+                <div class="hall-groups" id="hallGroups">
+                    @foreach (var grp in pickupHallGroups)
+                    {
+                        <div class="hall-group">
+                            <button type="button" class="hall-group-head">
+                                <span class="hall-group-title"><i class="ti ti-building"></i><span>@grp.Key</span></span>
+                                <span class="hall-group-meta">
+                                    <span class="hall-group-count">@grp.Count() client@(grp.Count() != 1 ? "s" : "")</span>
+                                    <i class="ti ti-chevron-down hall-chevron"></i>
+                                </span>
+                            </button>
+                            <div class="hall-group-body">
+                                @foreach (var order in grp)
+                                {
+                                    var isPending = (string)order.OrderStatus == "Confirmed";
+                                    var pickedLabel = isPending ? "pending" : "picked";
+                                    var searchBlob = $"{order.Student?.FirstName} {order.Student?.LastName} {order.RoomNumber} {order.OrderId}".ToLower();
+                                    <div class="sf-card" data-status="@pickedLabel" data-search="@searchBlob" data-order-id="@order.OrderId">
+                                        <div class="sf-card-icon"><i class="ti ti-package"></i></div>
+                                        <div class="sf-card-info">
+                                            <div class="sf-card-name">@order.Student?.FirstName @order.Student?.LastName</div>
+                                            <div class="sf-card-meta">Room @(order.RoomNumber ?? "—") · PROSBEE-@order.OrderId</div>
+                                        </div>
+                                        <span class="sf-badge @pickedLabel">@(isPending ? "Pending" : (string)order.OrderStatus)</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div id="logEmpty" class="sf-empty" hidden>
+                    <i class="ti ti-search-off"></i>
+                    No bookings match this search.
+                </div>
+            }
+
+            @if (!pickupOrders.Any())
+            {
+                <div class="sf-empty">
+                    <i class="ti ti-package-off"></i>
+                    No active logistics orders right now.
+                </div>
+            }
+
+            @if (completedOrders.Any())
+            {
+                <div class="sf-section-title">Recently completed</div>
+                <div class="sf-list">
+                    @foreach (var o in completedOrders)
+                    {
+                        <div class="sf-card" style="cursor:default;">
+                            <div class="sf-card-icon" style="background:#E8F5EE; color:#1A5C34;"><i class="ti ti-check"></i></div>
+                            <div class="sf-card-info">
+                                <div class="sf-card-name">@o.Student?.FirstName @o.Student?.LastName</div>
+                                <div class="sf-card-meta">Room @(o.RoomNumber ?? "—")</div>
+                            </div>
+                            <span class="sf-badge completed">Done</span>
+                        </div>
+                    }
+                </div>
+            }
+
+            <script id="pickupOrdersData" type="application/json">@Html.Raw(System.Text.Json.JsonSerializer.Serialize(pickupOrderData))</script>
+        </section>
+
     </main>
 
-    <!-- DETAIL MODAL -->
+    <!-- DETAIL MODAL (shared by both tabs) -->
     <div class="sf-modal-overlay" id="sfModalOverlay">
         <div class="sf-modal">
             <button type="button" class="sf-modal-close" id="sfModalClose" aria-label="Close"><i class="ti ti-x"></i></button>
@@ -370,10 +541,44 @@
 
     <script>
         const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
-        const UPDATE_STATUS_URL = '@Url.Action("UpdateRequestStatus", "Admin")';
+        const overlay = document.getElementById('sfModalOverlay');
+        const modalBody = document.getElementById('sfModalBody');
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str ?? '';
+            return div.innerHTML;
+        }
+
+        document.getElementById('sfModalClose')?.addEventListener('click', () => overlay.classList.remove('open'));
+        overlay?.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); });
+
+        // ── Tab switching ──
+        (function () {
+            const tabButtons = document.querySelectorAll('.sf-tab');
+            const panels = {
+                aesthetics: document.getElementById('tabAesthetics'),
+                logistics: document.getElementById('tabLogistics')
+            };
+
+            function activateTab(tab) {
+                tabButtons.forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+                Object.entries(panels).forEach(([key, el]) => { if (el) el.hidden = key !== tab; });
+                try { localStorage.setItem('prosbeeStaffTab', tab); } catch (e) { /* ignore */ }
+            }
+
+            tabButtons.forEach(btn => btn.addEventListener('click', () => activateTab(btn.dataset.tab)));
+
+            let savedTab = 'aesthetics';
+            try { savedTab = localStorage.getItem('prosbeeStaffTab') || 'aesthetics'; } catch (e) { /* ignore */ }
+            if (!panels[savedTab]) savedTab = 'aesthetics';
+            activateTab(savedTab);
+        })();
+
+        // ── AESTHETICS: search + filter + modal ──
+        const UPDATE_REQUEST_STATUS_URL = '@Url.Action("UpdateRequestStatus", "Admin")';
         const requestsData = JSON.parse(document.getElementById('staffRequestsData')?.textContent || '[]');
 
-        // ── Search + filter ──
         const search = document.getElementById('sfSearch');
         const filterTabs = document.getElementById('sfFilterTabs');
         const list = document.getElementById('sfList');
@@ -381,16 +586,16 @@
         let activeFilter = 'all';
 
         function applyFilters() {
-            const q = (search.value || '').trim().toLowerCase();
+            const q = (search?.value || '').trim().toLowerCase();
             let anyVisible = false;
-            list.querySelectorAll('.sf-card[data-request-id]').forEach(card => {
+            list?.querySelectorAll('.sf-card[data-request-id]').forEach(card => {
                 const matchesFilter = activeFilter === 'all' || card.dataset.status === activeFilter;
                 const matchesSearch = !q || card.dataset.search.includes(q);
                 const show = matchesFilter && matchesSearch;
                 card.hidden = !show;
                 if (show) anyVisible = true;
             });
-            empty.hidden = anyVisible || list.querySelectorAll('.sf-card[data-request-id]').length === 0;
+            if (empty) empty.hidden = anyVisible || (list?.querySelectorAll('.sf-card[data-request-id]').length || 0) === 0;
         }
 
         search?.addEventListener('input', applyFilters);
@@ -402,10 +607,6 @@
             activeFilter = btn.dataset.filter;
             applyFilters();
         });
-
-        // ── Detail modal ──
-        const overlay = document.getElementById('sfModalOverlay');
-        const modalBody = document.getElementById('sfModalBody');
 
         function openRequestModal(id) {
             const r = requestsData.find(x => x.id === id);
@@ -423,7 +624,7 @@
                 ${r.notes ? `<div class="sm-row"><i class="ti ti-note"></i><div><div class="sm-row-label">Notes</div><div class="sm-row-value">${escapeHtml(r.notes)}</div></div></div>` : ''}
 
                 <div class="sm-status-title">Update status</div>
-                <form class="sm-status-form" method="post" action="${UPDATE_STATUS_URL}">
+                <form class="sm-status-form" method="post" action="${UPDATE_REQUEST_STATUS_URL}">
                     <input type="hidden" name="__RequestVerificationToken" value="${csrfToken}" />
                     <input type="hidden" name="requestId" value="${r.id}" />
                     <select name="status">
@@ -439,20 +640,114 @@
             overlay.classList.add('open');
         }
 
-        function escapeHtml(str) {
-            const div = document.createElement('div');
-            div.textContent = str ?? '';
-            return div.innerHTML;
-        }
-
         list?.addEventListener('click', (e) => {
             const card = e.target.closest('.sf-card[data-request-id]');
             if (!card) return;
             openRequestModal(parseInt(card.dataset.requestId, 10));
         });
 
-        document.getElementById('sfModalClose')?.addEventListener('click', () => overlay.classList.remove('open'));
-        overlay?.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); });
+        // ── LOGISTICS: search + filter + hall groups + modal ──
+        (function () {
+            const dataEl = document.getElementById('pickupOrdersData');
+            if (!dataEl) return; // no active orders — nothing to wire up
+
+            const PICKUP_ORDERS = {};
+            JSON.parse(dataEl.textContent || '[]').forEach(o => { PICKUP_ORDERS[o.orderId] = o; });
+
+            const UPDATE_ORDER_STATUS_URL = '@Url.Action("UpdateOrderStatus", "Admin")';
+
+            let logFilter = 'all';
+            const logSearchInput = document.getElementById('logSearch');
+            const logFilterTabs = document.getElementById('logFilterTabs');
+            const logEmpty = document.getElementById('logEmpty');
+
+            function applyLogFilters() {
+                const q = (logSearchInput?.value || '').trim().toLowerCase();
+                let anyVisibleTotal = false;
+                document.querySelectorAll('#hallGroups .hall-group').forEach(group => {
+                    let visibleInGroup = 0;
+                    group.querySelectorAll('.sf-card[data-order-id]').forEach(card => {
+                        const matchesFilter = logFilter === 'all' || card.dataset.status === logFilter;
+                        const matchesSearch = !q || card.dataset.search.includes(q);
+                        const show = matchesFilter && matchesSearch;
+                        card.hidden = !show;
+                        if (show) visibleInGroup++;
+                    });
+                    group.hidden = visibleInGroup === 0;
+                    if (visibleInGroup > 0) {
+                        anyVisibleTotal = true;
+                        if (q || logFilter !== 'all') group.classList.add('expanded');
+                    }
+                });
+                if (logEmpty) {
+                    const anyCards = document.querySelectorAll('#hallGroups .sf-card[data-order-id]').length > 0;
+                    logEmpty.hidden = anyVisibleTotal || !anyCards;
+                }
+            }
+
+            logSearchInput?.addEventListener('input', applyLogFilters);
+            logFilterTabs?.addEventListener('click', (e) => {
+                const btn = e.target.closest('.sft');
+                if (!btn) return;
+                logFilterTabs.querySelectorAll('.sft').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                logFilter = btn.dataset.filter;
+                applyLogFilters();
+            });
+
+            document.querySelectorAll('#hallGroups .hall-group-head').forEach(head => {
+                head.addEventListener('click', () => head.closest('.hall-group').classList.toggle('expanded'));
+            });
+
+            function statusLabel(status) {
+                if (status === 'Confirmed') return 'Pending';
+                if (status === 'Collected') return 'Collected';
+                if (status === 'Stored') return 'In storage';
+                return status;
+            }
+
+            function openOrderModal(orderId) {
+                const o = PICKUP_ORDERS[orderId];
+                if (!o) return;
+
+                const itemsHtml = o.items.length
+                    ? o.items.map(it => `<li>${escapeHtml(it.name)}${it.qty > 1 ? ' × ' + it.qty : ''}</li>`).join('')
+                    : '<li>No items on record</li>';
+
+                modalBody.innerHTML = `
+                    <h3>${escapeHtml(o.studentName)}</h3>
+                    <div class="sf-modal-sub">PROSBEE-${o.orderId} · currently ${escapeHtml(statusLabel(o.status))}</div>
+
+                    <div class="sm-row"><i class="ti ti-mail"></i><div><div class="sm-row-label">Email</div><div class="sm-row-value">${escapeHtml(o.email || '—')}</div></div></div>
+                    <div class="sm-row"><i class="ti ti-phone"></i><div><div class="sm-row-label">Phone</div><div class="sm-row-value">${escapeHtml(o.phone || '—')}</div></div></div>
+                    <div class="sm-row"><i class="ti ti-door"></i><div><div class="sm-row-label">Room &amp; hostel</div><div class="sm-row-value">Room ${escapeHtml(o.room || '—')} · ${escapeHtml(o.hostel || '—')}</div></div></div>
+                    <div class="sm-row"><i class="ti ti-arrow-right"></i><div><div class="sm-row-label">Return to</div><div class="sm-row-value">${escapeHtml(o.returnHostel || '—')}</div></div></div>
+                    <div class="sm-row"><i class="ti ti-calendar"></i><div><div class="sm-row-label">Pickup</div><div class="sm-row-value">${escapeHtml(o.pickupDate)} · ${escapeHtml(o.pickupTime)}</div></div></div>
+                    <div class="sm-row"><i class="ti ti-receipt"></i><div><div class="sm-row-label">Payment</div><div class="sm-row-value"><span class="sf-badge completed">Paid</span></div></div></div>
+
+                    <div class="sm-row-label" style="display:block; margin-top:10px;">Items to collect</div>
+                    <ul class="sm-items">${itemsHtml}</ul>
+
+                    <div class="sm-status-title">Update status</div>
+                    <form class="sm-status-form" method="post" action="${UPDATE_ORDER_STATUS_URL}">
+                        <input type="hidden" name="__RequestVerificationToken" value="${csrfToken}" />
+                        <input type="hidden" name="orderId" value="${o.orderId}" />
+                        <select name="status">
+                            <option value="Confirmed" ${o.status === 'Confirmed' ? 'selected' : ''}>Pending</option>
+                            <option value="Collected" ${o.status === 'Collected' ? 'selected' : ''}>Picked up</option>
+                            <option value="Stored" ${o.status === 'Stored' ? 'selected' : ''}>In storage</option>
+                            <option value="Completed">Completed ✓</option>
+                        </select>
+                        <button type="submit">Save</button>
+                    </form>
+                `;
+                overlay.classList.add('open');
+            }
+
+            document.querySelectorAll('#hallGroups .sf-card[data-order-id]').forEach(card => {
+                card.addEventListener('click', () => openOrderModal(parseInt(card.dataset.orderId, 10)));
+            });
+        })();
     </script>
 </body>
 </html>
