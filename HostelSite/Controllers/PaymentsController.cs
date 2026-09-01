@@ -65,96 +65,13 @@ namespace HostelSite.Controllers
                 if (status != "success")
                     return Json(new PaystackVerifyResponse { Success = false, Message = "Payment status: " + status });
 
-                // 2. Parse order data
-                if (string.IsNullOrEmpty(request.OrderData))
-                    return Json(new PaystackVerifyResponse { Success = false, Message = "No order data." });
+                // 2. Create the order — or, if the webhook already beat this
+                // callback to it, do nothing (see the shared helper's
+                // idempotency check).
+                var (success, message, orderId) = await CreateOrderFromChargeAsync(
+                    request.Reference, amountPesewas, request.OrderData, GetStudentId());
 
-                int studentId = GetStudentId();
-                if (studentId == 0)
-                    return Json(new PaystackVerifyResponse { Success = false, Message = "Not logged in." });
-
-                var orderItems = JsonSerializer.Deserialize<OrderDataPayload>(
-                    request.OrderData,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-                if (orderItems == null || orderItems.Items == null || !orderItems.Items.Any())
-                    return Json(new PaystackVerifyResponse { Success = false, Message = "Order items empty." });
-
-                // 3. Save to DB using execution strategy (required when EnableRetryOnFailure is set)
-                var strategy = _db.Database.CreateExecutionStrategy();
-
-                return await strategy.ExecuteAsync(async () =>
-                {
-                    using var tx = await _db.Database.BeginTransactionAsync();
-                    try
-                    {
-                        var deliveryNotes = $"Pickup: {orderItems.Pickup} | Return: {orderItems.ReturnDate}";
-
-                        var order = new LogisticsOrder
-                        {
-                            StudentId = studentId,
-                            TotalAmount = (decimal)amountPesewas / 100m,
-                            OrderStatus = "Confirmed",
-                            DeliveryNotes = deliveryNotes,
-                            PickupDate = !string.IsNullOrEmpty(orderItems.Pickup) ? DateOnly.FromDateTime(DateTime.Parse(orderItems.Pickup)) : null,
-                            PickupTime = !string.IsNullOrEmpty(orderItems.PickupTime) ? TimeOnly.Parse(orderItems.PickupTime) : null,
-                            PreviousHostel = orderItems.PreviousHostel,
-                            NewHostel = orderItems.NewHostel,
-                            RoomNumber = orderItems.RoomNumber,
-                            Phone = orderItems.Phone,
-                            ReturnDate = !string.IsNullOrEmpty(orderItems.ReturnDate) ? DateOnly.Parse(orderItems.ReturnDate, System.Globalization.CultureInfo.GetCultureInfo("en-GB")) : null,
-                            OrderedAt = DateTime.UtcNow,
-                            UpdatedAt = DateTime.UtcNow
-                        };
-
-                        _db.LogisticsOrders.Add(order);
-                        await _db.SaveChangesAsync();
-
-                        foreach (var line in orderItems.Items)
-                        {
-                            _db.OrderItems.Add(new OrderItem
-                            {
-                                OrderId = order.OrderId,
-                                ItemId = line.ItemId,
-                                Quantity = line.Quantity,
-                                UnitPrice = (decimal)line.Price
-                            });
-                        }
-
-                        _db.Payments.Add(new Payment
-                        {
-                            BookingId = null,
-                            PaystackReference = request.Reference,
-                            Amount = (decimal)amountPesewas / 100m,
-                            Currency = "GHS",
-                            PaymentStatus = "Paid",
-                            PaidAt = DateTime.UtcNow,
-                            CreatedAt = DateTime.UtcNow
-                        });
-
-                        await _db.SaveChangesAsync();
-                        await tx.CommitAsync();
-
-                        var student = await _db.Students.FindAsync(studentId);
-                        var studentName = student != null ? $"{student.FirstName} {student.LastName}" : "A student";
-                        var pickupText = order.PickupDate.HasValue ? order.PickupDate.Value.ToString("dd MMM yyyy") : "an unscheduled date";
-                        await _push.NotifyAllAdminsAsync(
-                            "New storage booking",
-                            $"{studentName} booked storage (Order #{order.OrderId}) — pickup {pickupText}.",
-                            "/Admin/Dashboard");
-
-                        return Json(new PaystackVerifyResponse { Success = true, OrderId = order.OrderId });
-                    }
-                    catch (Exception dbEx)
-                    {
-                        await tx.RollbackAsync();
-                        return Json(new PaystackVerifyResponse
-                        {
-                            Success = false,
-                            Message = "DB error: " + (dbEx.InnerException?.Message ?? dbEx.Message)
-                        });
-                    }
-                });
+                return Json(new PaystackVerifyResponse { Success = success, Message = message, OrderId = orderId });
             }
             catch (Exception ex)
             {
@@ -194,15 +111,157 @@ namespace HostelSite.Controllers
                 var existing = _db.Payments
                     .FirstOrDefault(p => p.PaystackReference == payload.Data.Reference);
 
-                if (existing != null && existing.PaymentStatus != "Paid")
+                if (existing != null)
                 {
-                    existing.PaymentStatus = "Paid";
-                    existing.PaidAt = DateTime.UtcNow;
-                    await _db.SaveChangesAsync();
+                    if (existing.PaymentStatus != "Paid")
+                    {
+                        existing.PaymentStatus = "Paid";
+                        existing.PaidAt = DateTime.UtcNow;
+                        await _db.SaveChangesAsync();
+                    }
+                }
+                else
+                {
+                    // Safety net: no order was ever created for this charge —
+                    // most likely the student's phone/browser lost the
+                    // connection or the app was closed right after paying,
+                    // before it could call /Payments/Verify itself. Paystack
+                    // still says the charge succeeded, so build the order
+                    // from here using the cart JSON we stashed in the
+                    // transaction's metadata at checkout, rather than leaving
+                    // the student charged with no booking to show for it.
+                    var email = payload.Data.Customer?.Email;
+                    var student = !string.IsNullOrEmpty(email)
+                        ? _db.Students.FirstOrDefault(s => s.Email == email)
+                        : null;
+
+                    if (student != null)
+                    {
+                        await CreateOrderFromChargeAsync(
+                            payload.Data.Reference,
+                            payload.Data.Amount,
+                            payload.Data.Metadata?.OrderData,
+                            student.StudentId);
+                    }
+                    // If we can't match a student by email, there's nothing
+                    // safe to auto-create — it needs a manual look-up against
+                    // the Paystack dashboard by reference.
                 }
             }
 
             return Ok();
+        }
+
+        // Creates the LogisticsOrder + OrderItems + Payment for a successful
+        // Paystack charge. Both /Payments/Verify (the normal path, right
+        // after the student pays) and /Payments/Webhook (the fallback, in
+        // case that browser callback never arrives) call this, so it's
+        // idempotent on PaystackReference — whichever of the two gets here
+        // first wins, and the other becomes a harmless no-op.
+        private async Task<(bool Success, string? Message, int? OrderId)> CreateOrderFromChargeAsync(
+            string reference, long amountPesewas, string? orderDataJson, int studentId)
+        {
+            if (_db.Payments.Any(p => p.PaystackReference == reference))
+                return (true, "Order already recorded for this payment.", null);
+
+            if (studentId == 0)
+                return (false, "Not logged in.", null);
+
+            if (string.IsNullOrEmpty(orderDataJson))
+                return (false, "No order data.", null);
+
+            OrderDataPayload? orderItems;
+            try
+            {
+                orderItems = JsonSerializer.Deserialize<OrderDataPayload>(
+                    orderDataJson,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+            catch (Exception ex)
+            {
+                return (false, "Could not parse order data: " + ex.Message, null);
+            }
+
+            if (orderItems == null || orderItems.Items == null || !orderItems.Items.Any())
+                return (false, "Order items empty.", null);
+
+            // Save to DB using execution strategy (required when EnableRetryOnFailure is set)
+            var strategy = _db.Database.CreateExecutionStrategy();
+
+            return await strategy.ExecuteAsync(async () =>
+            {
+                using var tx = await _db.Database.BeginTransactionAsync();
+                try
+                {
+                    // Re-check inside the transaction — Verify() and the
+                    // webhook can arrive within milliseconds of each other,
+                    // and the outer check above doesn't close that race.
+                    if (_db.Payments.Any(p => p.PaystackReference == reference))
+                        return (true, "Order already recorded for this payment.", (int?)null);
+
+                    var deliveryNotes = $"Pickup: {orderItems.Pickup} | Return: {orderItems.ReturnDate}";
+
+                    var order = new LogisticsOrder
+                    {
+                        StudentId = studentId,
+                        TotalAmount = (decimal)amountPesewas / 100m,
+                        OrderStatus = "Confirmed",
+                        DeliveryNotes = deliveryNotes,
+                        PickupDate = !string.IsNullOrEmpty(orderItems.Pickup) ? DateOnly.FromDateTime(DateTime.Parse(orderItems.Pickup)) : null,
+                        PickupTime = !string.IsNullOrEmpty(orderItems.PickupTime) ? TimeOnly.Parse(orderItems.PickupTime) : null,
+                        PreviousHostel = orderItems.PreviousHostel,
+                        NewHostel = orderItems.NewHostel,
+                        RoomNumber = orderItems.RoomNumber,
+                        Phone = orderItems.Phone,
+                        ReturnDate = !string.IsNullOrEmpty(orderItems.ReturnDate) ? DateOnly.Parse(orderItems.ReturnDate, System.Globalization.CultureInfo.GetCultureInfo("en-GB")) : null,
+                        OrderedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+
+                    _db.LogisticsOrders.Add(order);
+                    await _db.SaveChangesAsync();
+
+                    foreach (var line in orderItems.Items)
+                    {
+                        _db.OrderItems.Add(new OrderItem
+                        {
+                            OrderId = order.OrderId,
+                            ItemId = line.ItemId,
+                            Quantity = line.Quantity,
+                            UnitPrice = (decimal)line.Price
+                        });
+                    }
+
+                    _db.Payments.Add(new Payment
+                    {
+                        BookingId = null,
+                        PaystackReference = reference,
+                        Amount = (decimal)amountPesewas / 100m,
+                        Currency = "GHS",
+                        PaymentStatus = "Paid",
+                        PaidAt = DateTime.UtcNow,
+                        CreatedAt = DateTime.UtcNow
+                    });
+
+                    await _db.SaveChangesAsync();
+                    await tx.CommitAsync();
+
+                    var student = await _db.Students.FindAsync(studentId);
+                    var studentName = student != null ? $"{student.FirstName} {student.LastName}" : "A student";
+                    var pickupText = order.PickupDate.HasValue ? order.PickupDate.Value.ToString("dd MMM yyyy") : "an unscheduled date";
+                    await _push.NotifyAllAdminsAsync(
+                        "New storage booking",
+                        $"{studentName} booked storage (Order #{order.OrderId}) — pickup {pickupText}.",
+                        "/Admin/Dashboard");
+
+                    return (true, (string?)null, (int?)order.OrderId);
+                }
+                catch (Exception dbEx)
+                {
+                    await tx.RollbackAsync();
+                    return (false, "DB error: " + (dbEx.InnerException?.Message ?? dbEx.Message), (int?)null);
+                }
+            });
         }
 
         // ── Helpers ──

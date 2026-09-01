@@ -29,10 +29,20 @@ namespace HostelSite.ViewModels
         public long Amount { get; set; }          // in pesewas
         public string Currency { get; set; } = string.Empty;
         public PaystackWebhookCustomer? Customer { get; set; }
+        public PaystackWebhookMetadata? Metadata { get; set; }
     }
 
     public class PaystackWebhookCustomer
     {
         public string Email { get; set; } = string.Empty;
+    }
+
+    // Echoes back whatever we sent Paystack as `metadata` at checkout time.
+    // OrderData is the full cart JSON (items, pickup, hostel, room, phone…) —
+    // stashed here so the webhook can build the order from scratch if the
+    // student's own browser never made it back to call /Payments/Verify.
+    public class PaystackWebhookMetadata
+    {
+        public string? OrderData { get; set; }
     }
 }

@@ -733,6 +733,11 @@
                 currency: 'GHS',
                 ref:      'PROSBEE-' + Date.now(),
                 metadata: {
+                    // Full cart JSON, so the server-side webhook can create
+                    // this order on its own if this browser tab never makes
+                    // it back to call /Payments/Verify (closed app, dropped
+                    // connection, etc. right after a mobile money charge).
+                    orderData: JSON.stringify(orderData),
                     custom_fields: [
                         { display_name: 'Order type',      variable_name: 'order_type',      value: 'Logistics storage' },
                         { display_name: 'Pickup date',      variable_name: 'pickup_date',      value: orderData.pickup },
