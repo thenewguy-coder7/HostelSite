@@ -56,6 +56,10 @@ public partial class HostelDbContext : DbContext
             entity.Property(e => e.PasswordHash)
                 .HasMaxLength(255)
                 .HasColumnName("password_hash");
+            entity.Property(e => e.Role)
+                .HasMaxLength(20)
+                .HasDefaultValue("Admin")
+                .HasColumnName("role");
         });
 
         modelBuilder.Entity<AdminPushSubscription>(entity =>
