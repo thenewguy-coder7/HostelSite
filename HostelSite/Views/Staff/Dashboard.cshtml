@@ -1,0 +1,458 @@
+@using HostelSite.Services
+@{
+    ViewData["Title"] = "Staff Dashboard";
+    Layout = null;
+
+    var staffRequests = ((IEnumerable<dynamic>)ViewBag.Requests).ToList();
+    int staffPendingCount = staffRequests.Count(r => (string)r.Status == "Pending");
+    int staffInProgressCount = staffRequests.Count(r => (string)r.Status == "Reviewing" || (string)r.Status == "Approved" || (string)r.Status == "In Progress");
+
+    var staffRequestData = staffRequests.Select(r => new
+    {
+        id = (int)r.RequestId,
+        studentName = $"{r.Student?.FirstName} {r.Student?.LastName}".Trim(),
+        email = (string)(r.Student?.Email ?? ""),
+        phone = (string)(NoteParser.Get(r.Notes, "Phone") ?? r.Student?.Phone ?? "—"),
+        hostel = (string)(NoteParser.Get(r.Notes, "Hostel") ?? "—"),
+        room = (string)(NoteParser.Get(r.Notes, "Room") ?? "—"),
+        style = (string)(NoteParser.Get(r.Notes, "Style") ?? "—"),
+        preferredDate = (string)(NoteParser.Get(r.Notes, "Date") ?? "—"),
+        notes = (string)(NoteParser.Get(r.Notes, "Notes") ?? ""),
+        status = (string)r.Status,
+        submittedAt = ((DateTime)r.RequestedAt).ToString("dd MMM yyyy")
+    }).ToList();
+
+    var completedRequests = ((IEnumerable<dynamic>)ViewBag.RecentlyCompleted).ToList();
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Staff Dashboard — PROSBEE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/@@tabler/icons-webfont@@latest/tabler-icons.min.css" rel="stylesheet" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --forest: #1C3B2E;
+            --forest-mid: #2E6B52;
+            --sage: #4A9572;
+            --sage-light: #EAF3EE;
+            --amber: #C9863A;
+            --amber-light: #FDF3E7;
+            --ink: #111318;
+            --ink2: #3D3F47;
+            --muted: #7C808C;
+            --line: #E3E5EA;
+            --sand: #F8F7F4;
+            --white: #FFFFFF;
+            --font-d: 'Montserrat', Georgia, serif;
+            --font-b: 'Outfit', system-ui, sans-serif;
+        }
+
+        body { font-family: var(--font-b); background: var(--sand); color: var(--ink); }
+
+        /* ── Top bar ── */
+        .sf-topbar {
+            background: var(--forest);
+            padding: 1.1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        .sf-brand { font-family: var(--font-d); font-size: 19px; color: #fff; }
+        .sf-brand em { font-style: normal; color: #7FBD9E; }
+        .sf-brand-sub { font-size: 10px; color: #9CBDAD; text-transform: uppercase; letter-spacing: 1px; margin-top: 1px; }
+
+        .sf-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sf-user span { font-size: 12px; color: #CFE3D8; }
+
+        .sf-logout-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .sf-logout-btn:hover { background: rgba(255,255,255,0.18); }
+
+        .sf-main { padding: 1.25rem; max-width: 720px; margin: 0 auto; }
+
+        .sf-alert { padding: 0.75rem 1rem; border-radius: 8px; font-size: 14px; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
+        .sf-alert.success { background: #E8F5EE; border-left: 3px solid #2D9B5A; color: #1A5C34; }
+        .sf-alert.error   { background: #FDECEA; border-left: 3px solid #D94040; color: #7A1E1E; }
+
+        /* ── Stat chips ── */
+        .sf-stats { display: flex; gap: 10px; margin-bottom: 1rem; }
+        .sf-stat-chip {
+            flex: 1;
+            background: var(--white);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 0.85rem 1rem;
+            text-align: center;
+        }
+        .sf-stat-chip .num { font-family: var(--font-d); font-size: 22px; font-weight: 700; color: var(--ink); }
+        .sf-stat-chip .lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+        .sf-stat-chip.pending .num { color: #946800; }
+        .sf-stat-chip.progress .num { color: var(--forest-mid); }
+
+        /* ── Search + filters ── */
+        .sf-controls { margin-bottom: 1rem; }
+        .sf-search {
+            width: 100%;
+            padding: 11px 14px 11px 38px;
+            border: 1.5px solid var(--line);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: var(--font-b);
+            background: var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%237C808C' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0'/%3E%3C/svg%3E") no-repeat 12px center;
+            outline: none;
+            margin-bottom: 10px;
+        }
+        .sf-search:focus { border-color: var(--sage); }
+
+        .sf-filter-tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+        .sft {
+            flex-shrink: 0;
+            padding: 7px 14px;
+            border-radius: 99px;
+            border: 1.5px solid var(--line);
+            background: var(--white);
+            color: var(--ink2);
+            font-size: 12.5px;
+            font-weight: 600;
+            font-family: var(--font-b);
+            cursor: pointer;
+        }
+        .sft.active { background: var(--forest); border-color: var(--forest); color: #fff; }
+
+        /* ── Request cards ── */
+        .sf-list { display: flex; flex-direction: column; gap: 10px; margin-top: 1rem; }
+
+        .sf-card {
+            background: var(--white);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: border-color 0.15s;
+        }
+        .sf-card:hover { border-color: var(--sage); }
+
+        .sf-card-icon {
+            width: 40px; height: 40px; border-radius: 10px;
+            background: var(--sage-light); color: var(--forest-mid);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; flex-shrink: 0;
+        }
+
+        .sf-card-info { flex: 1; min-width: 0; }
+        .sf-card-name { font-weight: 600; color: var(--ink); font-size: 14px; }
+        .sf-card-meta { font-size: 12px; color: var(--muted); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .sf-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 99px;
+            flex-shrink: 0;
+        }
+        .sf-badge.pending    { background: #FFF8E6; color: #946800; }
+        .sf-badge.reviewing  { background: #EEF4FF; color: #2B5CC8; }
+        .sf-badge.approved   { background: var(--sage-light); color: #1C5C40; }
+        .sf-badge.inprogress { background: var(--amber-light); color: #7A4B10; }
+        .sf-badge.completed  { background: #E8F5EE; color: #1A5C34; }
+
+        .sf-empty {
+            text-align: center; padding: 3rem 1rem; color: var(--muted); font-size: 14px;
+        }
+        .sf-empty i { font-size: 32px; display: block; margin-bottom: 10px; color: var(--line); }
+
+        .sf-section-title {
+            font-size: 13px; font-weight: 600; color: var(--muted);
+            text-transform: uppercase; letter-spacing: 0.6px;
+            margin: 1.75rem 0 0.75rem;
+        }
+
+        /* ── Detail modal ── */
+        .sf-modal-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(17,19,24,0.55);
+            z-index: 50;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        .sf-modal-overlay.open { display: flex; }
+
+        .sf-modal {
+            background: var(--white);
+            width: 100%;
+            max-width: 480px;
+            max-height: 88vh;
+            overflow-y: auto;
+            border-radius: 18px 18px 0 0;
+            padding: 1.5rem 1.25rem 2rem;
+            position: relative;
+            animation: sf-slide-up 0.2s ease-out;
+        }
+        @@media (min-width: 560px) {
+            .sf-modal-overlay { align-items: center; }
+            .sf-modal { border-radius: 18px; }
+        }
+        @@keyframes sf-slide-up { from { transform: translateY(24px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .sf-modal-close {
+            position: absolute; top: 1rem; right: 1rem;
+            width: 32px; height: 32px; border-radius: 9px;
+            background: var(--sand); border: none; color: var(--ink2);
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+        }
+
+        .sf-modal h3 { font-family: var(--font-d); font-size: 19px; margin-bottom: 4px; padding-right: 2.5rem; }
+        .sf-modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 1.25rem; }
+
+        .sm-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+        .sm-row:last-of-type { border-bottom: none; }
+        .sm-row i { font-size: 16px; color: var(--sage); margin-top: 2px; }
+        .sm-row-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .sm-row-value { font-size: 14px; color: var(--ink); margin-top: 1px; word-break: break-word; }
+
+        .sm-status-title { font-size: 13px; font-weight: 600; color: var(--ink); margin: 1.25rem 0 0.6rem; }
+        .sm-status-form { display: flex; gap: 8px; }
+        .sm-status-form select {
+            flex: 1; padding: 11px 12px; border: 1.5px solid var(--line); border-radius: 9px;
+            font-size: 14px; font-family: var(--font-b); background: var(--sand); color: var(--ink);
+        }
+        .sm-status-form button {
+            background: var(--forest); color: #fff; border: none; padding: 0 18px;
+            border-radius: 9px; font-size: 14px; font-weight: 600; font-family: var(--font-b); cursor: pointer;
+        }
+        .sm-status-form button:hover { background: var(--forest-mid); }
+    </style>
+</head>
+<body>
+
+    <div class="sf-topbar">
+        <div>
+            <div class="sf-brand">PROSBEE<em>.</em></div>
+            <div class="sf-brand-sub">Staff panel · Aesthetics</div>
+        </div>
+        <div class="sf-user">
+            <span>@ViewBag.StaffName</span>
+            <form asp-controller="Admin" asp-action="Logout" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="sf-logout-btn" title="Log out"><i class="ti ti-logout"></i></button>
+            </form>
+        </div>
+    </div>
+
+    <main class="sf-main">
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="sf-alert success"><i class="ti ti-circle-check"></i> @TempData["Success"]</div>
+        }
+        @if (TempData["AdminError"] != null)
+        {
+            <div class="sf-alert error"><i class="ti ti-circle-x"></i> @TempData["AdminError"]</div>
+        }
+
+        <div class="sf-stats">
+            <div class="sf-stat-chip pending">
+                <div class="num">@staffPendingCount</div>
+                <div class="lbl">Pending</div>
+            </div>
+            <div class="sf-stat-chip progress">
+                <div class="num">@staffInProgressCount</div>
+                <div class="lbl">In progress</div>
+            </div>
+            <div class="sf-stat-chip">
+                <div class="num">@staffRequests.Count</div>
+                <div class="lbl">Total active</div>
+            </div>
+        </div>
+
+        <div class="sf-controls">
+            <input type="text" id="sfSearch" class="sf-search" placeholder="Search name, room, hostel…" />
+            <div class="sf-filter-tabs" id="sfFilterTabs">
+                <button type="button" class="sft active" data-filter="all">All</button>
+                <button type="button" class="sft" data-filter="Pending">Pending</button>
+                <button type="button" class="sft" data-filter="Reviewing">Reviewing</button>
+                <button type="button" class="sft" data-filter="Approved">Approved</button>
+                <button type="button" class="sft" data-filter="In Progress">In progress</button>
+            </div>
+        </div>
+
+        <div class="sf-list" id="sfList">
+            @foreach (var r in staffRequestData)
+            {
+                var badgeClass = r.status switch
+                {
+                    "Pending" => "pending",
+                    "Reviewing" => "reviewing",
+                    "Approved" => "approved",
+                    "In Progress" => "inprogress",
+                    _ => "pending"
+                };
+                var searchBlob = $"{r.studentName} {r.room} {r.hostel} {r.style}".ToLower();
+                <div class="sf-card" data-status="@r.status" data-search="@searchBlob" data-request-id="@r.id">
+                    <div class="sf-card-icon"><i class="ti ti-palette"></i></div>
+                    <div class="sf-card-info">
+                        <div class="sf-card-name">@r.studentName</div>
+                        <div class="sf-card-meta">@r.hostel · Room @r.room · @r.style</div>
+                    </div>
+                    <span class="sf-badge @badgeClass">@r.status</span>
+                </div>
+            }
+        </div>
+
+        <div id="sfEmpty" class="sf-empty" hidden>
+            <i class="ti ti-palette-off"></i>
+            No aesthetics bookings match this search.
+        </div>
+
+        @if (!staffRequestData.Any())
+        {
+            <div class="sf-empty">
+                <i class="ti ti-palette-off"></i>
+                No active aesthetics bookings right now.
+            </div>
+        }
+
+        @if (completedRequests.Any())
+        {
+            <div class="sf-section-title">Recently completed</div>
+            <div class="sf-list">
+                @foreach (var r in completedRequests)
+                {
+                    <div class="sf-card" style="cursor:default;">
+                        <div class="sf-card-icon" style="background:#E8F5EE; color:#1A5C34;"><i class="ti ti-check"></i></div>
+                        <div class="sf-card-info">
+                            <div class="sf-card-name">@r.Student?.FirstName @r.Student?.LastName</div>
+                            <div class="sf-card-meta">@(NoteParser.Get(r.Notes, "Hostel") ?? "—") · Room @(NoteParser.Get(r.Notes, "Room") ?? "—")</div>
+                        </div>
+                        <span class="sf-badge completed">Done</span>
+                    </div>
+                }
+            </div>
+        }
+
+        <script id="staffRequestsData" type="application/json">@Html.Raw(System.Text.Json.JsonSerializer.Serialize(staffRequestData))</script>
+    </main>
+
+    <!-- DETAIL MODAL -->
+    <div class="sf-modal-overlay" id="sfModalOverlay">
+        <div class="sf-modal">
+            <button type="button" class="sf-modal-close" id="sfModalClose" aria-label="Close"><i class="ti ti-x"></i></button>
+            <div id="sfModalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+        const UPDATE_STATUS_URL = '@Url.Action("UpdateRequestStatus", "Admin")';
+        const requestsData = JSON.parse(document.getElementById('staffRequestsData')?.textContent || '[]');
+
+        // ── Search + filter ──
+        const search = document.getElementById('sfSearch');
+        const filterTabs = document.getElementById('sfFilterTabs');
+        const list = document.getElementById('sfList');
+        const empty = document.getElementById('sfEmpty');
+        let activeFilter = 'all';
+
+        function applyFilters() {
+            const q = (search.value || '').trim().toLowerCase();
+            let anyVisible = false;
+            list.querySelectorAll('.sf-card[data-request-id]').forEach(card => {
+                const matchesFilter = activeFilter === 'all' || card.dataset.status === activeFilter;
+                const matchesSearch = !q || card.dataset.search.includes(q);
+                const show = matchesFilter && matchesSearch;
+                card.hidden = !show;
+                if (show) anyVisible = true;
+            });
+            empty.hidden = anyVisible || list.querySelectorAll('.sf-card[data-request-id]').length === 0;
+        }
+
+        search?.addEventListener('input', applyFilters);
+        filterTabs?.addEventListener('click', (e) => {
+            const btn = e.target.closest('.sft');
+            if (!btn) return;
+            filterTabs.querySelectorAll('.sft').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeFilter = btn.dataset.filter;
+            applyFilters();
+        });
+
+        // ── Detail modal ──
+        const overlay = document.getElementById('sfModalOverlay');
+        const modalBody = document.getElementById('sfModalBody');
+
+        function openRequestModal(id) {
+            const r = requestsData.find(x => x.id === id);
+            if (!r) return;
+
+            modalBody.innerHTML = `
+                <h3>${escapeHtml(r.studentName)}</h3>
+                <div class="sf-modal-sub">Submitted ${escapeHtml(r.submittedAt)}</div>
+
+                <div class="sm-row"><i class="ti ti-mail"></i><div><div class="sm-row-label">Email</div><div class="sm-row-value">${escapeHtml(r.email || '—')}</div></div></div>
+                <div class="sm-row"><i class="ti ti-phone"></i><div><div class="sm-row-label">Phone</div><div class="sm-row-value">${escapeHtml(r.phone || '—')}</div></div></div>
+                <div class="sm-row"><i class="ti ti-building"></i><div><div class="sm-row-label">Hostel &amp; room</div><div class="sm-row-value">${escapeHtml(r.hostel || '—')} · Room ${escapeHtml(r.room || '—')}</div></div></div>
+                <div class="sm-row"><i class="ti ti-palette"></i><div><div class="sm-row-label">Style requested</div><div class="sm-row-value">${escapeHtml(r.style || '—')}</div></div></div>
+                <div class="sm-row"><i class="ti ti-calendar"></i><div><div class="sm-row-label">Preferred date</div><div class="sm-row-value">${escapeHtml(r.preferredDate || '—')}</div></div></div>
+                ${r.notes ? `<div class="sm-row"><i class="ti ti-note"></i><div><div class="sm-row-label">Notes</div><div class="sm-row-value">${escapeHtml(r.notes)}</div></div></div>` : ''}
+
+                <div class="sm-status-title">Update status</div>
+                <form class="sm-status-form" method="post" action="${UPDATE_STATUS_URL}">
+                    <input type="hidden" name="__RequestVerificationToken" value="${csrfToken}" />
+                    <input type="hidden" name="requestId" value="${r.id}" />
+                    <select name="status">
+                        <option value="Pending" ${r.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                        <option value="Reviewing" ${r.status === 'Reviewing' ? 'selected' : ''}>Reviewing</option>
+                        <option value="Approved" ${r.status === 'Approved' ? 'selected' : ''}>Approved</option>
+                        <option value="In Progress" ${r.status === 'In Progress' ? 'selected' : ''}>In progress</option>
+                        <option value="Completed">Completed ✓</option>
+                    </select>
+                    <button type="submit">Save</button>
+                </form>
+            `;
+            overlay.classList.add('open');
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str ?? '';
+            return div.innerHTML;
+        }
+
+        list?.addEventListener('click', (e) => {
+            const card = e.target.closest('.sf-card[data-request-id]');
+            if (!card) return;
+            openRequestModal(parseInt(card.dataset.requestId, 10));
+        });
+
+        document.getElementById('sfModalClose')?.addEventListener('click', () => overlay.classList.remove('open'));
+        overlay?.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); });
+    </script>
+</body>
+</html>

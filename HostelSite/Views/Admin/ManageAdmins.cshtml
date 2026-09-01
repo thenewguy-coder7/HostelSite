@@ -7,7 +7,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Manage Admins — PROSBEE</title>
+    <title>Manage Accounts — PROSBEE</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/@@tabler/icons-webfont@@latest/tabler-icons.min.css" rel="stylesheet" />
     <style>
@@ -101,6 +101,18 @@
 
         .you-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; background: var(--sage-light); color: var(--forest-mid); padding: 2px 8px; border-radius: 99px; }
 
+        .role-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 99px; }
+        .role-badge.admin { background: var(--amber-light); color: #7A4B10; }
+        .role-badge.staff { background: #EEF4FF; color: #2B5CC8; }
+
+        .field select {
+            padding: 10px 14px; border: 1.5px solid var(--line); border-radius: 8px;
+            font-size: 14px; font-family: var(--font-b); color: var(--ink);
+            background: var(--sand); outline: none; transition: border-color 0.15s;
+        }
+        .field select:focus { border-color: var(--sage); background: var(--white); }
+        .field-hint-text { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
         .btn-remove {
             background: #FDECEA; color: #D94040; border: none;
             padding: 6px 12px; border-radius: 7px; font-size: 12px;
@@ -161,7 +173,7 @@
                 <i class="ti ti-layout-dashboard"></i> Dashboard
             </a>
             <a class="sidebar-link active" asp-controller="Admin" asp-action="ManageAdmins">
-                <i class="ti ti-users"></i> Manage admins
+                <i class="ti ti-users"></i> Manage accounts
             </a>
         </nav>
         <div class="sidebar-logout">
@@ -178,7 +190,7 @@
     <main class="admin-main">
 
         <div class="admin-topbar">
-            <h1>Manage admins</h1>
+            <h1>Manage admins &amp; staff</h1>
             <a asp-controller="Admin" asp-action="Dashboard" class="back-link">
                 <i class="ti ti-arrow-left"></i> Back to dashboard
             </a>
@@ -200,16 +212,17 @@
 
         <div class="page-grid">
 
-            <!-- ADMINS LIST -->
+            <!-- ADMINS & STAFF LIST -->
             <div class="admin-section">
                 <div class="section-head">
-                    <h2><i class="ti ti-shield-check"></i> Admin accounts</h2>
-                    <span class="section-count">@(((IEnumerable<dynamic>)ViewBag.Admins).Count()) admins</span>
+                    <h2><i class="ti ti-shield-check"></i> Admin &amp; staff accounts</h2>
+                    <span class="section-count">@(((IEnumerable<dynamic>)ViewBag.Admins).Count()) accounts</span>
                 </div>
                 <table class="admin-table">
                     <thead>
                         <tr>
-                            <th>Admin</th>
+                            <th>Account</th>
+                            <th>Role</th>
                             <th>Created</th>
                             <th>Action</th>
                         </tr>
@@ -220,6 +233,7 @@
                         }
                         @foreach (var admin in ViewBag.Admins)
                         {
+                            bool isStaff = admin.Role == "Staff";
                             <tr>
                                 <td>
                                     <div class="td-name">
@@ -231,12 +245,22 @@
                                     </div>
                                     <div class="td-email">@admin.Email</div>
                                 </td>
+                                <td>
+                                    @if (isStaff)
+                                    {
+                                        <span class="role-badge staff"><i class="ti ti-palette"></i> Staff</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="role-badge admin"><i class="ti ti-shield-check"></i> Admin</span>
+                                    }
+                                </td>
                                 <td>@admin.CreatedAt?.ToString("dd MMM yyyy")</td>
                                 <td>
                                     @if (admin.AdminId != currentId)
                                     {
                                         <form asp-controller="Admin" asp-action="RemoveAdmin" method="post"
-                                              onsubmit="return confirm('Remove admin account for @admin.FullName? This cannot be undone.')">
+                                              onsubmit="return confirm('Remove the account for @admin.FullName? This cannot be undone.')">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="adminId" value="@admin.AdminId" />
                                             <button type="submit" class="btn-remove">
@@ -255,10 +279,10 @@
                 </table>
             </div>
 
-            <!-- ADD ADMIN FORM -->
+            <!-- ADD ACCOUNT FORM -->
             <div class="add-form-card">
                 <div class="add-form-head">
-                    <h3>Add new admin</h3>
+                    <h3>Add new account</h3>
                     <p>They can log in immediately after creation</p>
                 </div>
                 <div class="add-form-body">
@@ -276,6 +300,15 @@
                         </div>
 
                         <div class="field">
+                            <label>Role</label>
+                            <select name="role" required>
+                                <option value="Staff">Staff — aesthetics bookings only, no money</option>
+                                <option value="Admin">Admin — full access, including money</option>
+                            </select>
+                            <span class="field-hint-text">Staff can view and update aesthetics bookings but never see revenue, logistics, or payments.</span>
+                        </div>
+
+                        <div class="field">
                             <label>Password</label>
                             <input type="password" name="password" placeholder="••••••••" required id="newPwd" />
                             <span class="pwd-hint">Minimum 8 characters</span>
@@ -287,7 +320,7 @@
                             <span style="font-size:12px; color:#D94040;" id="pwdErr"></span>
                         </div>
 
-                        <button type="submit" class="btn-add">Create admin account →</button>
+                        <button type="submit" class="btn-add">Create account →</button>
                     </form>
                 </div>
             </div>

@@ -15,5 +15,9 @@ public partial class Admin
 
     public DateTime? CreatedAt { get; set; }
 
+    // "Admin" = full access, including money/logistics.
+    // "Staff" = aesthetics bookings only, no financial data — see StaffController.
+    public string Role { get; set; } = "Admin";
+
     public virtual ICollection<AdminPushSubscription> PushSubscriptions { get; set; } = new List<AdminPushSubscription>();
 }

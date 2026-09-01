@@ -29,7 +29,7 @@ namespace HostelSite.Controllers
         {
             var result = await HttpContext.AuthenticateAsync("AdminCookie");
             if (result.Succeeded)
-                return RedirectToAction("Dashboard");
+                return RedirectToRoleHome(result);
             return View();
         }
 
@@ -53,12 +53,14 @@ namespace HostelSite.Controllers
                 return View();
             }
 
+            var role = string.IsNullOrWhiteSpace(admin.Role) ? "Admin" : admin.Role;
+
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, admin.AdminId.ToString()),
                 new Claim(ClaimTypes.Name,           admin.FullName),
                 new Claim(ClaimTypes.Email,          admin.Email),
-                new Claim(ClaimTypes.Role,           "Admin")
+                new Claim(ClaimTypes.Role,           role)
             };
 
             var identity = new ClaimsIdentity(claims, "AdminCookie");
@@ -71,7 +73,9 @@ namespace HostelSite.Controllers
                     ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
                 });
 
-            return RedirectToAction("Dashboard");
+            return role == "Staff"
+                ? RedirectToAction("Dashboard", "Staff")
+                : RedirectToAction("Dashboard");
         }
 
         // ── POST /Admin/Logout ──
@@ -90,6 +94,11 @@ namespace HostelSite.Controllers
             var result = await HttpContext.AuthenticateAsync("AdminCookie");
             if (!result.Succeeded)
                 return RedirectToAction("Login");
+
+            // This dashboard shows money (revenue, logistics orders/payments) —
+            // Staff accounts are limited to the aesthetics-only Staff dashboard.
+            if (!IsAdmin(result))
+                return RedirectToAction("Dashboard", "Staff");
 
             // Purge permanently — delete records soft-deleted more than 15 days ago
             PurgeOldRecords();
@@ -148,6 +157,7 @@ namespace HostelSite.Controllers
         {
             var result = await HttpContext.AuthenticateAsync("AdminCookie");
             if (!result.Succeeded) return RedirectToAction("Login");
+            if (!IsAdmin(result)) return Forbid("AdminCookie");
 
             var order = _db.LogisticsOrders.Find(orderId);
             if (order == null) return NotFound();
@@ -175,6 +185,8 @@ namespace HostelSite.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateRequestStatus(int requestId, string status)
         {
+            // Both Admins and Staff handle aesthetic bookings, so either role
+            // may update a request's status — this action carries no money.
             var result = await HttpContext.AuthenticateAsync("AdminCookie");
             if (!result.Succeeded) return RedirectToAction("Login");
 
@@ -196,7 +208,7 @@ namespace HostelSite.Controllers
             await _db.SaveChangesAsync();
 
             TempData["Success"] = $"Request #{requestId} updated to {status}.";
-            return RedirectToAction("Dashboard");
+            return RedirectToRoleHome(result);
         }
 
         // ── POST /Admin/SubscribePush ──
@@ -206,6 +218,7 @@ namespace HostelSite.Controllers
         {
             var result = await HttpContext.AuthenticateAsync("AdminCookie");
             if (!result.Succeeded) return Unauthorized();
+            if (!IsAdmin(result)) return Forbid("AdminCookie");
 
             if (sub == null || string.IsNullOrEmpty(sub.Endpoint) || sub.Keys == null)
                 return BadRequest();
@@ -236,6 +249,7 @@ namespace HostelSite.Controllers
         {
             var result = await HttpContext.AuthenticateAsync("AdminCookie");
             if (!result.Succeeded) return Unauthorized();
+            if (!IsAdmin(result)) return Forbid("AdminCookie");
 
             if (req == null || string.IsNullOrEmpty(req.Endpoint)) return BadRequest();
 
@@ -256,6 +270,7 @@ namespace HostelSite.Controllers
         {
             var result = await HttpContext.AuthenticateAsync("AdminCookie");
             if (!result.Succeeded) return Unauthorized();
+            if (!IsAdmin(result)) return Forbid("AdminCookie");
 
             await _push.NotifyAllAdminsAsync(
                 "Test notification",
@@ -265,6 +280,25 @@ namespace HostelSite.Controllers
         }
 
         // ── Helpers ──
+
+        // True only for the "Admin" role — the full-access role that can see
+        // money (revenue, logistics orders, payments) and manage accounts.
+        // "Staff" accounts are limited to the aesthetics-only Staff dashboard.
+        private static bool IsAdmin(AuthenticateResult result)
+        {
+            var role = result.Principal?.FindFirst(ClaimTypes.Role)?.Value;
+            // Treat a missing role claim as Admin (defensive default for any
+            // cookie issued before the Staff role existed).
+            return string.IsNullOrEmpty(role) || role == "Admin";
+        }
+
+        private IActionResult RedirectToRoleHome(AuthenticateResult result)
+        {
+            return IsAdmin(result)
+                ? RedirectToAction("Dashboard")
+                : RedirectToAction("Dashboard", "Staff");
+        }
+
         private void PurgeOldRecords()
         {
             var cutoff = DateTime.UtcNow.AddDays(-15);
@@ -310,18 +344,20 @@ namespace HostelSite.Controllers
         {
             var result = await HttpContext.AuthenticateAsync("AdminCookie");
             if (!result.Succeeded) return RedirectToAction("Login");
+            if (!IsAdmin(result)) return RedirectToAction("Dashboard", "Staff");
 
-            ViewBag.Admins = _db.Admins.OrderBy(a => a.FullName).ToList();
+            ViewBag.Admins = _db.Admins.OrderBy(a => a.Role).ThenBy(a => a.FullName).ToList();
             return View();
         }
 
         // ── POST /Admin/AddAdmin ──
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddAdmin(string fullName, string email, string password)
+        public async Task<IActionResult> AddAdmin(string fullName, string email, string password, string role = "Admin")
         {
             var result = await HttpContext.AuthenticateAsync("AdminCookie");
             if (!result.Succeeded) return RedirectToAction("Login");
+            if (!IsAdmin(result)) return RedirectToAction("Dashboard", "Staff");
 
             if (string.IsNullOrWhiteSpace(fullName) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
             {
@@ -331,7 +367,7 @@ namespace HostelSite.Controllers
 
             if (_db.Admins.Any(a => a.Email == email.Trim().ToLower()))
             {
-                TempData["AdminError"] = "An admin with this email already exists.";
+                TempData["AdminError"] = "An account with this email already exists.";
                 return RedirectToAction("ManageAdmins");
             }
 
@@ -341,18 +377,23 @@ namespace HostelSite.Controllers
                 return RedirectToAction("ManageAdmins");
             }
 
+            // Only "Admin" or "Staff" are valid roles — anything else falls back to Staff
+            // (the lower-privilege option) rather than silently granting full access.
+            var safeRole = role == "Admin" ? "Admin" : "Staff";
+
             var admin = new Admin
             {
                 FullName = fullName.Trim(),
                 Email = email.Trim().ToLower(),
                 PasswordHash = HashPassword(password),
+                Role = safeRole,
                 CreatedAt = DateTime.UtcNow
             };
 
             _db.Admins.Add(admin);
             await _db.SaveChangesAsync();
 
-            TempData["Success"] = $"Admin account created for {fullName}.";
+            TempData["Success"] = $"{safeRole} account created for {fullName}.";
             return RedirectToAction("ManageAdmins");
         }
 
@@ -363,6 +404,7 @@ namespace HostelSite.Controllers
         {
             var result = await HttpContext.AuthenticateAsync("AdminCookie");
             if (!result.Succeeded) return RedirectToAction("Login");
+            if (!IsAdmin(result)) return RedirectToAction("Dashboard", "Staff");
 
             // Prevent deleting yourself
             var currentAdminId = int.Parse(result.Principal!.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
@@ -372,20 +414,20 @@ namespace HostelSite.Controllers
                 return RedirectToAction("ManageAdmins");
             }
 
-            // Must always keep at least one admin
-            if (_db.Admins.Count() <= 1)
+            var admin = _db.Admins.Find(adminId);
+            if (admin == null)
+                return RedirectToAction("ManageAdmins");
+
+            // Must always keep at least one full Admin account (Staff accounts don't count).
+            if (admin.Role != "Staff" && _db.Admins.Count(a => a.Role != "Staff") <= 1)
             {
                 TempData["AdminError"] = "Cannot remove the last admin account.";
                 return RedirectToAction("ManageAdmins");
             }
 
-            var admin = _db.Admins.Find(adminId);
-            if (admin != null)
-            {
-                _db.Admins.Remove(admin);
-                await _db.SaveChangesAsync();
-                TempData["Success"] = $"Admin account for {admin.FullName} has been removed.";
-            }
+            _db.Admins.Remove(admin);
+            await _db.SaveChangesAsync();
+            TempData["Success"] = $"{(admin.Role == "Staff" ? "Staff" : "Admin")} account for {admin.FullName} has been removed.";
 
             return RedirectToAction("ManageAdmins");
         }
