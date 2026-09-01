@@ -235,6 +235,13 @@
             line-height: 1;
         }
 
+        .field-optional-tag {
+            text-transform: none;
+            font-weight: 500;
+            letter-spacing: normal;
+            opacity: 0.65;
+        }
+
         .field-hint {
             max-width: 240px;
             font-size: 11px;
@@ -815,12 +822,12 @@
                 </div>
                 <div class="pickup-field">
                     <label for="new-hostel">
-                        Return to hostel
+                        Return to hostel <span class="field-optional-tag">(optional)</span>
                         <button type="button" class="field-hint-toggle" id="newHostelHintToggle" aria-label="Help — what to enter if your place has no name" aria-expanded="false">
                             <i class="ti ti-info-circle" aria-hidden="true"></i>
                         </button>
                     </label>
-                    <input type="text" id="new-hostel" placeholder="e.g. Evandy hostel" />
+                    <input type="text" id="new-hostel" placeholder="e.g. Evandy hostel — leave blank if not yet known" />
                     <div class="field-hint" id="newHostelHint" hidden>
                         <strong>Moving to a homestel, or your place has no name?</strong>
                         State the nearest hostel and the distance it is from your place — e.g. "5 min walk from Evandy hostel".
@@ -958,7 +965,7 @@
             if (!pickup) { alert('Please select a pickup date.'); return; }
             if (!prevHostel) { alert('Please enter your current hostel.'); return; }
             if (!roomNumber) { alert('Please enter your room number at your current hostel.'); return; }
-            if (!newHostel) { alert('Please enter the hostel to return items to.'); return; }
+            // "Return to hostel" is optional — some students don't know it yet at booking time.
             if (!phone) { alert('Please enter a phone number so we can contact you.'); return; }
 
             const items = Object.keys(order).map(id => ({
