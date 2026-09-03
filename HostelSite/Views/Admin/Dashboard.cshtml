@@ -438,6 +438,23 @@
                 box-shadow: 0 1px 3px rgba(0,0,0,0.08);
             }
 
+        .pickup-sort {
+            font-family: var(--font-b);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink);
+            background: var(--white);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 0 10px;
+            outline: none;
+            cursor: pointer;
+        }
+
+            .pickup-sort:focus {
+                border-color: var(--sage);
+            }
+
         .hall-groups {
             display: flex;
             flex-direction: column;
@@ -569,6 +586,13 @@
         .pc-room {
             font-size: 12px;
             color: var(--muted);
+        }
+
+        .pc-pickup {
+            font-size: 11px;
+            color: var(--forest-mid);
+            font-weight: 600;
+            margin-top: 1px;
         }
 
         .pc-status-badge {
@@ -1076,6 +1100,12 @@
                             <button type="button" class="pft" data-filter="pending">Pending</button>
                             <button type="button" class="pft" data-filter="picked">Picked up</button>
                         </div>
+                        <select id="pickupSort" class="pickup-sort" aria-label="Sort bookings by date">
+                            <option value="ordered-desc">Newest booked first</option>
+                            <option value="ordered-asc">Oldest booked first</option>
+                            <option value="pickup-asc">Pickup date — soonest first</option>
+                            <option value="pickup-desc">Pickup date — latest first</option>
+                        </select>
                     </div>
 
                     <div class="hall-groups" id="hallGroups">
@@ -1098,7 +1128,10 @@
                                         var isPending = (string)order.OrderStatus == "Confirmed";
                                         var pickedLabel = isPending ? "pending" : "picked";
                                         var searchBlob = $"{order.Student?.FirstName} {order.Student?.LastName} {order.RoomNumber} {order.OrderId}".ToLower();
-                                        <div class="pickup-card" data-status="@pickedLabel" data-search="@searchBlob" data-order-id="@order.OrderId">
+                                        var pickupIso = order.PickupDate != null ? ((DateOnly)order.PickupDate).ToString("yyyy-MM-dd") : "";
+                                        var pickupDisplay = order.PickupDate != null ? ((DateOnly)order.PickupDate).ToString("dd MMM") : "No date set";
+                                        var orderedAtIso = ((DateTime)order.OrderedAt).ToString("o");
+                                        <div class="pickup-card" data-status="@pickedLabel" data-search="@searchBlob" data-order-id="@order.OrderId" data-pickup-date="@pickupIso" data-ordered-at="@orderedAtIso">
                                             <div class="pc-check">
                                                 <i class="ti @(isPending ? "ti-circle" : "ti-circle-check-filled")"></i>
                                             </div>
@@ -1106,6 +1139,7 @@
                                                 <div class="pc-ref">PROSBEE-@order.OrderId</div>
                                                 <div class="pc-name">@order.Student?.FirstName @order.Student?.LastName</div>
                                                 <div class="pc-room">Room @(order.RoomNumber ?? "—")</div>
+                                                <div class="pc-pickup"><i class="ti ti-calendar" aria-hidden="true"></i> @pickupDisplay</div>
                                             </div>
                                             <div class="pc-status-badge @pickedLabel">@(isPending ? "Pending" : (string)order.OrderStatus)</div>
                                         </div>
@@ -1464,6 +1498,36 @@
                 activeFilter = btn.dataset.filter;
                 applyPickupFilters();
             });
+
+            // ── Sort ── reorders the cards inside each hall group; the
+            // grouping itself (by hall) is unaffected — this only changes the
+            // order clients appear in within their hall. Cards with no
+            // pickup date set sort to the end regardless of direction, since
+            // there's no date to compare.
+            function applyPickupSort() {
+                const mode = document.getElementById('pickupSort')?.value || 'ordered-desc';
+                const [field, direction] = mode.split('-'); // 'pickup'|'ordered', 'asc'|'desc'
+
+                document.querySelectorAll('.hall-group-body').forEach(body => {
+                    const cards = Array.from(body.querySelectorAll('.pickup-card'));
+                    cards.sort((a, b) => {
+                        let aVal, bVal;
+                        if (field === 'pickup') {
+                            aVal = a.dataset.pickupDate ? new Date(a.dataset.pickupDate).getTime() : Infinity;
+                            bVal = b.dataset.pickupDate ? new Date(b.dataset.pickupDate).getTime() : Infinity;
+                        } else {
+                            aVal = new Date(a.dataset.orderedAt).getTime();
+                            bVal = new Date(b.dataset.orderedAt).getTime();
+                        }
+                        return direction === 'asc' ? aVal - bVal : bVal - aVal;
+                    });
+                    // Re-appending each card in its new sorted order moves the
+                    // existing DOM nodes rather than duplicating them.
+                    cards.forEach(card => body.appendChild(card));
+                });
+            }
+
+            document.getElementById('pickupSort')?.addEventListener('change', applyPickupSort);
 
             document.querySelectorAll('.hall-group-head').forEach(head => {
                 head.addEventListener('click', () => {

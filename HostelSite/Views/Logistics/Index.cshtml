@@ -334,8 +334,8 @@
     .pickup-date-chips {
         display: flex;
         gap: 6px;
-        overflow-x: auto;
-        max-width: 280px;
+        flex-wrap: wrap;
+        max-width: 320px;
         padding-bottom: 2px;
     }
 
@@ -366,6 +366,14 @@
             background: var(--amber);
             border-color: var(--amber);
             color: #fff;
+        }
+
+        .date-chip.disabled {
+            background: var(--sand);
+            border-color: var(--line);
+            color: var(--muted);
+            cursor: not-allowed;
+            opacity: 0.65;
         }
 
     .fixed-tag {
@@ -877,6 +885,10 @@
             </div>
         </div>
         <div class="return-notice">
+            <i class="ti ti-clock" aria-hidden="true"></i>
+            The deadline of pickup bookings for each day is <strong>3pm</strong>.
+        </div>
+        <div class="return-notice">
             <i class="ti ti-alert-triangle" aria-hidden="true"></i>
             All items will be returned on <strong>@ViewBag.FixedReturnDate</strong>. Failure to be present for return on this day will result in delivery charges.
         </div>
@@ -1168,9 +1180,30 @@
             prevHostelHidden.value = this.value.trim();
         });
 
-        // Renders the next 21 days (tomorrow onward) as tappable chips and
-        // wires each one to set the hidden #pickup-date input that
-        // goToCheckout() and restoreSavedOrder() already read from.
+        // Pickup bookings for a given day close at 3pm that day — gives
+        // staff time to prepare before end of day. Change this one constant
+        // if the cutoff hour ever needs to move.
+        const PICKUP_CUTOFF_HOUR = 15; // 3pm, 24h clock
+
+        function formatIsoDate(d) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
+        // Renders the current calendar week (Monday–Sunday) as tappable
+        // chips and wires each enabled one to set the hidden #pickup-date
+        // input that goToCheckout() and restoreSavedOrder() already read
+        // from. Recomputed from "now" every call, so:
+        //   - days before today are always shown disabled ("blank" — greyed
+        //     out and unselectable), never removed, so students can still
+        //     see which day of the week it is;
+        //   - today itself flips from selectable to disabled the moment the
+        //     3pm cutoff passes;
+        //   - once the week turns over, the next call naturally produces
+        //     the new Monday–Sunday — nothing here is hard-coded to any
+        //     specific week.
         function renderPickupDateChips(selectedIso) {
             const container   = document.getElementById('pickup-date-chips');
             const pickupInput = document.getElementById('pickup-date');
@@ -1180,15 +1213,35 @@
             const dayNames   = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
             const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-            for (let i = 1; i <= 21; i++) {
-                const d = new Date();
-                d.setHours(0, 0, 0, 0);
-                d.setDate(d.getDate() + i);
-                const iso = d.toISOString().split('T')[0];
+            const now   = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const todayIso = formatIsoDate(today);
+
+            const todayDeadline = new Date(today);
+            todayDeadline.setHours(PICKUP_CUTOFF_HOUR, 0, 0, 0);
+            const todayPastDeadline = now >= todayDeadline;
+
+            // Monday of the current week — getDay() is 0=Sun..6=Sat, so
+            // Monday is "yesterday" when today is Sunday (diff -6),
+            // otherwise 1 - dow days back.
+            const dow = today.getDay();
+            const monday = new Date(today);
+            monday.setDate(today.getDate() + (dow === 0 ? -6 : 1 - dow));
+
+            let selectedIsNowDisabled = false;
+
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(monday);
+                d.setDate(monday.getDate() + i);
+                const iso = formatIsoDate(d);
+
+                const isPast     = d < today;
+                const isToday    = iso === todayIso;
+                const isDisabled = isPast || (isToday && todayPastDeadline);
 
                 const chip = document.createElement('button');
                 chip.type = 'button';
-                chip.className = 'date-chip';
+                chip.className = 'date-chip' + (isDisabled ? ' disabled' : '');
                 chip.setAttribute('role', 'option');
                 chip.dataset.date = iso;
                 chip.innerHTML =
@@ -1196,22 +1249,42 @@
                     '<span class="dc-day">' + d.getDate() + '</span>' +
                     '<span class="dc-dow">' + monthNames[d.getMonth()] + '</span>';
 
-                if (iso === selectedIso) chip.classList.add('selected');
-
-                chip.addEventListener('click', () => {
-                    container.querySelectorAll('.date-chip').forEach(c => c.classList.remove('selected'));
-                    chip.classList.add('selected');
-                    pickupInput.value = iso;
-                });
+                if (isDisabled) {
+                    chip.disabled = true;
+                    chip.setAttribute('aria-disabled', 'true');
+                    chip.title = isPast
+                        ? 'This date has passed.'
+                        : "Today's 3pm pickup booking deadline has passed.";
+                    if (iso === selectedIso) selectedIsNowDisabled = true;
+                } else {
+                    if (iso === selectedIso) chip.classList.add('selected');
+                    chip.addEventListener('click', () => {
+                        container.querySelectorAll('.date-chip').forEach(c => c.classList.remove('selected'));
+                        chip.classList.add('selected');
+                        pickupInput.value = iso;
+                    });
+                }
 
                 container.appendChild(chip);
             }
 
-            if (selectedIso) {
+            // A previously-picked date can lapse while the page just sits
+            // open (e.g. the 3pm cutoff passes) — clear it rather than
+            // silently letting checkout carry a date that's no longer valid.
+            if (selectedIsNowDisabled) {
+                pickupInput.value = '';
+            } else if (selectedIso) {
                 const match = container.querySelector(`.date-chip[data-date="${selectedIso}"]`);
                 if (match) match.scrollIntoView({ inline: 'center', block: 'nearest' });
             }
         }
+
+        // Re-render once a minute so a chip flips from selectable to
+        // disabled right at 3pm without needing a page refresh.
+        setInterval(() => {
+            const pickupInput = document.getElementById('pickup-date');
+            renderPickupDateChips(pickupInput ? pickupInput.value : undefined);
+        }, 60000);
 
         // Restores a previously started order — e.g. clicking "Edit" from the
         // Checkout page brings the student back here, and this repopulates the
