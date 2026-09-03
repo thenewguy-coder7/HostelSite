@@ -4,3 +4,8 @@ obj/
 *.user
 appsettings.Production.json
 appsettings_additions.json
+
+# One-off SQL scripts and other scratch files saved from chat — these are
+# run once in Supabase's SQL editor (or are otherwise not part of the app),
+# so they don't belong in version control.
+Claude outputs/
