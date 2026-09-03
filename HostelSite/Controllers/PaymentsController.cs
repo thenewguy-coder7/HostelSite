@@ -3,6 +3,7 @@ using HostelSite.Services;
 using HostelSite.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -255,6 +256,22 @@ namespace HostelSite.Controllers
                         "/Admin/Dashboard");
 
                     return (true, (string?)null, (int?)order.OrderId);
+                }
+                // /Payments/Verify (the browser callback) and /Payments/Webhook
+                // can both reach this point within milliseconds of each other —
+                // the in-transaction re-check above narrows that race but can't
+                // close it outright under normal transaction isolation, so the
+                // database's own unique constraint on PaystackReference is the
+                // real backstop. When two calls do race past the re-check
+                // together, this is what the *losing* one hits: not a real
+                // failure, just proof the other call already recorded this
+                // exact payment. Treat it the same as the pre-check above
+                // instead of surfacing a scary "DB error" to the student.
+                catch (DbUpdateException dbEx) when (dbEx.InnerException is PostgresException pgEx
+                    && pgEx.SqlState == PostgresErrorCodes.UniqueViolation)
+                {
+                    await tx.RollbackAsync();
+                    return (true, "Order already recorded for this payment.", (int?)null);
                 }
                 catch (Exception dbEx)
                 {
