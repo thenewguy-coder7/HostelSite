@@ -1,56 +1,65 @@
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace HostelSite.Services
 {
-    // Students type their current hostel freely at checkout, so the same real
-    // hall often ends up stored under several different spellings —
-    // "Independence hall" vs "Independence Hall", "Katanga" vs "Katanga hall",
-    // "Queens hall" vs "Queens Elizabeth hall", "wilkado hostel" vs
-    // "Wilkado Hostel". The Admin Dashboard groups pickups by hostel so staff
-    // can clear one building at a time — if the same hall shows up as two
-    // separate groups because of spelling differences, that grouping breaks.
+    // Groups the many ways students actually type a traditional hall's name
+    // into one canonical spelling, so the Admin dashboard's "bookings by
+    // hall" grouping doesn't split one hall into several rows just because
+    // of a typo or an alternate name.
     //
-    // This maps known variants to one canonical display name used for both
-    // grouping and display. To merge a new variant you spot in the
-    // dashboard, just add a line to KnownAliases below (the key is matched
-    // case-insensitively and with extra spaces collapsed, so you only need
-    // to add each distinct wording once).
+    // Real examples that prompted this (from actual bookings):
+    //   "Katanga hall" / "University hall(Katanga)"   → Katanga Hall
+    //   "Unity hall"   / "Unity halll"                → Unity Hall
+    //   "Queen Elizabeth" / "Queen Elizabeth li hall"  → Queen Elizabeth Hall
+    //
+    // Rather than maintain a hand-typed list of every misspelling anyone
+    // could produce, this matches on a single distinctive keyword unique to
+    // each traditional hall — "katanga", "unity", "elizabeth", etc. — so it
+    // survives typos (extra/missing letters), casing, punctuation, and
+    // alternate official names (e.g. Katanga is also called "University
+    // Hall") without needing an update every time a new variant shows up.
+    //
+    // Now that the logistics booking form (Views/Logistics/Index.cshtml)
+    // offers these 6 halls as a dropdown, new bookings should already come
+    // in with the canonical spelling — this normalizer mainly exists to
+    // keep older, freely-typed bookings grouped correctly too.
     public static class HostelNameNormalizer
     {
-        private static readonly Dictionary<string, string> KnownAliases = new(StringComparer.OrdinalIgnoreCase)
+        // (keyword to look for, canonical display name) — order doesn't
+        // matter since the keywords don't overlap with each other.
+        private static readonly (string Keyword, string Canonical)[] TraditionalHalls =
         {
-            ["independence hall"] = "Independence Hall",
-            ["katanga"] = "Katanga Hall",
-            ["katanga hall"] = "Katanga Hall",
-            ["queens hall"] = "Queens Elizabeth Hall",
-            ["queens elizabeth hall"] = "Queens Elizabeth Hall",
-            ["queen's hall"] = "Queens Elizabeth Hall",
-            ["wilkado"] = "Wilkado Hostel",
-            ["wilkado hostel"] = "Wilkado Hostel",
-            ["africa hall"] = "Africa Hall",
-            ["republic hall"] = "Republic Hall",
-            ["unity hall"] = "Unity Hall",
-            ["guss hostel"] = "Guss Hostels",
-            ["guss hostels"] = "Guss Hostels",
+            ("unity",       "Unity Hall"),
+            ("independence","Independence Hall"),
+            ("elizabeth",   "Queen Elizabeth Hall"),
+            ("africa",      "Africa Hall"),
+            ("katanga",     "Katanga Hall"),
+            ("republic",    "Republic Hall"),
         };
 
-        public static string Canonicalize(string? raw)
+        public static string Canonicalize(string? rawHostelName)
         {
-            if (string.IsNullOrWhiteSpace(raw))
-                return "Hostel not specified";
+            if (string.IsNullOrWhiteSpace(rawHostelName))
+                return "Not specified";
 
-            var trimmed = Regex.Replace(raw.Trim(), @"\s+", " ");
+            // Lowercased, letters-only version, purely for matching against
+            // the keywords above — punctuation like "(Katanga)" or extra
+            // spaces shouldn't stop a match.
+            var lettersOnly = Regex.Replace(rawHostelName, "[^a-zA-Z]", "").ToLowerInvariant();
 
-            if (KnownAliases.TryGetValue(trimmed, out var canonical))
-                return canonical;
+            foreach (var (keyword, canonical) in TraditionalHalls)
+            {
+                if (lettersOnly.Contains(keyword))
+                    return canonical;
+            }
 
-            // Not a known alias yet — fall back to Title Case so at least
-            // plain case differences ("wilkado hostel" vs "Wilkado Hostel")
-            // still merge into one group instead of splitting.
-            return CultureInfo.InvariantCulture.TextInfo.ToTitleCase(trimmed.ToLowerInvariant());
+            // Not one of the 6 traditional halls — e.g. a homestel or hostel
+            // typed in under "Other…". Just tidy up spacing/casing so at
+            // least "evandy hostel" and "Evandy Hostel" still group as one.
+            var collapsedWhitespace = Regex.Replace(rawHostelName.Trim(), @"\s+", " ");
+            return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(collapsedWhitespace.ToLowerInvariant());
         }
     }
 }

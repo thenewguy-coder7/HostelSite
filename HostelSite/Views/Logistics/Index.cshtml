@@ -285,6 +285,28 @@
             border-color: var(--amber);
         }
 
+        .pickup-field select {
+            font-family: var(--font-b);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--ink);
+            background: var(--white);
+            border: 1px solid #F0D9BE;
+            border-radius: 7px;
+            padding: 7px 12px;
+            outline: none;
+            cursor: pointer;
+            min-width: 170px;
+        }
+
+        .pickup-field select:focus {
+            border-color: var(--amber);
+        }
+
+        .pickup-field #previous-hostel-other {
+            margin-top: 5px;
+        }
+
     .pickup-fixed-value {
         font-family: var(--font-b);
         font-size: 13px;
@@ -813,8 +835,23 @@
                     </div>
                 </div>
                 <div class="pickup-field">
-                    <label for="previous-hostel">Current hostel</label>
-                    <input type="text" id="previous-hostel" placeholder="e.g. Fortune Royal" />
+                    <label for="previous-hostel-select">Current hostel</label>
+                    <select id="previous-hostel-select">
+                        <option value="" disabled selected>Select your hall/hostel</option>
+                        <option value="Unity Hall">Unity Hall</option>
+                        <option value="Independence Hall">Independence Hall</option>
+                        <option value="Queen Elizabeth Hall">Queen Elizabeth Hall</option>
+                        <option value="Africa Hall">Africa Hall</option>
+                        <option value="Katanga Hall">Katanga Hall</option>
+                        <option value="Republic Hall">Republic Hall</option>
+                        <option value="__other__">Other…</option>
+                    </select>
+                    <input type="text" id="previous-hostel-other" placeholder="Type your hall or hostel name" hidden />
+                    <!-- Hidden field holds whichever value is actually current — the
+                         picked hall name, or whatever was typed into "Other" — so the
+                         rest of the checkout logic (goToCheckout, restoreSavedOrder)
+                         can keep reading a single #previous-hostel value like before. -->
+                    <input type="hidden" id="previous-hostel" />
                 </div>
                 <div class="pickup-field">
                     <label for="room-number">Room number</label>
@@ -1079,6 +1116,58 @@
             this.setAttribute('aria-expanded', String(!hint.hidden));
         });
 
+        // ── Current-hostel dropdown ──
+        // The 6 traditional halls, exactly as they should be stored — picking
+        // one of these means the name always lands in the DB spelled the same
+        // way, so lookups (e.g. staff searching a booking by hall) don't fail
+        // over "Unity hall" vs "unity Hall" vs a typo. "Other…" still lets a
+        // student in a non-traditional hostel type their own name in.
+        const TRADITIONAL_HALLS = [
+            'Unity Hall', 'Independence Hall', 'Queen Elizabeth Hall',
+            'Africa Hall', 'Katanga Hall', 'Republic Hall'
+        ];
+
+        const prevHostelSelect = document.getElementById('previous-hostel-select');
+        const prevHostelOther  = document.getElementById('previous-hostel-other');
+        const prevHostelHidden = document.getElementById('previous-hostel');
+
+        // Sets the select + "other" input + hidden field from a single string
+        // value — used on first load restore (see restoreSavedOrder) and could
+        // be reused anywhere else a saved hostel name needs to populate this
+        // control.
+        function setPreviousHostelValue(value) {
+            if (!value) return;
+            const match = TRADITIONAL_HALLS.find(h => h.toLowerCase() === value.trim().toLowerCase());
+            if (match) {
+                prevHostelSelect.value = match;
+                prevHostelOther.hidden = true;
+                prevHostelOther.value = '';
+                prevHostelHidden.value = match;
+            } else {
+                prevHostelSelect.value = '__other__';
+                prevHostelOther.hidden = false;
+                prevHostelOther.value = value;
+                prevHostelHidden.value = value;
+            }
+        }
+
+        prevHostelSelect?.addEventListener('change', function () {
+            if (this.value === '__other__') {
+                prevHostelOther.hidden = false;
+                prevHostelOther.value = '';
+                prevHostelHidden.value = '';
+                prevHostelOther.focus();
+            } else {
+                prevHostelOther.hidden = true;
+                prevHostelOther.value = '';
+                prevHostelHidden.value = this.value;
+            }
+        });
+
+        prevHostelOther?.addEventListener('input', function () {
+            prevHostelHidden.value = this.value.trim();
+        });
+
         // Renders the next 21 days (tomorrow onward) as tappable chips and
         // wires each one to set the hidden #pickup-date input that
         // goToCheckout() and restoreSavedOrder() already read from.
@@ -1157,11 +1246,10 @@
                     renderPickupDateChips(data.pickup);
                 }
 
-                const prevHostelInput = document.getElementById('previous-hostel');
                 const newHostelInput  = document.getElementById('new-hostel');
                 const roomNumberInput = document.getElementById('room-number');
                 const phoneInput      = document.getElementById('phone-number');
-                if (data.previousHostel && prevHostelInput) prevHostelInput.value = data.previousHostel;
+                if (data.previousHostel) setPreviousHostelValue(data.previousHostel);
                 if (data.newHostel && newHostelInput) newHostelInput.value = data.newHostel;
                 if (data.roomNumber && roomNumberInput) roomNumberInput.value = data.roomNumber;
                 if (data.phone && phoneInput) phoneInput.value = data.phone;
