@@ -255,6 +255,24 @@
             margin: 1.75rem 0 0.75rem;
         }
 
+        .sf-restore-form { flex-shrink: 0; }
+        .sf-restore-btn {
+            background: transparent;
+            color: #946800;
+            border: 1.5px solid #946800;
+            padding: 5px 10px;
+            border-radius: 7px;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: var(--font-b);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .sf-restore-btn:hover { background: #946800; color: #fff; }
+
         /* ── Hall-grouped logistics list ── */
         .hall-groups { display: flex; flex-direction: column; gap: 12px; margin-top: 1rem; }
         .hall-group { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--white); }
@@ -442,6 +460,14 @@
                                 <div class="sf-card-meta">@(NoteParser.Get(r.Notes, "Hostel") ?? "—") · Room @(NoteParser.Get(r.Notes, "Room") ?? "—")</div>
                             </div>
                             <span class="sf-badge completed">Done</span>
+                            <form class="sf-restore-form" asp-controller="Admin" asp-action="RestoreRequest" method="post"
+                                  onsubmit="return confirm('Restore this request back to Pending?');">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="requestId" value="@r.RequestId" />
+                                <button type="submit" class="sf-restore-btn" title="Undo — restore this request">
+                                    <i class="ti ti-arrow-back-up"></i> Undo
+                                </button>
+                            </form>
                         </div>
                     }
                 </div>
@@ -547,6 +573,14 @@
                                 <div class="sf-card-meta">Room @(o.RoomNumber ?? "—")</div>
                             </div>
                             <span class="sf-badge completed">Done</span>
+                            <form class="sf-restore-form" asp-controller="Admin" asp-action="RestoreOrder" method="post"
+                                  onsubmit="return confirm('Restore this order back to the active pickup queue?');">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="orderId" value="@o.OrderId" />
+                                <button type="submit" class="sf-restore-btn" title="Undo — restore this order">
+                                    <i class="ti ti-arrow-back-up"></i> Undo
+                                </button>
+                            </form>
                         </div>
                     }
                 </div>

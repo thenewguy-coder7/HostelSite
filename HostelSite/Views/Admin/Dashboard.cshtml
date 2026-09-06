@@ -813,6 +813,28 @@
                 background: var(--forest-mid);
             }
 
+        .btn-restore {
+            background: transparent;
+            color: var(--amber);
+            border: 1.5px solid var(--amber);
+            padding: 5px 12px;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font-b);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.15s, color 0.15s;
+            white-space: nowrap;
+        }
+
+            .btn-restore:hover {
+                background: var(--amber);
+                color: #fff;
+            }
+
         .table-empty {
             text-align: center;
             padding: 3rem;
@@ -1275,6 +1297,7 @@
                                     <th>Student</th>
                                     <th>Completed on</th>
                                     <th>Deletes on</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -1288,6 +1311,16 @@
                                         <td style="color:var(--amber); font-weight:600;">
                                             @order.DeletedAt?.AddDays(15).ToString("dd MMM yyyy")
                                         </td>
+                                        <td>
+                                            <form asp-controller="Admin" asp-action="RestoreOrder" method="post"
+                                                  onsubmit="return confirm('Restore order #@order.OrderId back to the active pickup queue?');">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="orderId" value="@order.OrderId" />
+                                                <button type="submit" class="btn-restore" title="Undo — restore this order">
+                                                    <i class="ti ti-arrow-back-up"></i> Undo
+                                                </button>
+                                            </form>
+                                        </td>
                                     </tr>
                                 }
                                 @foreach (var req in completedRequests)
@@ -1299,6 +1332,16 @@
                                         <td>@req.DeletedAt?.ToString("dd MMM yyyy")</td>
                                         <td style="color:var(--amber); font-weight:600;">
                                             @req.DeletedAt?.AddDays(15).ToString("dd MMM yyyy")
+                                        </td>
+                                        <td>
+                                            <form asp-controller="Admin" asp-action="RestoreRequest" method="post"
+                                                  onsubmit="return confirm('Restore request #@req.RequestId back to Pending?');">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="requestId" value="@req.RequestId" />
+                                                <button type="submit" class="btn-restore" title="Undo — restore this request">
+                                                    <i class="ti ti-arrow-back-up"></i> Undo
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 }

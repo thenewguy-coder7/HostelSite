@@ -214,6 +214,54 @@ namespace HostelSite.Controllers
             return RedirectToRoleHome(result);
         }
 
+        // ── POST /Admin/RestoreOrder ──
+        // Undoes "Completed" within the 15-day grace window before
+        // PurgeOldRecords() deletes it for good. Both Admins and Staff work
+        // the same pickup queue and can mark an order Completed, so either
+        // role may undo that too.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RestoreOrder(int orderId)
+        {
+            var result = await HttpContext.AuthenticateAsync("AdminCookie");
+            if (!result.Succeeded) return RedirectToAction("Login");
+
+            var order = _db.LogisticsOrders.Find(orderId);
+            if (order == null) return NotFound();
+
+            order.IsDeleted = false;
+            order.DeletedAt = null;
+            order.OrderStatus = "Confirmed";
+            order.UpdatedAt = DateTime.UtcNow;
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] = $"Order #{orderId} restored — back in the active pickup queue as Confirmed.";
+            return RedirectToRoleHome(result);
+        }
+
+        // ── POST /Admin/RestoreRequest ──
+        // Same idea for aesthetic requests — undoes "Completed" within the
+        // 15-day grace window.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RestoreRequest(int requestId)
+        {
+            var result = await HttpContext.AuthenticateAsync("AdminCookie");
+            if (!result.Succeeded) return RedirectToAction("Login");
+
+            var request = _db.AestheticRequests.Find(requestId);
+            if (request == null) return NotFound();
+
+            request.IsDeleted = false;
+            request.DeletedAt = null;
+            request.Status = "Pending";
+            request.ResolvedAt = null;
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] = $"Request #{requestId} restored — back to Pending.";
+            return RedirectToRoleHome(result);
+        }
+
         // ── POST /Admin/SubscribePush ──
         [HttpPost]
         [ValidateAntiForgeryToken]
