@@ -25,6 +25,12 @@ public partial class AestheticRequest
 
     public DateTime? DeletedAt { get; set; }
 
+    // The status this request had right before it was marked "Completed" —
+    // e.g. "Pending", "Reviewing", "Approved", or "In Progress". Restore/Undo
+    // uses this to put the request back where it actually was, instead of
+    // always resetting it to "Pending".
+    public string? PreviousStatus { get; set; }
+
     public virtual RoomAesthetic? Aesthetic { get; set; }
 
 

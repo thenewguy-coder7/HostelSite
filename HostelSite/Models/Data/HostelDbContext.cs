@@ -107,6 +107,9 @@ public partial class HostelDbContext : DbContext
                 .HasDefaultValue("Pending")
                 .HasColumnName("status");
             entity.Property(e => e.StudentId).HasColumnName("student_id");
+            entity.Property(e => e.PreviousStatus)
+                .HasMaxLength(30)
+                .HasColumnName("previous_status");
 
             entity.HasOne(d => d.Aesthetic).WithMany(p => p.AestheticRequests)
                 .HasForeignKey(d => d.AestheticId)
@@ -186,6 +189,9 @@ public partial class HostelDbContext : DbContext
             entity.Property(e => e.PickupReminderSentAt).HasColumnName("pickup_reminder_sent_at");
             entity.Property(e => e.RoomNumber).HasMaxLength(50).HasColumnName("room_number");
             entity.Property(e => e.Phone).HasMaxLength(20).HasColumnName("phone");
+            entity.Property(e => e.PreviousStatus)
+                .HasMaxLength(30)
+                .HasColumnName("previous_status");
         });
 
         modelBuilder.Entity<OrderItem>(entity =>

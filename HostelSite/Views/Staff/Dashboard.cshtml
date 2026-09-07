@@ -220,6 +220,16 @@
         }
         .sf-card:hover { border-color: var(--sage); }
 
+        /* The filter/search/sort JS toggles the "hidden" attribute on cards
+           it wants to hide. Without this rule, ".sf-card"'s own
+           "display: flex" ties in CSS specificity with the browser's
+           built-in "[hidden] { display: none }" rule and wins, so
+           filtered-out cards stayed visible even though the attribute was
+           set correctly — filtering/search/tabs looked like they did
+           nothing. This selector's higher specificity makes hidden always
+           win. */
+        .sf-card[hidden] { display: none; }
+
         .sf-card-icon {
             width: 40px; height: 40px; border-radius: 10px;
             background: var(--sage-light); color: var(--forest-mid);
@@ -495,7 +505,7 @@
             </div>
 
             <div class="sf-controls">
-                <input type="text" id="logSearch" class="sf-search" placeholder="Search name, room, order #…" />
+                <input type="text" id="logSearch" class="sf-search" placeholder="Search name, room, order #, hall…" />
                 <div class="sf-filter-tabs" id="logFilterTabs">
                     <button type="button" class="sft active" data-filter="all">All</button>
                     <button type="button" class="sft" data-filter="pending">Pending</button>
@@ -527,7 +537,7 @@
                                 {
                                     var isPending = (string)order.OrderStatus == "Confirmed";
                                     var pickedLabel = isPending ? "pending" : "picked";
-                                    var searchBlob = $"{order.Student?.FirstName} {order.Student?.LastName} {order.RoomNumber} {order.OrderId}".ToLower();
+                                    var searchBlob = $"{order.Student?.FirstName} {order.Student?.LastName} {order.RoomNumber} {order.OrderId} {grp.Key}".ToLower();
                                     var pickupIso = order.PickupDate != null ? ((DateOnly)order.PickupDate).ToString("yyyy-MM-dd") : "";
                                     var pickupDisplay = order.PickupDate != null ? ((DateOnly)order.PickupDate).ToString("dd MMM") : "No date set";
                                     var orderedAtIso = ((DateTime)order.OrderedAt).ToString("o");

@@ -167,6 +167,9 @@ namespace HostelSite.Controllers
 
             if (status == "Completed")
             {
+                // Remember what it was (Confirmed/Collected/Stored) so Undo
+                // can put it back where it actually was, not just "Confirmed".
+                order.PreviousStatus = order.OrderStatus;
                 order.IsDeleted = true;
                 order.DeletedAt = DateTime.UtcNow;
                 order.OrderStatus = "Completed";
@@ -198,6 +201,9 @@ namespace HostelSite.Controllers
 
             if (status == "Completed")
             {
+                // Remember what it was (Pending/Reviewing/Approved/In Progress)
+                // so Undo can put it back where it actually was.
+                request.PreviousStatus = request.Status;
                 request.IsDeleted = true;
                 request.DeletedAt = DateTime.UtcNow;
                 request.Status = "Completed";
@@ -229,13 +235,20 @@ namespace HostelSite.Controllers
             var order = _db.LogisticsOrders.Find(orderId);
             if (order == null) return NotFound();
 
+            // Put it back exactly where it was before "Completed" — Collected
+            // and Stored orders shouldn't reset all the way to Confirmed.
+            // Older records completed before PreviousStatus existed fall back
+            // to Confirmed since there's nothing recorded for them.
+            var restoredStatus = order.PreviousStatus ?? "Confirmed";
+
             order.IsDeleted = false;
             order.DeletedAt = null;
-            order.OrderStatus = "Confirmed";
+            order.OrderStatus = restoredStatus;
+            order.PreviousStatus = null;
             order.UpdatedAt = DateTime.UtcNow;
             await _db.SaveChangesAsync();
 
-            TempData["Success"] = $"Order #{orderId} restored — back in the active pickup queue as Confirmed.";
+            TempData["Success"] = $"Order #{orderId} restored — back in the active pickup queue as {restoredStatus}.";
             return RedirectToRoleHome(result);
         }
 
@@ -252,13 +265,19 @@ namespace HostelSite.Controllers
             var request = _db.AestheticRequests.Find(requestId);
             if (request == null) return NotFound();
 
+            // Put it back exactly where it was before "Completed", same idea
+            // as RestoreOrder. Falls back to Pending for older records
+            // completed before PreviousStatus existed.
+            var restoredStatus = request.PreviousStatus ?? "Pending";
+
             request.IsDeleted = false;
             request.DeletedAt = null;
-            request.Status = "Pending";
+            request.Status = restoredStatus;
+            request.PreviousStatus = null;
             request.ResolvedAt = null;
             await _db.SaveChangesAsync();
 
-            TempData["Success"] = $"Request #{requestId} restored — back to Pending.";
+            TempData["Success"] = $"Request #{requestId} restored — back to {restoredStatus}.";
             return RedirectToRoleHome(result);
         }
 

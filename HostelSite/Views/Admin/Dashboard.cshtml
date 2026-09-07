@@ -543,6 +543,18 @@
             transition: background 0.15s ease;
         }
 
+            /* The filter/search/sort JS toggles the "hidden" attribute on
+               cards it wants to hide. Without this rule, ".pickup-card"'s
+               own "display: flex" ties in CSS specificity with the
+               browser's built-in "[hidden] { display: none }" rule and
+               wins, so filtered-out cards stayed visible even though the
+               attribute was set correctly — filtering/search/tabs looked
+               like they did nothing. This selector's higher specificity
+               makes hidden always win. */
+            .pickup-card[hidden] {
+                display: none;
+            }
+
             .pickup-card:last-child {
                 border-bottom: none;
             }
@@ -1116,7 +1128,7 @@
                     </div>
 
                     <div class="pickup-controls">
-                        <input type="text" id="pickupSearch" class="pickup-search" placeholder="Search name, room, order #…" />
+                        <input type="text" id="pickupSearch" class="pickup-search" placeholder="Search name, room, order #, hall…" />
                         <div class="pickup-filter-tabs" id="pickupFilterTabs">
                             <button type="button" class="pft active" data-filter="all">All</button>
                             <button type="button" class="pft" data-filter="pending">Pending</button>
@@ -1149,7 +1161,7 @@
                                     {
                                         var isPending = (string)order.OrderStatus == "Confirmed";
                                         var pickedLabel = isPending ? "pending" : "picked";
-                                        var searchBlob = $"{order.Student?.FirstName} {order.Student?.LastName} {order.RoomNumber} {order.OrderId}".ToLower();
+                                        var searchBlob = $"{order.Student?.FirstName} {order.Student?.LastName} {order.RoomNumber} {order.OrderId} {grp.Key}".ToLower();
                                         var pickupIso = order.PickupDate != null ? ((DateOnly)order.PickupDate).ToString("yyyy-MM-dd") : "";
                                         var pickupDisplay = order.PickupDate != null ? ((DateOnly)order.PickupDate).ToString("dd MMM") : "No date set";
                                         var orderedAtIso = ((DateTime)order.OrderedAt).ToString("o");

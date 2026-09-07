@@ -27,6 +27,12 @@ public partial class LogisticsOrder
 
     public DateTime? DeletedAt { get; set; }
 
+    // The status this order had right before it was marked "Completed" —
+    // e.g. "Confirmed", "Collected", or "Stored". Restore/Undo uses this to
+    // put the order back where it actually was, instead of always resetting
+    // it to "Confirmed".
+    public string? PreviousStatus { get; set; }
+
     public TimeOnly? PickupTime { get; set; }
     public string? PreviousHostel { get; set; }
     public string? NewHostel { get; set; }
