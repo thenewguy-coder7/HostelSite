@@ -376,6 +376,21 @@
             opacity: 0.65;
         }
 
+    .pickup-window-closed {
+        font-family: var(--font-b);
+        font-size: 12px;
+        color: #7A5020;
+        background: var(--amber-light);
+        border: 1px solid #F0D9BE;
+        border-radius: 7px;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        max-width: 320px;
+        margin-top: 6px;
+    }
+
     .fixed-tag {
         font-size: 10px;
         font-weight: 700;
@@ -834,6 +849,10 @@
                 <div class="pickup-field">
                     <label id="pickup-date-label">Pickup date</label>
                     <div class="pickup-date-chips" id="pickup-date-chips" role="listbox" aria-labelledby="pickup-date-label"></div>
+                    <div class="pickup-window-closed" id="pickup-window-closed" hidden>
+                        <i class="ti ti-calendar-off" aria-hidden="true"></i>
+                        Available booking dates are over.
+                    </div>
                     <input type="hidden" id="pickup-date" />
                 </div>
                 <div class="pickup-field">
@@ -1192,21 +1211,33 @@
             return `${y}-${m}-${day}`;
         }
 
-        // Renders the current calendar week (Monday–Sunday) as tappable
-        // chips and wires each enabled one to set the hidden #pickup-date
-        // input that goToCheckout() and restoreSavedOrder() already read
-        // from. Recomputed from "now" every call, so:
-        //   - days before today are always shown disabled ("blank" — greyed
-        //     out and unselectable), never removed, so students can still
-        //     see which day of the week it is;
-        //   - today itself flips from selectable to disabled the moment the
-        //     3pm cutoff passes;
-        //   - once the week turns over, the next call naturally produces
-        //     the new Monday–Sunday — nothing here is hard-coded to any
-        //     specific week.
+        // This pickup window is a ONE-TIME thing tied to the current
+        // move-in period — it does not recur the following week. Everything
+        // below is anchored to FIXED_LAST_DAY_ISO, a hard-coded final day,
+        // not to "today" — so the set of days rendered never changes and
+        // never grows, no matter how many days/weeks pass after this was
+        // deployed. Only update this constant if a future, separate pickup
+        // window needs to be opened.
+        const FIXED_LAST_DAY_ISO = '2026-09-07';
+
+        // Renders the fixed Monday-through-FIXED_LAST_DAY_ISO range as
+        // tappable chips (a single day, right now, since the last day is
+        // itself a Monday) and wires each enabled one to set the hidden
+        // #pickup-date input that goToCheckout() and restoreSavedOrder()
+        // already read from. Recomputed from "now" every call, so:
+        //   - the set of days shown is always the same fixed range — no day
+        //     is ever added, no matter what today's real date is;
+        //   - days before today (within that fixed range) are shown
+        //     disabled ("blank"), never removed;
+        //   - the fixed last day flips from selectable to disabled the
+        //     moment its 3pm cutoff passes;
+        //   - once that cutoff passes, EVERY day in the range is disabled
+        //     (there's nothing left to book) and the "booking dates are
+        //     over" notice appears instead of relying on chip color alone.
         function renderPickupDateChips(selectedIso) {
             const container   = document.getElementById('pickup-date-chips');
             const pickupInput = document.getElementById('pickup-date');
+            const closedNotice = document.getElementById('pickup-window-closed');
             if (!container || !pickupInput) return;
 
             container.innerHTML = '';
@@ -1215,29 +1246,32 @@
 
             const now   = new Date();
             const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const todayIso = formatIsoDate(today);
 
-            const todayDeadline = new Date(today);
-            todayDeadline.setHours(PICKUP_CUTOFF_HOUR, 0, 0, 0);
-            const todayPastDeadline = now >= todayDeadline;
+            const [fy, fm, fd] = FIXED_LAST_DAY_ISO.split('-').map(Number);
+            const fixedLastDay = new Date(fy, fm - 1, fd);
 
-            // Monday of the current week — getDay() is 0=Sun..6=Sat, so
-            // Monday is "yesterday" when today is Sunday (diff -6),
-            // otherwise 1 - dow days back.
-            const dow = today.getDay();
-            const monday = new Date(today);
-            monday.setDate(today.getDate() + (dow === 0 ? -6 : 1 - dow));
+            const fixedLastDayDeadline = new Date(fixedLastDay);
+            fixedLastDayDeadline.setHours(PICKUP_CUTOFF_HOUR, 0, 0, 0);
+            // Once true this stays true forever going forward — there's no
+            // future day to fall back on, since none ever gets added.
+            const windowClosed = now >= fixedLastDayDeadline;
+
+            // Monday of the fixed last day's week — getDay() is 0=Sun..6=Sat.
+            const dow = fixedLastDay.getDay();
+            const monday = new Date(fixedLastDay);
+            monday.setDate(fixedLastDay.getDate() + (dow === 0 ? -6 : 1 - dow));
+
+            const totalDays = Math.round((fixedLastDay - monday) / 86400000) + 1;
 
             let selectedIsNowDisabled = false;
 
-            for (let i = 0; i < 7; i++) {
+            for (let i = 0; i < totalDays; i++) {
                 const d = new Date(monday);
                 d.setDate(monday.getDate() + i);
                 const iso = formatIsoDate(d);
 
                 const isPast     = d < today;
-                const isToday    = iso === todayIso;
-                const isDisabled = isPast || (isToday && todayPastDeadline);
+                const isDisabled = isPast || windowClosed;
 
                 const chip = document.createElement('button');
                 chip.type = 'button';
@@ -1252,9 +1286,9 @@
                 if (isDisabled) {
                     chip.disabled = true;
                     chip.setAttribute('aria-disabled', 'true');
-                    chip.title = isPast
-                        ? 'This date has passed.'
-                        : "Today's 3pm pickup booking deadline has passed.";
+                    chip.title = windowClosed
+                        ? 'Available booking dates are over.'
+                        : 'This date has passed.';
                     if (iso === selectedIso) selectedIsNowDisabled = true;
                 } else {
                     if (iso === selectedIso) chip.classList.add('selected');
@@ -1267,6 +1301,8 @@
 
                 container.appendChild(chip);
             }
+
+            if (closedNotice) closedNotice.hidden = !windowClosed;
 
             // A previously-picked date can lapse while the page just sits
             // open (e.g. the 3pm cutoff passes) — clear it rather than
