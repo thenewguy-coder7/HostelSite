@@ -575,21 +575,6 @@
         text-align: center;
     }
 
-    /* Per-item "add a photo" control — only shown once that item is in the
-       order (card.in-order), so the catalog doesn't look cluttered for
-       items the student hasn't picked yet. */
-    .item-photo {
-        display: none;
-        align-items: center;
-        gap: 8px;
-        margin-top: 2px;
-        flex-wrap: wrap;
-    }
-
-    .item-card.in-order .item-photo {
-        display: flex;
-    }
-
     .item-photo-btn {
         display: inline-flex;
         align-items: center;
@@ -633,6 +618,17 @@
         .item-photo-status.error {
             color: #C0392B;
         }
+
+    .item-photo-required-mark {
+        color: #C0392B;
+        font-weight: 700;
+        margin-left: 1px;
+    }
+
+    .order-note-warning {
+        color: #C0392B;
+        font-weight: 600;
+    }
 
     .order-panel {
         background: var(--white);
@@ -694,8 +690,8 @@
 
     .order-line {
         display: flex;
-        align-items: center;
-        justify-content: space-between;
+        flex-direction: column;
+        gap: 7px;
         padding: 10px 0;
         border-bottom: 1px solid var(--line);
         font-size: 13px;
@@ -704,6 +700,23 @@
         .order-line:last-child {
             border-bottom: none;
         }
+
+    .ol-top-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    /* The "add a photo" control for this item — lives in the order list,
+       once the item has actually been added, rather than cluttering the
+       catalog card before it's even picked. Rebuilt every renderOrder()
+       call, so it always reflects order[id].photoUrl directly. */
+    .ol-photo-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
 
     .ol-name {
         font-weight: 500;
@@ -1004,15 +1017,6 @@
                                     <button class="qty-btn" onclick="changeQty(@item.Id, 1)" aria-label="Add one">+</button>
                                 </div>
                             </div>
-                            <div class="item-photo" id="photo-@item.Id">
-                                <label class="item-photo-btn" for="photo-input-@item.Id">
-                                    <i class="ti ti-camera" aria-hidden="true"></i>
-                                    <span id="photo-btn-text-@item.Id">Add photo</span>
-                                </label>
-                                <input type="file" id="photo-input-@item.Id" accept="image/*" capture="environment" hidden onchange="uploadItemPhoto(@item.Id, this)" />
-                                <img class="item-photo-thumb" id="photo-thumb-@item.Id" alt="Your photo of @item.Name" hidden />
-                                <span class="item-photo-status" id="photo-status-@item.Id" hidden></span>
-                            </div>
                         </div>
                     }
                 }
@@ -1047,7 +1051,11 @@
                     <button class="btn-checkout" id="checkout-btn" onclick="goToCheckout()">
                         Proceed to checkout →
                     </button>
-                    <p class="order-note">
+                    <p class="order-note order-note-warning" id="photo-required-notice" hidden>
+                        <i class="ti ti-camera" aria-hidden="true"></i>
+                        <span id="photo-required-text">Add a photo for every item to continue</span>
+                    </p>
+                    <p class="order-note" id="insured-note">
                         <i class="ti ti-shield-check" aria-hidden="true"></i>
                         All items insured from pickup
                     </p>
@@ -1080,29 +1088,26 @@
             order[id].qty = Math.max(0, order[id].qty + delta);
             qtyEl.textContent = order[id].qty;
 
-            if (order[id].qty === 0) {
-                // Dropping an item back to zero clears any photo too — re-adding
-                // it starts fresh rather than silently reusing a stale upload.
-                resetItemPhotoUi(id);
-                delete order[id];
-            }
+            // Dropping an item back to zero drops it from the order
+            // entirely — its order-line (and any photo on it) disappears
+            // along with it. Re-adding it later starts fresh.
+            if (order[id].qty === 0) delete order[id];
 
             card.classList.toggle('in-order', !!(order[id] && order[id].qty > 0));
             renderOrder();
         }
 
         // Uploads the chosen/captured photo for one item line to Supabase
-        // Storage (via the server, so the service-role key never reaches the
+        // Storage (via the server, so the secret key never reaches the
         // browser) and stashes the returned URL on that item's order entry.
-        // Entirely optional — a failed or skipped upload never blocks adding
-        // the item or checking out.
+        // The "add a photo" control itself lives in the order list (see
+        // renderOrder below), not on the catalog card — it only makes sense
+        // once the student has actually picked the item.
         function uploadItemPhoto(id, inputEl) {
             const file = inputEl.files && inputEl.files[0];
             if (!file) return;
 
-            const statusEl = document.getElementById('photo-status-' + id);
-            const thumbEl  = document.getElementById('photo-thumb-' + id);
-            const btnText  = document.getElementById('photo-btn-text-' + id);
+            const statusEl = document.getElementById('ol-photo-status-' + id);
             const token    = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
 
             if (statusEl) {
@@ -1130,9 +1135,10 @@
                     return;
                 }
                 if (order[id]) order[id].photoUrl = data.url;
-                if (thumbEl) { thumbEl.src = data.url; thumbEl.hidden = false; }
-                if (btnText) btnText.textContent = 'Change photo';
-                if (statusEl) { statusEl.textContent = ''; statusEl.hidden = true; }
+                // Rebuilds this item's order-line from scratch, which swaps
+                // the upload button for a thumbnail now that
+                // order[id].photoUrl is set, and re-checks the
+                // every-item-has-a-photo gate on the checkout button.
                 renderOrder();
             })
             .catch(() => {
@@ -1142,30 +1148,6 @@
                     statusEl.hidden = false;
                 }
             });
-        }
-
-        // Clears the thumbnail/status UI for one item's photo control —
-        // used when its quantity drops to zero.
-        function resetItemPhotoUi(id) {
-            const thumbEl  = document.getElementById('photo-thumb-' + id);
-            const statusEl = document.getElementById('photo-status-' + id);
-            const btnText  = document.getElementById('photo-btn-text-' + id);
-            const inputEl  = document.getElementById('photo-input-' + id);
-            if (thumbEl)  { thumbEl.hidden = true; thumbEl.removeAttribute('src'); }
-            if (statusEl) { statusEl.hidden = true; statusEl.textContent = ''; statusEl.classList.remove('error'); }
-            if (btnText)  btnText.textContent = 'Add photo';
-            if (inputEl)  inputEl.value = '';
-        }
-
-        // Reflects a restored order's photoUrl (if any) back onto that
-        // item's thumbnail/button — used by restoreSavedOrder() below.
-        function applyRestoredPhoto(id) {
-            const photoUrl = order[id] && order[id].photoUrl;
-            if (!photoUrl) return;
-            const thumbEl = document.getElementById('photo-thumb-' + id);
-            const btnText = document.getElementById('photo-btn-text-' + id);
-            if (thumbEl) { thumbEl.src = photoUrl; thumbEl.hidden = false; }
-            if (btnText) btnText.textContent = 'Change photo';
         }
 
         function goToCheckout() {
@@ -1181,6 +1163,20 @@
                 alert('Please add at least one item to your order.');
                 return;
             }
+
+            // A photo is required for every item before checkout — lets
+            // Admin/Staff see exactly what to expect at pickup. The checkout
+            // button is also disabled client-side while any are missing
+            // (see renderOrder), but this is the hard stop in case that
+            // somehow gets bypassed.
+            const missingPhotoNames = Object.keys(order)
+                .filter(id => !order[id].photoUrl)
+                .map(id => order[id].name);
+            if (missingPhotoNames.length > 0) {
+                alert('Please add a photo for: ' + missingPhotoNames.join(', '));
+                return;
+            }
+
             if (!pickup) { alert('Please select a pickup date.'); return; }
             if (!prevHostel) { alert('Please enter your current hostel.'); return; }
             if (!roomNumber) { alert('Please enter your room number at your current hostel.'); return; }
@@ -1221,6 +1217,9 @@
             const summary= document.getElementById('order-summary');
             const badge  = document.getElementById('order-badge');
             const emptyC = document.getElementById('order-empty-checkout');
+            const checkoutBtn = document.getElementById('checkout-btn');
+            const photoNotice = document.getElementById('photo-required-notice');
+            const insuredNote = document.getElementById('insured-note');
 
             if (ids.length === 0) {
                 empty.style.display  = '';
@@ -1242,25 +1241,56 @@
             lines.innerHTML = '';
 
             ids.forEach(id => {
-                const { name, price, qty } = order[id];
+                const { name, price, qty, photoUrl } = order[id];
                 const lineTotal = price * qty;
                 total     += lineTotal;
                 itemCount += qty;
 
+                // The photo control lives here, in the order list, rather
+                // than on the catalog card — it only makes sense once the
+                // student has actually picked the item. A photo is required
+                // before checkout (see goToCheckout + the button-disable
+                // logic below), so there's no "skip" option here, only
+                // add-now or change-later.
+                const photoRowHtml = photoUrl
+                    ? `<img class="item-photo-thumb" src="${photoUrl}" alt="Your photo of ${name}">
+                       <label class="item-photo-btn" for="ol-photo-input-${id}">
+                           <i class="ti ti-camera" aria-hidden="true"></i> Change photo
+                       </label>`
+                    : `<label class="item-photo-btn" for="ol-photo-input-${id}">
+                           <i class="ti ti-camera" aria-hidden="true"></i> Add photo
+                           <span class="item-photo-required-mark" title="Required to checkout">*</span>
+                       </label>`;
+
                 const el  = document.createElement('div');
                 el.className = 'order-line';
                 el.innerHTML = `
-                    <span class="ol-name">${name}</span>
-                    <span class="ol-qty">x${qty}</span>
-                    <span class="ol-price">GH₵ ${lineTotal.toFixed(2)}</span>
-                    <button class="ol-remove" onclick="removeItem(${id})" aria-label="Remove ${name}">
-                        <i class="ti ti-x" aria-hidden="true"></i>
-                    </button>`;
+                    <div class="ol-top-row">
+                        <span class="ol-name">${name}</span>
+                        <span class="ol-qty">x${qty}</span>
+                        <span class="ol-price">GH₵ ${lineTotal.toFixed(2)}</span>
+                        <button class="ol-remove" onclick="removeItem(${id})" aria-label="Remove ${name}">
+                            <i class="ti ti-x" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <div class="ol-photo-row">
+                        ${photoRowHtml}
+                        <input type="file" id="ol-photo-input-${id}" accept="image/*" capture="environment" hidden onchange="uploadItemPhoto(${id}, this)" />
+                        <span class="item-photo-status" id="ol-photo-status-${id}" hidden></span>
+                    </div>`;
                 lines.appendChild(el);
             });
 
             badge.textContent = itemCount;
             document.getElementById('order-total').textContent = 'GH₵ ' + total.toFixed(2);
+
+            // Checkout stays disabled until every item in the order has a
+            // photo attached — goToCheckout() has the same check as a hard
+            // stop in case this ever gets bypassed.
+            const missingPhotoCount = ids.filter(id => !order[id].photoUrl).length;
+            if (checkoutBtn) checkoutBtn.disabled = missingPhotoCount > 0;
+            if (photoNotice) photoNotice.hidden = missingPhotoCount === 0;
+            if (insuredNote) insuredNote.hidden = missingPhotoCount > 0;
 
             sessionStorage.setItem('nestOrder', JSON.stringify(order));
         }
@@ -1529,9 +1559,11 @@
                 const qtyEl = document.getElementById('qty-' + id);
                 if (qtyEl) qtyEl.textContent = order[id].qty;
                 if (card)  card.classList.toggle('in-order', order[id].qty > 0);
-                applyRestoredPhoto(id);
             });
 
+            // renderOrder() rebuilds the order-lines (including each item's
+            // photo thumbnail/button) straight from order[id].photoUrl, so
+            // no separate restore step is needed for the photo UI itself.
             renderOrder();
         }
     </script>
