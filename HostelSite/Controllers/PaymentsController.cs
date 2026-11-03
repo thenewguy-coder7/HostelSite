@@ -229,7 +229,8 @@ namespace HostelSite.Controllers
                             OrderId = order.OrderId,
                             ItemId = line.ItemId,
                             Quantity = line.Quantity,
-                            UnitPrice = (decimal)line.Price
+                            UnitPrice = (decimal)line.Price,
+                            PhotoUrl = line.PhotoUrl
                         });
                     }
 
@@ -318,6 +319,7 @@ namespace HostelSite.Controllers
         public string Name { get; set; } = "";
         public double Price { get; set; }
         public int Quantity { get; set; }
+        public string? PhotoUrl { get; set; }
     }
 
 }  // end of namespace

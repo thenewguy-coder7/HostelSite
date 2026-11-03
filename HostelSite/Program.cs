@@ -60,6 +60,25 @@ builder.Services.AddHttpClient("Paystack", client =>
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
 
+// ── HTTP CLIENT for Supabase Storage (item photos students upload at booking) ──
+// Uses the privileged secret key (Project Settings → API Keys → "Secret
+// keys" — the sb_secret_... one, Supabase's replacement for the old
+// service_role key), which bypasses Storage RLS, so the server can write to
+// the bucket on the student's behalf without exposing that key to the
+// browser. Photos live in Supabase Storage (not the app's own disk) because
+// Render's free instance wipes local files on every restart/redeploy.
+//
+// IMPORTANT: Supabase's new publishable/secret keys are opaque strings, not
+// JWTs — sending one on "Authorization: Bearer" makes Supabase try to verify
+// it as a JWT and reject it. Only the "apikey" header is correct for these
+// (see https://supabase.com/docs/guides/api/api-keys, "Known limitations").
+builder.Services.AddHttpClient("SupabaseStorage", client =>
+{
+    var supabaseUrl = builder.Configuration["Supabase:Url"]?.TrimEnd('/') ?? "";
+    client.BaseAddress = new Uri(supabaseUrl + "/storage/v1/");
+    client.DefaultRequestHeaders.Add("apikey", builder.Configuration["Supabase:SecretKey"]);
+});
+
 // ── PUSH NOTIFICATIONS (admin alerts for bookings, requests, pickup reminders) ──
 builder.Services.AddScoped<PushNotificationService>();
 

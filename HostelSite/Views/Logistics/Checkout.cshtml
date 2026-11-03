@@ -681,7 +681,7 @@
                 list.innerHTML = items.map(item => `
                     <div class="co-item">
                         <div class="co-item-left">
-                            <div class="co-item-icon"><i class="ti ti-package"></i></div>
+                            <div class="co-item-icon">${item.photoUrl ? `<img src="${item.photoUrl}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:9px;">` : '<i class="ti ti-package"></i>'}</div>
                             <div>
                                 <div class="co-item-name">${item.name}</div>
                                 <div class="co-item-meta">Qty: ${item.quantity} &times; GH&#8373; ${parseFloat(item.price).toFixed(2)}</div>

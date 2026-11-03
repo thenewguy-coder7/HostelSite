@@ -575,6 +575,65 @@
         text-align: center;
     }
 
+    /* Per-item "add a photo" control — only shown once that item is in the
+       order (card.in-order), so the catalog doesn't look cluttered for
+       items the student hasn't picked yet. */
+    .item-photo {
+        display: none;
+        align-items: center;
+        gap: 8px;
+        margin-top: 2px;
+        flex-wrap: wrap;
+    }
+
+    .item-card.in-order .item-photo {
+        display: flex;
+    }
+
+    .item-photo-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-family: var(--font-b);
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--forest-mid);
+        background: var(--sage-light);
+        border: 1px solid transparent;
+        border-radius: 7px;
+        padding: 5px 9px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background 0.12s;
+        margin: 0;
+    }
+
+        .item-photo-btn:hover {
+            background: rgba(74,149,114,0.22);
+        }
+
+        .item-photo-btn i {
+            font-size: 13px;
+        }
+
+    .item-photo-thumb {
+        width: 30px;
+        height: 30px;
+        border-radius: 6px;
+        object-fit: cover;
+        border: 1px solid var(--line);
+        flex-shrink: 0;
+    }
+
+    .item-photo-status {
+        font-size: 10px;
+        color: var(--muted);
+    }
+
+        .item-photo-status.error {
+            color: #C0392B;
+        }
+
     .order-panel {
         background: var(--white);
         border: 1px solid var(--line);
@@ -945,6 +1004,15 @@
                                     <button class="qty-btn" onclick="changeQty(@item.Id, 1)" aria-label="Add one">+</button>
                                 </div>
                             </div>
+                            <div class="item-photo" id="photo-@item.Id">
+                                <label class="item-photo-btn" for="photo-input-@item.Id">
+                                    <i class="ti ti-camera" aria-hidden="true"></i>
+                                    <span id="photo-btn-text-@item.Id">Add photo</span>
+                                </label>
+                                <input type="file" id="photo-input-@item.Id" accept="image/*" capture="environment" hidden onchange="uploadItemPhoto(@item.Id, this)" />
+                                <img class="item-photo-thumb" id="photo-thumb-@item.Id" alt="Your photo of @item.Name" hidden />
+                                <span class="item-photo-status" id="photo-status-@item.Id" hidden></span>
+                            </div>
                         </div>
                     }
                 }
@@ -997,6 +1065,7 @@
     </div>
 </div>
 
+@Html.AntiForgeryToken()
 @section Scripts {
     <script>
         const order = {};
@@ -1007,14 +1076,96 @@
             const price = parseFloat(card.dataset.price);
             const qtyEl = document.getElementById('qty-' + id);
 
-            order[id] = order[id] || { name, price, qty: 0 };
+            order[id] = order[id] || { name, price, qty: 0, photoUrl: null };
             order[id].qty = Math.max(0, order[id].qty + delta);
             qtyEl.textContent = order[id].qty;
 
-            if (order[id].qty === 0) delete order[id];
+            if (order[id].qty === 0) {
+                // Dropping an item back to zero clears any photo too — re-adding
+                // it starts fresh rather than silently reusing a stale upload.
+                resetItemPhotoUi(id);
+                delete order[id];
+            }
 
             card.classList.toggle('in-order', !!(order[id] && order[id].qty > 0));
             renderOrder();
+        }
+
+        // Uploads the chosen/captured photo for one item line to Supabase
+        // Storage (via the server, so the service-role key never reaches the
+        // browser) and stashes the returned URL on that item's order entry.
+        // Entirely optional — a failed or skipped upload never blocks adding
+        // the item or checking out.
+        function uploadItemPhoto(id, inputEl) {
+            const file = inputEl.files && inputEl.files[0];
+            if (!file) return;
+
+            const statusEl = document.getElementById('photo-status-' + id);
+            const thumbEl  = document.getElementById('photo-thumb-' + id);
+            const btnText  = document.getElementById('photo-btn-text-' + id);
+            const token    = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
+
+            if (statusEl) {
+                statusEl.textContent = 'Uploading…';
+                statusEl.classList.remove('error');
+                statusEl.hidden = false;
+            }
+
+            const formData = new FormData();
+            formData.append('photo', file);
+            formData.append('__RequestVerificationToken', token);
+
+            fetch('@Url.Action("UploadItemPhoto", "Logistics")', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json().then(data => ({ ok: r.ok, data })))
+            .then(({ ok, data }) => {
+                if (!ok) {
+                    if (statusEl) {
+                        statusEl.textContent = data.error || 'Could not upload photo.';
+                        statusEl.classList.add('error');
+                        statusEl.hidden = false;
+                    }
+                    return;
+                }
+                if (order[id]) order[id].photoUrl = data.url;
+                if (thumbEl) { thumbEl.src = data.url; thumbEl.hidden = false; }
+                if (btnText) btnText.textContent = 'Change photo';
+                if (statusEl) { statusEl.textContent = ''; statusEl.hidden = true; }
+                renderOrder();
+            })
+            .catch(() => {
+                if (statusEl) {
+                    statusEl.textContent = 'Upload failed — check your connection and try again.';
+                    statusEl.classList.add('error');
+                    statusEl.hidden = false;
+                }
+            });
+        }
+
+        // Clears the thumbnail/status UI for one item's photo control —
+        // used when its quantity drops to zero.
+        function resetItemPhotoUi(id) {
+            const thumbEl  = document.getElementById('photo-thumb-' + id);
+            const statusEl = document.getElementById('photo-status-' + id);
+            const btnText  = document.getElementById('photo-btn-text-' + id);
+            const inputEl  = document.getElementById('photo-input-' + id);
+            if (thumbEl)  { thumbEl.hidden = true; thumbEl.removeAttribute('src'); }
+            if (statusEl) { statusEl.hidden = true; statusEl.textContent = ''; statusEl.classList.remove('error'); }
+            if (btnText)  btnText.textContent = 'Add photo';
+            if (inputEl)  inputEl.value = '';
+        }
+
+        // Reflects a restored order's photoUrl (if any) back onto that
+        // item's thumbnail/button — used by restoreSavedOrder() below.
+        function applyRestoredPhoto(id) {
+            const photoUrl = order[id] && order[id].photoUrl;
+            if (!photoUrl) return;
+            const thumbEl = document.getElementById('photo-thumb-' + id);
+            const btnText = document.getElementById('photo-btn-text-' + id);
+            if (thumbEl) { thumbEl.src = photoUrl; thumbEl.hidden = false; }
+            if (btnText) btnText.textContent = 'Change photo';
         }
 
         function goToCheckout() {
@@ -1041,7 +1192,8 @@
                 name:     order[id].name,
                 price:    order[id].price,
                 quantity: order[id].qty,
-                icon:     'ti-package'
+                icon:     'ti-package',
+                photoUrl: order[id].photoUrl || null
             }));
 
             const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
@@ -1340,7 +1492,7 @@
             // Full checkout-shape: { items: [...], pickup, previousHostel, newHostel, ... }
             if (data && Array.isArray(data.items)) {
                 data.items.forEach(it => {
-                    order[it.itemId] = { name: it.name, price: it.price, qty: it.quantity };
+                    order[it.itemId] = { name: it.name, price: it.price, qty: it.quantity, photoUrl: it.photoUrl || null };
                 });
 
                 // NOTE: `pickupInput` here used to reference a `const` that only
@@ -1377,6 +1529,7 @@
                 const qtyEl = document.getElementById('qty-' + id);
                 if (qtyEl) qtyEl.textContent = order[id].qty;
                 if (card)  card.classList.toggle('in-order', order[id].qty > 0);
+                applyRestoredPhoto(id);
             });
 
             renderOrder();

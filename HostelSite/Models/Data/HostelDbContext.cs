@@ -209,6 +209,9 @@ public partial class HostelDbContext : DbContext
             entity.Property(e => e.UnitPrice)
                 .HasColumnType("decimal(10,2)")
                 .HasColumnName("unit_price");
+            entity.Property(e => e.PhotoUrl)
+                .HasMaxLength(500)
+                .HasColumnName("photo_url");
 
             entity.HasOne(d => d.Item).WithMany(p => p.OrderItems)
                 .HasForeignKey(d => d.ItemId)

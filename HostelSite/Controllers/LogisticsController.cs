@@ -10,11 +10,13 @@ namespace HostelSite.Controllers
     {
         private readonly HostelDbContext _db;
         private readonly IConfiguration _config;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public LogisticsController(HostelDbContext db, IConfiguration config)
+        public LogisticsController(HostelDbContext db, IConfiguration config, IHttpClientFactory httpClientFactory)
         {
             _db = db;
             _config = config;
+            _httpClientFactory = httpClientFactory;
         }
 
         // GET /Logistics
@@ -100,6 +102,75 @@ namespace HostelSite.Controllers
 
             ViewBag.Orders = orders;
             return View();
+        }
+
+        // POST /Logistics/UploadItemPhoto
+        // A student attaches this at booking time — before checkout, before
+        // an order even exists — so it can't be tied to an OrderItem row yet.
+        // It just uploads to Supabase Storage and hands back a public URL,
+        // which the browser carries through sessionStorage/checkout and the
+        // server later saves onto the right OrderItem once the order and
+        // payment are confirmed. Entirely optional: a failed/skipped upload
+        // never blocks adding the item to the cart or checking out.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UploadItemPhoto(IFormFile? photo)
+        {
+            if (User.Identity?.IsAuthenticated != true)
+                return Unauthorized();
+
+            if (photo == null || photo.Length == 0)
+                return BadRequest(new { error = "No photo received." });
+
+            const long maxBytes = 8 * 1024 * 1024; // 8 MB
+            if (photo.Length > maxBytes)
+                return BadRequest(new { error = "That photo is too large — please keep it under 8MB." });
+
+            if (string.IsNullOrEmpty(photo.ContentType) || !photo.ContentType.StartsWith("image/"))
+                return BadRequest(new { error = "Only image files are allowed." });
+
+            var ext = Path.GetExtension(photo.FileName);
+            if (string.IsNullOrEmpty(ext) || ext.Length > 6)
+            {
+                ext = photo.ContentType switch
+                {
+                    "image/png" => ".png",
+                    "image/webp" => ".webp",
+                    "image/heic" => ".heic",
+                    "image/heif" => ".heif",
+                    _ => ".jpg"
+                };
+            }
+
+            var studentId = GetStudentId();
+            var objectPath = $"{studentId}/{Guid.NewGuid():N}{ext}";
+            var bucket = _config["Supabase:ItemPhotosBucket"] ?? "item-photos";
+            var supabaseUrl = _config["Supabase:Url"]?.TrimEnd('/');
+
+            if (string.IsNullOrEmpty(supabaseUrl) || supabaseUrl.Contains("REPLACE_WITH"))
+                return StatusCode(500, new { error = "Photo storage isn't configured yet — contact the admin." });
+
+            try
+            {
+                var client = _httpClientFactory.CreateClient("SupabaseStorage");
+                using var content = new StreamContent(photo.OpenReadStream());
+                content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(photo.ContentType);
+
+                var response = await client.PostAsync($"object/{bucket}/{objectPath}", content);
+                if (!response.IsSuccessStatusCode)
+                {
+                    var err = await response.Content.ReadAsStringAsync();
+                    return StatusCode(502, new { error = "Could not save the photo. Please try again." +
+                        (System.Diagnostics.Debugger.IsAttached ? " (" + err + ")" : "") });
+                }
+
+                var publicUrl = $"{supabaseUrl}/storage/v1/object/public/{bucket}/{objectPath}";
+                return Json(new { url = publicUrl });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { error = "Upload failed. Please check your connection and try again." });
+            }
         }
 
         // ── Helper ──

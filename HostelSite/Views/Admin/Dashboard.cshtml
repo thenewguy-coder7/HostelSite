@@ -748,6 +748,23 @@
                 background: var(--sand);
                 border-radius: 7px;
                 padding: 8px 12px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .pm-item-thumb {
+                width: 36px;
+                height: 36px;
+                border-radius: 6px;
+                object-fit: cover;
+                border: 1px solid var(--line);
+                flex-shrink: 0;
+                cursor: zoom-in;
+            }
+
+            .pm-item-name {
+                flex: 1;
             }
 
         .pm-status-buttons {
@@ -1100,7 +1117,8 @@
                     items = ((IEnumerable<dynamic>)o.OrderItems).Select(oi => new
                     {
                         name = (string)oi.Item.ItemName,
-                        qty = (int)oi.Quantity
+                        qty = (int)oi.Quantity,
+                        photoUrl = (string?)oi.PhotoUrl
                     }).ToList()
                 }).ToList();
             }
@@ -1602,7 +1620,7 @@
                 if (!o) return;
 
                 const itemsHtml = o.items.length
-                    ? o.items.map(it => `<li>${it.name}${it.qty > 1 ? ' × ' + it.qty : ''}</li>`).join('')
+                    ? o.items.map(it => `<li>${it.photoUrl ? `<img class="pm-item-thumb" src="${it.photoUrl}" alt="Photo of ${it.name}" onclick="window.open('${it.photoUrl}', '_blank')">` : ''}<span class="pm-item-name">${it.name}${it.qty > 1 ? ' × ' + it.qty : ''}</span></li>`).join('')
                     : '<li>No items on record</li>';
 
                 document.getElementById('pickupModalBody').innerHTML = `
